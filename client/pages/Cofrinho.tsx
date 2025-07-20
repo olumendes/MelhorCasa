@@ -44,7 +44,8 @@ export default function Cofrinho() {
   useEffect(() => {
     const savedLiked = localStorage.getItem('likedProperties');
     const savedSavings = localStorage.getItem('totalSavings');
-    const savedGoals = localStorage.getItem('savingsGoals');
+        const savedGoals = localStorage.getItem('savingsGoals');
+    const savedTags = localStorage.getItem('availableTags');
     
     if (savedLiked) {
       try {
@@ -58,14 +59,34 @@ export default function Cofrinho() {
       setTotalSavings(parseFloat(savedSavings));
     }
     
-    if (savedGoals) {
+        if (savedGoals) {
       try {
         setSavingsGoals(JSON.parse(savedGoals));
       } catch (error) {
         console.error('Error loading savings goals:', error);
       }
     }
+
+    if (savedTags) {
+      try {
+        setAvailableTags(JSON.parse(savedTags));
+      } catch (error) {
+        console.error('Error loading available tags:', error);
+      }
+    }
   }, []);
+
+  // Filter properties based on selected tags
+  useEffect(() => {
+    if (tagFilter.length === 0) {
+      setFilteredProperties(likedProperties);
+    } else {
+      const filtered = likedProperties.filter(property =>
+        property.tags && tagFilter.some(tag => property.tags!.includes(tag))
+      );
+      setFilteredProperties(filtered);
+    }
+  }, [likedProperties, tagFilter]);
 
   const parseNumericValue = (valueStr: string): number => {
     return parseInt(valueStr.replace(/[^\d]/g, '')) || 0;
