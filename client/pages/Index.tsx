@@ -692,7 +692,7 @@ export default function Index() {
               </div>
             </div>
             
-                                                <div className="flex flex-wrap items-center gap-2 sm:gap-3 w-full sm:w-auto">
+                                                            <div className="flex flex-wrap items-center gap-2 sm:gap-3 w-full sm:w-auto">
               <Button
                 onClick={startMatchMode}
                 variant="default"
@@ -704,6 +704,23 @@ export default function Index() {
                 <span className="hidden sm:inline">Modo Match</span>
                 <span className="sm:hidden">⚡</span>
               </Button>
+
+              <Link to="/casas-com-tags">
+                <Button
+                  variant="outline"
+                  size="sm"
+                  className="gap-2 flex-1 sm:flex-none"
+                >
+                  <Tag className="h-4 w-4" />
+                  <span className="hidden sm:inline">Casas com Tags</span>
+                  <span className="sm:hidden">🏷️</span>
+                  {(likedProperties.length + dislikedProperties.length) > 0 && (
+                    <Badge variant="secondary" className="ml-1 text-xs">
+                      {likedProperties.length + dislikedProperties.length}
+                    </Badge>
+                  )}
+                </Button>
+              </Link>
 
               <Link to="/cofrinho">
                 <Button
@@ -730,7 +747,7 @@ export default function Index() {
                 >
                   <ThumbsDown className="h-4 w-4" />
                   <span className="hidden sm:inline">Rejeitadas</span>
-                  <span className="sm:hidden">👎</span>
+                  <span className="sm:hidden">���</span>
                   {dislikedProperties.length > 0 && (
                     <Badge variant="destructive" className="ml-1 text-xs">
                       {dislikedProperties.length}
