@@ -130,9 +130,14 @@ export default function Index() {
     return parseInt(valueStr.replace(/[^\d]/g, '')) || 0;
   };
 
-      // Function to check if property link already exists
+        // Function to check if property link already exists
   const isDuplicateProperty = (newProperty: Property, existingProperties: Property[]): boolean => {
     return existingProperties.some(existing => existing.link === newProperty.link);
+  };
+
+  // Function to check if property already exists in liked or disliked
+  const isPropertyAlreadyProcessed = (newProperty: Property): boolean => {
+    return isDuplicateProperty(newProperty, likedProperties) || isDuplicateProperty(newProperty, dislikedProperties);
   };
 
   // Function to remove duplicates from property array based on link
@@ -210,9 +215,16 @@ export default function Index() {
         return false;
       }
 
-      // Distance filter
+            // Distance filter
       if (userLocation && enhanced.distancia && enhanced.distancia > filters.distanciaMax) {
         return false;
+      }
+
+      // Tags filter
+      if (filters.tags.length > 0) {
+        if (!property.tags || !filters.tags.some(tag => property.tags!.includes(tag))) {
+          return false;
+        }
       }
 
       return true;
