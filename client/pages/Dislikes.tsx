@@ -2,7 +2,7 @@ import { useState, useEffect } from "react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
-import { ArrowLeft, Home, MapPin, Car, Maximize2, Trash2, RotateCcw } from "lucide-react";
+import { ArrowLeft, Home, MapPin, Car, Maximize2, Trash2, RotateCcw, Tag, Filter, Plus, X, Search } from "lucide-react";
 import { Link } from "react-router-dom";
 
 interface Property {
@@ -22,10 +22,14 @@ interface Property {
   quartosNumerico?: number;
   garagemNumerico?: number;
   distancia?: number;
+  tags?: string[];
 }
 
 export default function Dislikes() {
   const [dislikedProperties, setDislikedProperties] = useState<Property[]>([]);
+  const [tagFilter, setTagFilter] = useState<string[]>([]);
+  const [availableTags, setAvailableTags] = useState<string[]>([]);
+  const [filteredProperties, setFilteredProperties] = useState<Property[]>([]);
 
   // Function to remove duplicates from property array based on link
   const removeDuplicateProperties = (properties: Property[]): Property[] => {
