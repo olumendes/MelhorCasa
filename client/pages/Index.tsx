@@ -7,7 +7,7 @@ import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from 
 import { Label } from "@/components/ui/label";
 import { Slider } from "@/components/ui/slider";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
-import { Play, Square, Upload, Download, Home, MapPin, Car, Maximize2, Settings, Filter, Heart, ThumbsDown, ArrowUpDown, Target, Tag, Plus, X, Search, ArrowLeft, ArrowRight, Zap } from "lucide-react";
+import { Play, Square, Upload, Download, Home, MapPin, Car, Maximize2, Settings, Filter, Heart, ThumbsDown, ArrowUpDown, Target, Tag, Plus, X, Search, ArrowLeft, ArrowRight, Zap, PiggyBank } from "lucide-react";
 import { Link } from "react-router-dom";
 import { toast } from "sonner";
 import * as XLSX from 'xlsx';
@@ -1082,14 +1082,15 @@ export default function Index() {
               <div className="space-y-3 flex items-end">
                 <Button
                   variant="outline"
-                  onClick={() => setFilters({
+                                    onClick={() => setFilters({
                     valorMin: "",
                     valorMax: "",
                     m2Min: 0,
                     m2Max: 1000,
                     quartos: "all",
                     vagas: "all",
-                    distanciaMax: 50
+                    distanciaMax: 50,
+                    tags: []
                   })}
                   className="w-full"
                 >
@@ -1280,14 +1281,15 @@ export default function Index() {
               </p>
                             <Button
                 variant="outline"
-                onClick={() => setFilters({
+                                onClick={() => setFilters({
                   valorMin: "",
                   valorMax: "",
                   m2Min: 0,
                   m2Max: 1000,
                   quartos: "all",
                   vagas: "all",
-                  distanciaMax: 50
+                  distanciaMax: 50,
+                  tags: []
                 })}
               >
                 Limpar Filtros
