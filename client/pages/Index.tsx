@@ -1416,12 +1416,12 @@ export default function Index() {
       <Dialog open={isMatchModeOpen} onOpenChange={setIsMatchModeOpen}>
         <DialogContent className="sm:max-w-2xl max-h-[90vh] overflow-hidden">
           <DialogHeader>
-            <DialogTitle className="flex items-center gap-2">
+                        <DialogTitle className="flex items-center gap-2">
               <Zap className="h-5 w-5 text-purple-600" />
               Modo Match - Tinder de Casas
             </DialogTitle>
             <div className="text-sm text-gray-600">
-              Use as setas do teclado: ← para rejeitar, → para curtir, Esc para sair
+              Use as setas: ← rejeitar, → curtir, T para adicionar tag, Esc para sair
             </div>
           </DialogHeader>
 
