@@ -5,7 +5,7 @@ import { Badge } from "@/components/ui/badge";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
-import { ArrowLeft, PiggyBank, Target, Calendar, TrendingUp, Plus, Home, MapPin, Car, Maximize2, Tag, Search, X, Filter } from "lucide-react";
+import { ArrowLeft, PiggyBank, Target, Calendar, TrendingUp, Plus, Home, MapPin, Car, Maximize2, Tag, Search, X, Filter, Trash2 } from "lucide-react";
 import { Link } from "react-router-dom";
 import { toast } from "sonner";
 
@@ -139,9 +139,16 @@ export default function Cofrinho() {
     return remaining / monthsRemaining;
   };
 
-  const getProgressPercentage = (valor: string): number => {
+    const getProgressPercentage = (valor: string): number => {
     const downPayment = calculateDownPayment(valor);
     return Math.min(100, (totalSavings / downPayment) * 100);
+  };
+
+  const removeFromLiked = (propertyId: string) => {
+    const updatedLiked = likedProperties.filter(p => p.id !== propertyId);
+    setLikedProperties(updatedLiked);
+    localStorage.setItem('likedProperties', JSON.stringify(updatedLiked));
+    toast.success("Casa removida das curtidas!");
   };
 
   return (
