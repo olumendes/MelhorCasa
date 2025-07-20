@@ -481,11 +481,12 @@ export default function Index() {
     });
   };
 
-    // Load user location and liked/disliked properties from localStorage on component mount
+      // Load user location and liked/disliked properties from localStorage on component mount
   useEffect(() => {
     const savedLocation = localStorage.getItem('userLocation');
     const savedLiked = localStorage.getItem('likedProperties');
     const savedDisliked = localStorage.getItem('dislikedProperties');
+    const savedTags = localStorage.getItem('availableTags');
 
     if (savedLocation) {
       try {
@@ -524,6 +525,14 @@ export default function Index() {
         }
       } catch (error) {
         console.error('Error loading disliked properties:', error);
+      }
+    }
+
+    if (savedTags) {
+      try {
+        setAvailableTags(JSON.parse(savedTags));
+      } catch (error) {
+        console.error('Error loading available tags:', error);
       }
     }
   }, []);
