@@ -68,9 +68,11 @@ export default function Index() {
   const [userLocation, setUserLocation] = useState<UserLocation | null>(null);
     const [isSettingsOpen, setIsSettingsOpen] = useState(false);
   const [isLikedModalOpen, setIsLikedModalOpen] = useState(false);
-    const [isMatchModeOpen, setIsMatchModeOpen] = useState(false);
+      const [isMatchModeOpen, setIsMatchModeOpen] = useState(false);
   const [currentMatchIndex, setCurrentMatchIndex] = useState(0);
   const [matchModeProperties, setMatchModeProperties] = useState<Property[]>([]);
+  const [matchModeTagInput, setMatchModeTagInput] = useState("");
+  const [isMatchModeTagModalOpen, setIsMatchModeTagModalOpen] = useState(false);
   const [isTagModalOpen, setIsTagModalOpen] = useState(false);
   const [selectedPropertyForTag, setSelectedPropertyForTag] = useState<Property | null>(null);
   const [newTagInput, setNewTagInput] = useState("");
@@ -747,7 +749,7 @@ export default function Index() {
                 >
                   <ThumbsDown className="h-4 w-4" />
                   <span className="hidden sm:inline">Rejeitadas</span>
-                  <span className="sm:hidden">���</span>
+                  <span className="sm:hidden">👎</span>
                   {dislikedProperties.length > 0 && (
                     <Badge variant="destructive" className="ml-1 text-xs">
                       {dislikedProperties.length}
