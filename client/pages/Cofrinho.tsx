@@ -268,9 +268,14 @@ export default function Cofrinho() {
           <Card className="bg-white/60 backdrop-blur-sm">
             <CardContent className="p-6">
               <div className="flex items-center justify-between">
-                <div>
+                                <div>
                   <p className="text-sm font-medium text-gray-600">Casas Curtidas</p>
-                  <p className="text-3xl font-bold text-blue-600">{likedProperties.length}</p>
+                  <p className="text-3xl font-bold text-blue-600">
+                    {filteredProperties.length}
+                    {tagFilter.length > 0 && filteredProperties.length !== likedProperties.length && (
+                      <span className="text-lg text-gray-500">/{likedProperties.length}</span>
+                    )}
+                  </p>
                 </div>
                 <Home className="h-8 w-8 text-blue-600" />
               </div>
