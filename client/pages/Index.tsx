@@ -287,7 +287,7 @@ export default function Index() {
     });
   };
 
-  const handleTouchEnd = (propertyId: string) => {
+    const handleTouchEnd = (propertyId: string) => {
     if (!touchStart || !touchEnd) return;
 
     const distanceX = touchStart.x - touchEnd.x;
@@ -307,6 +307,113 @@ export default function Index() {
     setTouchStart(null);
     setTouchEnd(null);
   };
+
+  // Tag management functions
+  const addTagToProperty = (propertyId: string, tag: string) => {
+    setProperties(prev => prev.map(property => {
+      if (property.id === propertyId) {
+        const currentTags = property.tags || [];
+        if (!currentTags.includes(tag)) {
+          return { ...property, tags: [...currentTags, tag] };
+        }
+      }
+      return property;
+    }));
+
+    // Also update liked properties if this property is liked
+    setLikedProperties(prev => prev.map(property => {
+      if (property.id === propertyId) {
+        const currentTags = property.tags || [];
+        if (!currentTags.includes(tag)) {
+          const updated = [...prev.filter(p => p.id !== propertyId), { ...property, tags: [...currentTags, tag] }];
+          localStorage.setItem('likedProperties', JSON.stringify(updated));
+          return { ...property, tags: [...currentTags, tag] };
+        }
+      }
+      return property;
+    }));
+
+    // Update available tags
+    if (!availableTags.includes(tag)) {
+      const newTags = [...availableTags, tag];
+      setAvailableTags(newTags);
+      localStorage.setItem('availableTags', JSON.stringify(newTags));
+    }
+  };
+
+  const addNewTag = () => {
+    if (newTagInput.trim() && selectedPropertyForTag) {
+      addTagToProperty(selectedPropertyForTag.id, newTagInput.trim());
+      setNewTagInput("");
+      setIsTagModalOpen(false);
+      setSelectedPropertyForTag(null);
+      toast.success(`Tag "${newTagInput.trim()}" adicionada!`);
+    }
+  };
+
+  const openTagModal = (property: Property) => {
+    setSelectedPropertyForTag(property);
+    setIsTagModalOpen(true);
+  };
+
+  // Match Mode functions
+  const startMatchMode = () => {
+    if (filteredProperties.length === 0) {
+      toast.error("Nenhuma propriedade disponível para o modo match");
+      return;
+    }
+    setMatchModeProperties([...filteredProperties]);
+    setCurrentMatchIndex(0);
+    setIsMatchModeOpen(true);
+  };
+
+  const handleMatchModeAction = (action: 'like' | 'dislike') => {
+    if (currentMatchIndex >= matchModeProperties.length) return;
+
+    const currentProperty = matchModeProperties[currentMatchIndex];
+
+    if (action === 'like') {
+      handleLike(currentProperty.id);
+    } else {
+      handleDislike(currentProperty.id);
+    }
+
+    // Remove the property from match mode list
+    const updatedMatchProperties = matchModeProperties.filter(p => p.id !== currentProperty.id);
+    setMatchModeProperties(updatedMatchProperties);
+
+    // If no more properties, close match mode
+    if (updatedMatchProperties.length === 0) {
+      setIsMatchModeOpen(false);
+      toast.info("Todas as propriedades foram avaliadas!");
+      return;
+    }
+
+    // Adjust index if necessary
+    if (currentMatchIndex >= updatedMatchProperties.length) {
+      setCurrentMatchIndex(0);
+    }
+  };
+
+  // Keyboard controls for match mode
+  useEffect(() => {
+    const handleKeyDown = (event: KeyboardEvent) => {
+      if (!isMatchModeOpen) return;
+
+      if (event.key === 'ArrowLeft') {
+        event.preventDefault();
+        handleMatchModeAction('dislike');
+      } else if (event.key === 'ArrowRight') {
+        event.preventDefault();
+        handleMatchModeAction('like');
+      } else if (event.key === 'Escape') {
+        setIsMatchModeOpen(false);
+      }
+    };
+
+    window.addEventListener('keydown', handleKeyDown);
+    return () => window.removeEventListener('keydown', handleKeyDown);
+  }, [isMatchModeOpen, currentMatchIndex, matchModeProperties]);
 
     const handleLike = (propertyId: string) => {
     const property = properties.find(p => p.id === propertyId);
