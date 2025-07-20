@@ -7,7 +7,7 @@ import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from 
 import { Label } from "@/components/ui/label";
 import { Slider } from "@/components/ui/slider";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
-import { Play, Square, Upload, Download, Home, MapPin, Car, Maximize2, Settings, Filter, Heart, ThumbsDown, ArrowUpDown } from "lucide-react";
+import { Play, Square, Upload, Download, Home, MapPin, Car, Maximize2, Settings, Filter, Heart, ThumbsDown, ArrowUpDown, Target, Tag, Plus, X, Search, ArrowLeft, ArrowRight, Zap } from "lucide-react";
 import { Link } from "react-router-dom";
 import { toast } from "sonner";
 import * as XLSX from 'xlsx';
@@ -46,6 +46,7 @@ interface Filters {
   quartos: string;
   vagas: string;
   distanciaMax: number;
+  tags: string[];
 }
 
 interface SortOption {
@@ -67,13 +68,15 @@ export default function Index() {
   const [userLocation, setUserLocation] = useState<UserLocation | null>(null);
     const [isSettingsOpen, setIsSettingsOpen] = useState(false);
   const [isLikedModalOpen, setIsLikedModalOpen] = useState(false);
-  const [isMatchModeOpen, setIsMatchModeOpen] = useState(false);
+    const [isMatchModeOpen, setIsMatchModeOpen] = useState(false);
   const [currentMatchIndex, setCurrentMatchIndex] = useState(0);
+  const [matchModeProperties, setMatchModeProperties] = useState<Property[]>([]);
   const [isTagModalOpen, setIsTagModalOpen] = useState(false);
   const [selectedPropertyForTag, setSelectedPropertyForTag] = useState<Property | null>(null);
   const [newTagInput, setNewTagInput] = useState("");
   const [availableTags, setAvailableTags] = useState<string[]>([]);
-  const [tagSearchInput, setTagSearchInput] = useState("");
+    const [tagSearchInput, setTagSearchInput] = useState("");
+  const [selectedTagsFilter, setSelectedTagsFilter] = useState<string[]>([]);
   const [locationInput, setLocationInput] = useState("");
   const [sortOption, setSortOption] = useState<SortOption>({ field: 'valor', direction: 'desc' });
   const [touchStart, setTouchStart] = useState<TouchPosition | null>(null);
@@ -86,7 +89,8 @@ export default function Index() {
     m2Max: 1000,
     quartos: "all",
     vagas: "all",
-    distanciaMax: 50
+      distanciaMax: 50,
+  tags: []
   });
     const fileInputRef = useRef<HTMLInputElement>(null);
 
