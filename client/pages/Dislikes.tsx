@@ -129,14 +129,63 @@ export default function Dislikes() {
         </div>
       </header>
 
-      <div className="container mx-auto px-4 sm:px-6 py-6 sm:py-8">
+            <div className="container mx-auto px-4 sm:px-6 py-6 sm:py-8">
+        {/* Tag Filter */}
+        {availableTags.length > 0 && (
+          <Card className="mb-8 bg-white/60 backdrop-blur-sm">
+            <CardHeader>
+              <CardTitle className="text-lg flex items-center gap-2">
+                <Filter className="h-5 w-5" />
+                Filtrar por Tags
+              </CardTitle>
+            </CardHeader>
+            <CardContent>
+              <div className="space-y-3">
+                <div className="flex flex-wrap gap-1 min-h-[2rem] p-2 border rounded-md bg-white">
+                  {tagFilter.length === 0 ? (
+                    <span className="text-sm text-gray-400">Selecione tags para filtrar suas casas rejeitadas</span>
+                  ) : (
+                    tagFilter.map(tag => (
+                      <Badge
+                        key={tag}
+                        variant="secondary"
+                        className="cursor-pointer hover:bg-red-100"
+                        onClick={() => setTagFilter(prev => prev.filter(t => t !== tag))}
+                      >
+                        {tag} <X className="h-3 w-3 ml-1" />
+                      </Badge>
+                    ))
+                  )}
+                </div>
+                <div className="flex flex-wrap gap-1">
+                  {availableTags.filter(tag => !tagFilter.includes(tag)).map(tag => (
+                    <Badge
+                      key={tag}
+                      variant="outline"
+                      className="cursor-pointer hover:bg-blue-50"
+                      onClick={() => setTagFilter(prev => [...prev, tag])}
+                    >
+                      <Plus className="h-3 w-3 mr-1" /> {tag}
+                    </Badge>
+                  ))}
+                </div>
+              </div>
+            </CardContent>
+          </Card>
+        )}
+
         {/* Statistics */}
         <Card className="mb-8 bg-white/60 backdrop-blur-sm">
           <CardContent className="p-6">
             <div className="flex items-center justify-between">
               <div>
                 <p className="text-sm font-medium text-gray-600">Total Rejeitadas</p>
-                <p className="text-3xl font-bold text-red-600">{dislikedProperties.length}</p>
+                <p className="text-3xl font-bold text-red-600">
+                  {filteredProperties.length}
+                  {tagFilter.length > 0 && filteredProperties.length !== dislikedProperties.length && (
+                    <span className="text-lg text-gray-500">/{dislikedProperties.length}</span>
+                  )}
+                </p>
               </div>
               <div className="w-12 h-12 bg-red-100 rounded-full flex items-center justify-center">
                 <span className="text-red-600 text-xl">👎</span>
