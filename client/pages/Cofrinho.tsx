@@ -290,9 +290,9 @@ export default function Cofrinho() {
           </Card>
         </div>
 
-        {/* Properties Grid */}
+                {/* Properties Grid */}
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-          {likedProperties.map((property) => {
+          {filteredProperties.map((property) => {
             const downPayment = calculateDownPayment(property.valor);
             const progress = getProgressPercentage(property.valor);
             const monthlyNeeded = calculateMonthlyNeeded(property.id, property.valor);
@@ -353,7 +353,7 @@ export default function Cofrinho() {
                     </div>
                   </div>
                   
-                  <div className="flex flex-wrap gap-2 mb-4">
+                                    <div className="flex flex-wrap gap-2 mb-4">
                     <Badge variant="secondary" className="gap-1">
                       <Maximize2 className="h-3 w-3" />
                       {property.m2}
@@ -367,6 +367,18 @@ export default function Cofrinho() {
                       {property.garagem} vagas
                     </Badge>
                   </div>
+
+                  {/* Tags */}
+                  {property.tags && property.tags.length > 0 && (
+                    <div className="flex flex-wrap gap-1 mb-4">
+                      {property.tags.map(tag => (
+                        <Badge key={tag} variant="default" className="text-xs bg-purple-100 text-purple-800">
+                          <Tag className="h-3 w-3 mr-1" />
+                          {tag}
+                        </Badge>
+                      ))}
+                    </div>
+                  )}
 
                   {/* Target Date and Monthly Calculation */}
                   <div className="space-y-3">
@@ -408,7 +420,7 @@ export default function Cofrinho() {
           })}
         </div>
 
-        {likedProperties.length === 0 && (
+                {filteredProperties.length === 0 && likedProperties.length === 0 && (
           <Card className="bg-white/60 backdrop-blur-sm">
             <CardContent className="p-12 text-center">
               <PiggyBank className="h-16 w-16 text-gray-400 mx-auto mb-4" />
@@ -424,6 +436,23 @@ export default function Cofrinho() {
                   Voltar para a busca
                 </Button>
               </Link>
+            </CardContent>
+          </Card>
+        )}
+
+        {filteredProperties.length === 0 && likedProperties.length > 0 && (
+          <Card className="bg-white/60 backdrop-blur-sm">
+            <CardContent className="p-12 text-center">
+              <Search className="h-16 w-16 text-gray-400 mx-auto mb-4" />
+              <h3 className="text-xl font-semibold text-gray-900 mb-2">
+                Nenhuma casa encontrada com essas tags
+              </h3>
+              <p className="text-gray-600 mb-6">
+                Tente ajustar os filtros. Você tem {likedProperties.length} casas curtidas.
+              </p>
+              <Button variant="outline" onClick={() => setTagFilter([])}>
+                Limpar Filtros
+              </Button>
             </CardContent>
           </Card>
         )}
