@@ -43,8 +43,10 @@ export default function Dislikes() {
     });
   };
 
-  useEffect(() => {
+    useEffect(() => {
     const savedDislikes = localStorage.getItem('dislikedProperties');
+    const savedTags = localStorage.getItem('availableTags');
+
     if (savedDislikes) {
       try {
         const dislikedData = JSON.parse(savedDislikes);
@@ -60,7 +62,27 @@ export default function Dislikes() {
         console.error('Error loading disliked properties:', error);
       }
     }
+
+    if (savedTags) {
+      try {
+        setAvailableTags(JSON.parse(savedTags));
+      } catch (error) {
+        console.error('Error loading available tags:', error);
+      }
+    }
   }, []);
+
+  // Filter properties based on selected tags
+  useEffect(() => {
+    if (tagFilter.length === 0) {
+      setFilteredProperties(dislikedProperties);
+    } else {
+      const filtered = dislikedProperties.filter(property =>
+        property.tags && tagFilter.some(tag => property.tags!.includes(tag))
+      );
+      setFilteredProperties(filtered);
+    }
+  }, [dislikedProperties, tagFilter]);
 
   const removeFromDislikes = (propertyId: string) => {
     const updatedDislikes = dislikedProperties.filter(p => p.id !== propertyId);
