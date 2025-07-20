@@ -570,7 +570,7 @@ export default function Index() {
     setTimeout(() => {
       const newProperty2 = {
         id: (Date.now() + 1).toString(),
-        nome: "Sobrado moderno com ��rea gourmet",
+        nome: "Sobrado moderno com área gourmet",
         imagem: "https://cdn.builder.io/api/v1/image/assets%2FTEMP%2Fb2e4f88a7cc0405a8c0c5e2f4e2f6e8f",
         valor: "R$ 1.150.000",
         m2: "220 m²",
@@ -692,7 +692,36 @@ export default function Index() {
               </div>
             </div>
             
-                                    <div className="flex items-center gap-2 sm:gap-3 w-full sm:w-auto">
+                                                <div className="flex flex-wrap items-center gap-2 sm:gap-3 w-full sm:w-auto">
+              <Button
+                onClick={startMatchMode}
+                variant="default"
+                size="sm"
+                className="gap-2 flex-1 sm:flex-none bg-gradient-to-r from-pink-500 to-purple-600 hover:from-pink-600 hover:to-purple-700"
+                disabled={filteredProperties.length === 0}
+              >
+                <Zap className="h-4 w-4" />
+                <span className="hidden sm:inline">Modo Match</span>
+                <span className="sm:hidden">⚡</span>
+              </Button>
+
+              <Link to="/cofrinho">
+                <Button
+                  variant="outline"
+                  size="sm"
+                  className="gap-2 flex-1 sm:flex-none"
+                >
+                  <PiggyBank className="h-4 w-4" />
+                  <span className="hidden sm:inline">Cofrinho</span>
+                  <span className="sm:hidden">🐷</span>
+                  {likedProperties.length > 0 && (
+                    <Badge variant="secondary" className="ml-1 text-xs">
+                      {likedProperties.length}
+                    </Badge>
+                  )}
+                </Button>
+              </Link>
+
               <Link to="/dislikes">
                 <Button
                   variant="outline"
