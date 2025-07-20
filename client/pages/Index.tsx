@@ -1493,32 +1493,43 @@ export default function Index() {
                           </div>
                         )}
 
-                        <div className="flex gap-4 mt-6">
+                                                <div className="space-y-3 mt-6">
                           <Button
-                            size="lg"
-                            variant="destructive"
-                            onClick={() => handleMatchModeAction('dislike')}
-                            className="flex-1 gap-2"
-                          >
-                            <ArrowLeft className="h-5 w-5" />
-                            Rejeitar
-                          </Button>
-                          <Button
-                            size="lg"
-                            onClick={() => window.open(property.link, '_blank')}
+                            onClick={() => setIsMatchModeTagModalOpen(true)}
                             variant="outline"
-                            className="gap-2"
+                            className="w-full gap-2"
                           >
-                            Ver Detalhes
+                            <Tag className="h-4 w-4" />
+                            Adicionar Tag (T)
                           </Button>
-                          <Button
-                            size="lg"
-                            onClick={() => handleMatchModeAction('like')}
-                            className="flex-1 gap-2 bg-pink-600 hover:bg-pink-700"
-                          >
-                            <ArrowRight className="h-5 w-5" />
-                            Curtir
-                          </Button>
+
+                          <div className="flex gap-4">
+                            <Button
+                              size="lg"
+                              variant="destructive"
+                              onClick={() => handleMatchModeAction('dislike')}
+                              className="flex-1 gap-2"
+                            >
+                              <ArrowLeft className="h-5 w-5" />
+                              Rejeitar
+                            </Button>
+                            <Button
+                              size="lg"
+                              onClick={() => window.open(property.link, '_blank')}
+                              variant="outline"
+                              className="gap-2"
+                            >
+                              Ver Detalhes
+                            </Button>
+                            <Button
+                              size="lg"
+                              onClick={() => handleMatchModeAction('like')}
+                              className="flex-1 gap-2 bg-pink-600 hover:bg-pink-700"
+                            >
+                              <ArrowRight className="h-5 w-5" />
+                              Curtir
+                            </Button>
+                          </div>
                         </div>
                       </CardContent>
                     </Card>
