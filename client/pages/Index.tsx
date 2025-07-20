@@ -555,12 +555,12 @@ export default function Index() {
         garagem: "2"
       };
 
-      setProperties(prev => {
-        if (!isDuplicateProperty(newProperty1, prev)) {
+            setProperties(prev => {
+        if (!isDuplicateProperty(newProperty1, prev) && !isPropertyAlreadyProcessed(newProperty1)) {
           toast.info("Encontrada nova propriedade!");
           return [...prev, newProperty1];
         } else {
-          toast.info("Propriedade já existe, pulando duplicata");
+          toast.info("Propriedade já existe ou foi processada, pulando duplicata");
           return prev;
         }
       });
@@ -570,7 +570,7 @@ export default function Index() {
     setTimeout(() => {
       const newProperty2 = {
         id: (Date.now() + 1).toString(),
-        nome: "Sobrado moderno com área gourmet",
+        nome: "Sobrado moderno com ��rea gourmet",
         imagem: "https://cdn.builder.io/api/v1/image/assets%2FTEMP%2Fb2e4f88a7cc0405a8c0c5e2f4e2f6e8f",
         valor: "R$ 1.150.000",
         m2: "220 m²",
@@ -580,12 +580,12 @@ export default function Index() {
         garagem: "3"
       };
 
-      setProperties(prev => {
-        if (!isDuplicateProperty(newProperty2, prev)) {
+            setProperties(prev => {
+        if (!isDuplicateProperty(newProperty2, prev) && !isPropertyAlreadyProcessed(newProperty2)) {
           toast.info("Encontrada nova propriedade!");
           return [...prev, newProperty2];
         } else {
-          toast.info("Propriedade já existe, pulando duplicata");
+          toast.info("Propriedade já existe ou foi processada, pulando duplicata");
           return prev;
         }
       });
@@ -622,16 +622,16 @@ export default function Index() {
             garagem: row.Garagem || row.garagem || "0"
           }));
           
-                    // Filter out duplicates based on link
+                              // Filter out duplicates and already processed properties
           setProperties(prev => {
             const newProperties = importedProperties.filter(newProp =>
-              !isDuplicateProperty(newProp, prev)
+              !isDuplicateProperty(newProp, prev) && !isPropertyAlreadyProcessed(newProp)
             );
 
             const duplicatesCount = importedProperties.length - newProperties.length;
 
             if (duplicatesCount > 0) {
-              toast.info(`${newProperties.length} novos imóveis importados, ${duplicatesCount} duplicatas ignoradas`);
+              toast.info(`${newProperties.length} novos imóveis importados, ${duplicatesCount} duplicatas/já processadas ignoradas`);
             } else {
               toast.success(`${newProperties.length} imóveis importados do arquivo ${file.name}!`);
             }
