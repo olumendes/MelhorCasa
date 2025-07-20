@@ -1613,6 +1613,92 @@ export default function Index() {
               </Button>
             </div>
           </div>
+                </DialogContent>
+      </Dialog>
+
+      {/* Match Mode Tag Modal */}
+      <Dialog open={isMatchModeTagModalOpen} onOpenChange={setIsMatchModeTagModalOpen}>
+        <DialogContent className="sm:max-w-md">
+          <DialogHeader>
+            <DialogTitle>Adicionar Tag no Modo Match</DialogTitle>
+            {currentMatchIndex < matchModeProperties.length && (
+              <p className="text-sm text-gray-600">
+                Adicionando tag para: {matchModeProperties[currentMatchIndex]?.nome}
+              </p>
+            )}
+          </DialogHeader>
+          <div className="space-y-4">
+            <div className="space-y-2">
+              <Label htmlFor="matchTag">Nome da Tag</Label>
+              <Input
+                id="matchTag"
+                placeholder="Ex: Favorita, Próxima ao trabalho, Boa localização"
+                value={matchModeTagInput}
+                onChange={(e) => setMatchModeTagInput(e.target.value)}
+                onKeyDown={(e) => {
+                  if (e.key === 'Enter') {
+                    addNewTagInMatchMode();
+                  } else if (e.key === 'Escape') {
+                    setIsMatchModeTagModalOpen(false);
+                    setMatchModeTagInput("");
+                  }
+                }}
+                autoFocus
+              />
+            </div>
+
+            {availableTags.length > 0 && (
+              <div className="space-y-2">
+                <Label>Tags Existentes</Label>
+                <div className="flex flex-wrap gap-1 max-h-32 overflow-y-auto">
+                  {availableTags.map(tag => {
+                    const currentProperty = matchModeProperties[currentMatchIndex];
+                    const hasTag = currentProperty?.tags?.includes(tag);
+                    return (
+                      <Badge
+                        key={tag}
+                        variant={hasTag ? "default" : "outline"}
+                        className={`cursor-pointer ${
+                          hasTag
+                            ? "bg-purple-100 text-purple-800"
+                            : "hover:bg-blue-50"
+                        }`}
+                        onClick={() => {
+                          if (!hasTag) {
+                            addTagInMatchMode(tag);
+                            setIsMatchModeTagModalOpen(false);
+                            toast.success(`Tag "${tag}" adicionada!`);
+                          }
+                        }}
+                      >
+                        {hasTag && <Tag className="h-3 w-3 mr-1" />}
+                        {tag}
+                      </Badge>
+                    );
+                  })}
+                </div>
+              </div>
+            )}
+
+            <div className="flex gap-3">
+              <Button
+                onClick={addNewTagInMatchMode}
+                className="flex-1"
+                disabled={!matchModeTagInput.trim()}
+              >
+                Adicionar Nova Tag
+              </Button>
+              <Button
+                variant="outline"
+                onClick={() => {
+                  setIsMatchModeTagModalOpen(false);
+                  setMatchModeTagInput("");
+                }}
+              >
+                Cancelar
+              </Button>
+            </div>
+          </div>
         </DialogContent>
       </Dialog>
     </div>
