@@ -5,7 +5,7 @@ import { Badge } from "@/components/ui/badge";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
-import { ArrowLeft, PiggyBank, Target, Calendar, TrendingUp, Plus, Home, MapPin, Car, Maximize2 } from "lucide-react";
+import { ArrowLeft, PiggyBank, Target, Calendar, TrendingUp, Plus, Home, MapPin, Car, Maximize2, Tag, Search, X, Filter } from "lucide-react";
 import { Link } from "react-router-dom";
 import { toast } from "sonner";
 
@@ -35,8 +35,11 @@ export default function Cofrinho() {
   const [likedProperties, setLikedProperties] = useState<Property[]>([]);
   const [totalSavings, setTotalSavings] = useState(0);
   const [savingsGoals, setSavingsGoals] = useState<SavingsGoal[]>([]);
-  const [addMoneyAmount, setAddMoneyAmount] = useState("");
+    const [addMoneyAmount, setAddMoneyAmount] = useState("");
   const [isAddMoneyOpen, setIsAddMoneyOpen] = useState(false);
+  const [tagFilter, setTagFilter] = useState<string[]>([]);
+  const [availableTags, setAvailableTags] = useState<string[]>([]);
+  const [filteredProperties, setFilteredProperties] = useState<Property[]>([]);
 
   useEffect(() => {
     const savedLiked = localStorage.getItem('likedProperties');
