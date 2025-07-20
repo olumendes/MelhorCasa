@@ -1357,7 +1357,7 @@ export default function Index() {
         )}
       </div>
 
-      {/* Hidden file input */}
+            {/* Hidden file input */}
       <input
         ref={fileInputRef}
         type="file"
@@ -1365,6 +1365,199 @@ export default function Index() {
         onChange={handleFileUpload}
         className="hidden"
       />
+
+      {/* Match Mode Modal */}
+      <Dialog open={isMatchModeOpen} onOpenChange={setIsMatchModeOpen}>
+        <DialogContent className="sm:max-w-2xl max-h-[90vh] overflow-hidden">
+          <DialogHeader>
+            <DialogTitle className="flex items-center gap-2">
+              <Zap className="h-5 w-5 text-purple-600" />
+              Modo Match - Tinder de Casas
+            </DialogTitle>
+            <div className="text-sm text-gray-600">
+              Use as setas do teclado: ← para rejeitar, → para curtir, Esc para sair
+            </div>
+          </DialogHeader>
+
+          {matchModeProperties.length > 0 && currentMatchIndex < matchModeProperties.length && (
+            <div className="overflow-y-auto max-h-[70vh]">
+              <div className="relative">
+                {(() => {
+                  const property = matchModeProperties[currentMatchIndex];
+                  return (
+                    <Card className="overflow-hidden">
+                      <div className="relative">
+                        <img
+                          src={property.imagem}
+                          alt={property.nome}
+                          className="w-full h-64 object-cover"
+                          onError={(e) => {
+                            (e.target as HTMLImageElement).src = "https://images.unsplash.com/photo-1570129477492-45c003edd2be?w=600&h=400&fit=crop";
+                          }}
+                        />
+                        <Badge className="absolute top-3 right-3 bg-blue-600">
+                          {currentMatchIndex + 1} de {matchModeProperties.length}
+                        </Badge>
+                      </div>
+
+                      <CardContent className="p-6">
+                        <h3 className="font-bold text-xl text-gray-900 mb-2">
+                          {property.nome}
+                        </h3>
+
+                        <div className="flex items-center gap-2 mb-3">
+                          <MapPin className="h-4 w-4 text-gray-500" />
+                          <p className="text-sm text-gray-600">{property.localizacao}</p>
+                        </div>
+
+                        <div className="text-3xl font-bold text-green-600 mb-4">
+                          {property.valor}
+                        </div>
+
+                        <div className="flex flex-wrap gap-2 mb-4">
+                          <Badge variant="secondary" className="gap-1">
+                            <Maximize2 className="h-3 w-3" />
+                            {property.m2}
+                          </Badge>
+                          <Badge variant="secondary" className="gap-1">
+                            <Home className="h-3 w-3" />
+                            {property.quartos}
+                          </Badge>
+                          <Badge variant="secondary" className="gap-1">
+                            <Car className="h-3 w-3" />
+                            {property.garagem} vagas
+                          </Badge>
+                          {property.distancia && userLocation && (
+                            <Badge variant="outline" className="gap-1 border-blue-200 text-blue-700">
+                              <MapPin className="h-3 w-3" />
+                              {property.distancia.toFixed(1)} km
+                            </Badge>
+                          )}
+                        </div>
+
+                        {/* Tags */}
+                        {property.tags && property.tags.length > 0 && (
+                          <div className="flex flex-wrap gap-1 mb-4">
+                            {property.tags.map(tag => (
+                              <Badge key={tag} variant="default" className="text-xs bg-purple-100 text-purple-800">
+                                <Tag className="h-3 w-3 mr-1" />
+                                {tag}
+                              </Badge>
+                            ))}
+                          </div>
+                        )}
+
+                        <div className="flex gap-4 mt-6">
+                          <Button
+                            size="lg"
+                            variant="destructive"
+                            onClick={() => handleMatchModeAction('dislike')}
+                            className="flex-1 gap-2"
+                          >
+                            <ArrowLeft className="h-5 w-5" />
+                            Rejeitar
+                          </Button>
+                          <Button
+                            size="lg"
+                            onClick={() => window.open(property.link, '_blank')}
+                            variant="outline"
+                            className="gap-2"
+                          >
+                            Ver Detalhes
+                          </Button>
+                          <Button
+                            size="lg"
+                            onClick={() => handleMatchModeAction('like')}
+                            className="flex-1 gap-2 bg-pink-600 hover:bg-pink-700"
+                          >
+                            <ArrowRight className="h-5 w-5" />
+                            Curtir
+                          </Button>
+                        </div>
+                      </CardContent>
+                    </Card>
+                  );
+                })()}
+              </div>
+            </div>
+          )}
+
+          {matchModeProperties.length === 0 && (
+            <div className="text-center py-8">
+              <Zap className="h-16 w-16 text-gray-400 mx-auto mb-4" />
+              <p className="text-gray-600">Todas as propriedades foram avaliadas!</p>
+            </div>
+          )}
+        </DialogContent>
+      </Dialog>
+
+      {/* Tag Modal */}
+      <Dialog open={isTagModalOpen} onOpenChange={setIsTagModalOpen}>
+        <DialogContent className="sm:max-w-md">
+          <DialogHeader>
+            <DialogTitle>Adicionar Tag</DialogTitle>
+            {selectedPropertyForTag && (
+              <p className="text-sm text-gray-600">
+                Adicionando tag para: {selectedPropertyForTag.nome}
+              </p>
+            )}
+          </DialogHeader>
+          <div className="space-y-4">
+            <div className="space-y-2">
+              <Label htmlFor="tag">Nome da Tag</Label>
+              <Input
+                id="tag"
+                placeholder="Ex: Favorita, Próxima ao trabalho, Boa localização"
+                value={newTagInput}
+                onChange={(e) => setNewTagInput(e.target.value)}
+                onKeyDown={(e) => {
+                  if (e.key === 'Enter') {
+                    addNewTag();
+                  }
+                }}
+              />
+            </div>
+
+            {availableTags.length > 0 && (
+              <div className="space-y-2">
+                <Label>Tags Existentes</Label>
+                <div className="flex flex-wrap gap-1">
+                  {availableTags.map(tag => (
+                    <Badge
+                      key={tag}
+                      variant="outline"
+                      className="cursor-pointer hover:bg-blue-50"
+                      onClick={() => {
+                        if (selectedPropertyForTag) {
+                          addTagToProperty(selectedPropertyForTag.id, tag);
+                          setIsTagModalOpen(false);
+                          setSelectedPropertyForTag(null);
+                          toast.success(`Tag "${tag}" adicionada!`);
+                        }
+                      }}
+                    >
+                      {tag}
+                    </Badge>
+                  ))}
+                </div>
+              </div>
+            )}
+
+            <div className="flex gap-3">
+              <Button onClick={addNewTag} className="flex-1" disabled={!newTagInput.trim()}>
+                Adicionar Nova Tag
+              </Button>
+              <Button variant="outline" onClick={() => {
+                setIsTagModalOpen(false);
+                setSelectedPropertyForTag(null);
+                setNewTagInput("");
+              }}>
+                Cancelar
+              </Button>
+            </div>
+          </div>
+        </DialogContent>
+      </Dialog>
     </div>
   );
 }
