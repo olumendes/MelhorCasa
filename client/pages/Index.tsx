@@ -1078,6 +1078,43 @@ export default function Index() {
                 </Select>
               </div>
 
+                                          {/* Tags Filter */}
+              <div className="space-y-3 md:col-span-2">
+                <Label className="text-sm font-medium">Filtrar por Tags</Label>
+                <div className="space-y-2">
+                  <div className="flex flex-wrap gap-1 min-h-[2rem] p-2 border rounded-md bg-white">
+                    {filters.tags.length === 0 ? (
+                      <span className="text-sm text-gray-400">Selecione tags para filtrar</span>
+                    ) : (
+                      filters.tags.map(tag => (
+                        <Badge
+                          key={tag}
+                          variant="secondary"
+                          className="cursor-pointer hover:bg-red-100"
+                          onClick={() => setFilters(prev => ({ ...prev, tags: prev.tags.filter(t => t !== tag) }))}
+                        >
+                          {tag} <X className="h-3 w-3 ml-1" />
+                        </Badge>
+                      ))
+                    )}
+                  </div>
+                  {availableTags.length > 0 && (
+                    <div className="flex flex-wrap gap-1">
+                      {availableTags.filter(tag => !filters.tags.includes(tag)).map(tag => (
+                        <Badge
+                          key={tag}
+                          variant="outline"
+                          className="cursor-pointer hover:bg-blue-50"
+                          onClick={() => setFilters(prev => ({ ...prev, tags: [...prev.tags, tag] }))}
+                        >
+                          <Plus className="h-3 w-3 mr-1" /> {tag}
+                        </Badge>
+                      ))}
+                    </div>
+                  )}
+                </div>
+              </div>
+
                             {/* Clear Filters */}
               <div className="space-y-3 flex items-end">
                 <Button
