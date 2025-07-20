@@ -397,10 +397,34 @@ export default function Index() {
     }
   };
 
+    // Match Mode tag functions
+  const addTagInMatchMode = (tag: string) => {
+    if (currentMatchIndex >= matchModeProperties.length) return;
+
+    const currentProperty = matchModeProperties[currentMatchIndex];
+    addTagToProperty(currentProperty.id, tag);
+
+    // Update the match mode properties array
+    setMatchModeProperties(prev => prev.map(prop =>
+      prop.id === currentProperty.id
+        ? { ...prop, tags: [...(prop.tags || []), tag] }
+        : prop
+    ));
+  };
+
+  const addNewTagInMatchMode = () => {
+    if (matchModeTagInput.trim()) {
+      addTagInMatchMode(matchModeTagInput.trim());
+      setMatchModeTagInput("");
+      setIsMatchModeTagModalOpen(false);
+      toast.success(`Tag "${matchModeTagInput.trim()}" adicionada!`);
+    }
+  };
+
   // Keyboard controls for match mode
   useEffect(() => {
     const handleKeyDown = (event: KeyboardEvent) => {
-      if (!isMatchModeOpen) return;
+      if (!isMatchModeOpen || isMatchModeTagModalOpen) return;
 
       if (event.key === 'ArrowLeft') {
         event.preventDefault();
@@ -410,12 +434,15 @@ export default function Index() {
         handleMatchModeAction('like');
       } else if (event.key === 'Escape') {
         setIsMatchModeOpen(false);
+      } else if (event.key === 't' || event.key === 'T') {
+        event.preventDefault();
+        setIsMatchModeTagModalOpen(true);
       }
     };
 
     window.addEventListener('keydown', handleKeyDown);
     return () => window.removeEventListener('keydown', handleKeyDown);
-  }, [isMatchModeOpen, currentMatchIndex, matchModeProperties]);
+  }, [isMatchModeOpen, isMatchModeTagModalOpen, currentMatchIndex, matchModeProperties]);
 
     const handleLike = (propertyId: string) => {
     const property = properties.find(p => p.id === propertyId);
