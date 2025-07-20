@@ -1226,7 +1226,7 @@ export default function Index() {
                   {property.valor}
                 </div>
                 
-                                <div className="flex flex-wrap gap-2 mb-4">
+                                                <div className="flex flex-wrap gap-2 mb-4">
                   <Badge variant="secondary" className="gap-1">
                     <Maximize2 className="h-3 w-3" />
                     {property.m2}
@@ -1246,8 +1246,20 @@ export default function Index() {
                     </Badge>
                   )}
                 </div>
+
+                {/* Tags */}
+                {property.tags && property.tags.length > 0 && (
+                  <div className="flex flex-wrap gap-1 mb-4">
+                    {property.tags.map(tag => (
+                      <Badge key={tag} variant="default" className="text-xs bg-purple-100 text-purple-800">
+                        <Tag className="h-3 w-3 mr-1" />
+                        {tag}
+                      </Badge>
+                    ))}
+                  </div>
+                )}
                 
-                                <div className="space-y-2">
+                                                <div className="space-y-2">
                   <div className="flex gap-2">
                                         <Button
                       size="sm"
@@ -1273,6 +1285,15 @@ export default function Index() {
                       <Heart className="h-4 w-4" />
                     </Button>
                   </div>
+                  <Button
+                    size="sm"
+                    variant="outline"
+                    onClick={() => openTagModal(property)}
+                    className="w-full gap-2"
+                  >
+                    <Tag className="h-4 w-4" />
+                    Adicionar Tag
+                  </Button>
                   <div className="text-xs text-center text-gray-500">
                     ← Arraste para rejeitar | Arraste para curtir →
                   </div>
