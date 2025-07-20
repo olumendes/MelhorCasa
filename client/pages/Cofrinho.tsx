@@ -419,12 +419,23 @@ export default function Cofrinho() {
                       </div>
                     )}
                     
-                    <Button
-                      className="w-full"
-                      onClick={() => window.open(property.link, '_blank')}
-                    >
-                      Ver Detalhes
-                    </Button>
+                                        <div className="flex gap-2">
+                      <Button
+                        size="sm"
+                        variant="destructive"
+                        onClick={() => removeFromLiked(property.id)}
+                        className="gap-2"
+                      >
+                        <Trash2 className="h-4 w-4" />
+                        Remover
+                      </Button>
+                      <Button
+                        className="flex-1"
+                        onClick={() => window.open(property.link, '_blank')}
+                      >
+                        Ver Detalhes
+                      </Button>
+                    </div>
                   </div>
                 </CardContent>
               </Card>
