@@ -1019,8 +1019,8 @@ export default function Index() {
               </Select>
             </CardTitle>
           </CardHeader>
-          <CardContent>
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+          <CardContent className="px-3 sm:px-6">
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 sm:gap-6">
               {/* Price Filter */}
               <div className="space-y-3">
                 <Label className="text-sm font-medium">Valor (R$)</Label>
