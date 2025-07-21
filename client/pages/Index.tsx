@@ -1237,7 +1237,7 @@ export default function Index() {
         </div>
 
                         {/* Properties Grid */}
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 sm:gap-6">
           {filteredProperties.map((property) => (
             <Card
               key={property.id}
@@ -1361,7 +1361,7 @@ export default function Index() {
                 Nenhum imóvel encontrado
               </h3>
               <p className="text-gray-600 mb-6">
-                Inicie o scraping para come��ar a coletar dados reais do QuintoAndar ou importe um arquivo Excel
+                Inicie o scraping para começar a coletar dados reais do QuintoAndar ou importe um arquivo Excel
               </p>
               <div className="flex flex-col sm:flex-row gap-3 justify-center">
                 <Button onClick={handleStartScraping} className="gap-2">
