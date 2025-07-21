@@ -230,7 +230,7 @@ export default function CasasComTags() {
         </div>
       </header>
 
-      <div className="container mx-auto px-4 sm:px-6 py-6 sm:py-8">
+      <div className="container mx-auto px-3 sm:px-6 py-4 sm:py-6 md:py-8">
         {/* Tag Filter */}
         {availableTags.length > 0 && (
           <Card className="mb-8 bg-white/60 backdrop-blur-sm">
@@ -276,7 +276,7 @@ export default function CasasComTags() {
         )}
 
         {/* Statistics */}
-        <div className="grid grid-cols-1 md:grid-cols-4 gap-6 mb-8">
+        <div className="grid grid-cols-2 sm:grid-cols-4 gap-3 sm:gap-6 mb-6 sm:mb-8">
           <Card className="bg-white/60 backdrop-blur-sm">
             <CardContent className="p-6">
               <div className="flex items-center justify-between">
@@ -332,7 +332,7 @@ export default function CasasComTags() {
         </div>
 
         {/* Properties Grid */}
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 sm:gap-6">
           {filteredProperties.map((property) => (
             <Card key={property.id} className="overflow-hidden bg-white/80 backdrop-blur-sm hover:shadow-lg transition-all duration-300">
               <div className="relative">
