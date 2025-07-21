@@ -1697,13 +1697,15 @@ export default function Index() {
               </div>
             )}
 
-            <div className="flex gap-3">
+            <div className="flex flex-col sm:flex-row gap-2 sm:gap-3 pt-2">
               <Button
                 onClick={addNewTagInMatchMode}
-                className="flex-1"
+                className="flex-1 text-sm sm:text-base"
                 disabled={!matchModeTagInput.trim()}
+                size="sm"
               >
-                Adicionar Nova Tag
+                <span className="hidden sm:inline">Adicionar Nova Tag</span>
+                <span className="sm:hidden">Adicionar Tag</span>
               </Button>
               <Button
                 variant="outline"
@@ -1711,6 +1713,8 @@ export default function Index() {
                   setIsMatchModeTagModalOpen(false);
                   setMatchModeTagInput("");
                 }}
+                className="text-sm sm:text-base"
+                size="sm"
               >
                 Cancelar
               </Button>
