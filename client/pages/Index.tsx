@@ -1630,16 +1630,20 @@ export default function Index() {
 
       {/* Match Mode Tag Modal */}
       <Dialog open={isMatchModeTagModalOpen} onOpenChange={setIsMatchModeTagModalOpen}>
-        <DialogContent className="sm:max-w-md">
-          <DialogHeader>
-            <DialogTitle>Adicionar Tag no Modo Match</DialogTitle>
+        <DialogContent className="w-[95vw] max-w-md max-h-[90vh] overflow-hidden">
+          <DialogHeader className="space-y-2">
+            <DialogTitle className="text-lg sm:text-xl">
+              <span className="hidden sm:inline">Adicionar Tag no Modo Match</span>
+              <span className="sm:hidden">Adicionar Tag</span>
+            </DialogTitle>
             {currentMatchIndex < matchModeProperties.length && (
-              <p className="text-sm text-gray-600">
-                Adicionando tag para: {matchModeProperties[currentMatchIndex]?.nome}
+              <p className="text-xs sm:text-sm text-gray-600 line-clamp-2">
+                <span className="hidden sm:inline">Adicionando tag para:</span>
+                <span className="font-medium">{matchModeProperties[currentMatchIndex]?.nome}</span>
               </p>
             )}
           </DialogHeader>
-          <div className="space-y-4">
+          <div className="space-y-3 sm:space-y-4 overflow-y-auto">
             <div className="space-y-2">
               <Label htmlFor="matchTag">Nome da Tag</Label>
               <Input
