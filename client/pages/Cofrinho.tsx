@@ -212,17 +212,18 @@ export default function Cofrinho() {
         </div>
       </header>
 
-      <div className="container mx-auto px-4 sm:px-6 py-6 sm:py-8">
-                {/* Tag Filter */}
+      <div className="container mx-auto px-3 sm:px-6 py-4 sm:py-6 md:py-8">
+        {/* Tag Filter */}
         {availableTags.length > 0 && (
-          <Card className="mb-8 bg-white/60 backdrop-blur-sm">
-            <CardHeader>
-              <CardTitle className="text-lg flex items-center gap-2">
-                <Filter className="h-5 w-5" />
-                Filtrar por Tags
+          <Card className="mb-6 sm:mb-8 bg-white/60 backdrop-blur-sm">
+            <CardHeader className="pb-3 sm:pb-6">
+              <CardTitle className="text-base sm:text-lg flex items-center gap-2">
+                <Filter className="h-4 w-4 sm:h-5 sm:w-5" />
+                <span className="hidden sm:inline">Filtrar por Tags</span>
+                <span className="sm:hidden">Tags</span>
               </CardTitle>
             </CardHeader>
-            <CardContent>
+            <CardContent className="px-3 sm:px-6">
               <div className="space-y-3">
                 <div className="flex flex-wrap gap-1 min-h-[2rem] p-2 border rounded-md bg-white">
                   {tagFilter.length === 0 ? (
