@@ -740,51 +740,48 @@ export default function Index() {
                 </Button>
               </div>
 
-              <Link to="/casas-com-tags">
+              <Link to="/casas-com-tags" className="w-full lg:w-auto">
                 <Button
                   variant="outline"
                   size="sm"
-                  className="gap-2 flex-1 sm:flex-none"
+                  className="gap-1 sm:gap-2 w-full lg:w-auto justify-start lg:justify-center text-xs sm:text-sm"
                 >
-                  <Tag className="h-4 w-4" />
-                  <span className="hidden sm:inline">Casas com Tags</span>
-                  <span className="sm:hidden">🏷️</span>
+                  <Tag className="h-3 w-3 sm:h-4 sm:w-4" />
+                  <span className="truncate">Tags</span>
                   {(likedProperties.length + dislikedProperties.length) > 0 && (
-                    <Badge variant="secondary" className="ml-1 text-xs">
+                    <Badge variant="secondary" className="ml-auto lg:ml-1 text-xs">
                       {likedProperties.length + dislikedProperties.length}
                     </Badge>
                   )}
                 </Button>
               </Link>
 
-              <Link to="/cofrinho">
+              <Link to="/cofrinho" className="w-full lg:w-auto">
                 <Button
                   variant="outline"
                   size="sm"
-                  className="gap-2 flex-1 sm:flex-none"
+                  className="gap-1 sm:gap-2 w-full lg:w-auto justify-start lg:justify-center text-xs sm:text-sm"
                 >
-                  <PiggyBank className="h-4 w-4" />
-                  <span className="hidden sm:inline">Cofrinho</span>
-                  <span className="sm:hidden">🐷</span>
+                  <PiggyBank className="h-3 w-3 sm:h-4 sm:w-4" />
+                  <span className="truncate">Cofrinho</span>
                   {likedProperties.length > 0 && (
-                    <Badge variant="secondary" className="ml-1 text-xs">
+                    <Badge variant="secondary" className="ml-auto lg:ml-1 text-xs">
                       {likedProperties.length}
                     </Badge>
                   )}
                 </Button>
               </Link>
 
-              <Link to="/dislikes">
+              <Link to="/dislikes" className="w-full lg:w-auto">
                 <Button
                   variant="outline"
                   size="sm"
-                  className="gap-2 flex-1 sm:flex-none"
+                  className="gap-1 sm:gap-2 w-full lg:w-auto justify-start lg:justify-center text-xs sm:text-sm"
                 >
-                  <ThumbsDown className="h-4 w-4" />
-                  <span className="hidden sm:inline">Rejeitadas</span>
-                  <span className="sm:hidden">👎</span>
+                  <ThumbsDown className="h-3 w-3 sm:h-4 sm:w-4" />
+                  <span className="truncate">Rejeitadas</span>
                   {dislikedProperties.length > 0 && (
-                    <Badge variant="destructive" className="ml-1 text-xs">
+                    <Badge variant="destructive" className="ml-auto lg:ml-1 text-xs">
                       {dislikedProperties.length}
                     </Badge>
                   )}
