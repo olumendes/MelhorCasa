@@ -1417,14 +1417,16 @@ export default function Index() {
 
       {/* Match Mode Modal */}
       <Dialog open={isMatchModeOpen} onOpenChange={setIsMatchModeOpen}>
-        <DialogContent className="sm:max-w-2xl max-h-[90vh] overflow-hidden">
-          <DialogHeader>
-                        <DialogTitle className="flex items-center gap-2">
-              <Zap className="h-5 w-5 text-purple-600" />
-              Modo Match - Tinder de Casas
+        <DialogContent className="w-[95vw] max-w-2xl h-[95vh] max-h-[95vh] overflow-hidden p-3 sm:p-6">
+          <DialogHeader className="space-y-2 pb-2">
+            <DialogTitle className="flex items-center gap-2 text-lg sm:text-xl">
+              <Zap className="h-4 w-4 sm:h-5 sm:w-5 text-purple-600" />
+              <span className="hidden sm:inline">Modo Match - Tinder de Casas</span>
+              <span className="sm:hidden">Match Mode</span>
             </DialogTitle>
-            <div className="text-sm text-gray-600">
-              Use as setas: ← rejeitar, → curtir, T para adicionar tag, Esc para sair
+            <div className="text-xs sm:text-sm text-gray-600">
+              <span className="hidden sm:inline">Use as setas: ← rejeitar, → curtir, T para adicionar tag, Esc para sair</span>
+              <span className="sm:hidden">Setas: ← rejeitar, → curtir, T = tag</span>
             </div>
           </DialogHeader>
 
