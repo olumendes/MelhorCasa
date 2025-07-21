@@ -1488,7 +1488,7 @@ export default function Index() {
 
                         {/* Tags */}
                         {property.tags && property.tags.length > 0 && (
-                          <div className="flex flex-wrap gap-1 mb-4">
+                          <div className="flex flex-wrap gap-1 mb-3 sm:mb-4">
                             {property.tags.map(tag => (
                               <Badge key={tag} variant="default" className="text-xs bg-purple-100 text-purple-800">
                                 <Tag className="h-3 w-3 mr-1" />
@@ -1498,41 +1498,48 @@ export default function Index() {
                           </div>
                         )}
 
-                                                <div className="space-y-3 mt-6">
+                        <div className="space-y-2 sm:space-y-3 mt-4 sm:mt-6">
                           <Button
                             onClick={() => setIsMatchModeTagModalOpen(true)}
                             variant="outline"
-                            className="w-full gap-2"
+                            className="w-full gap-1 sm:gap-2 text-xs sm:text-sm py-2 sm:py-3"
+                            size="sm"
                           >
-                            <Tag className="h-4 w-4" />
-                            Adicionar Tag (T)
+                            <Tag className="h-3 w-3 sm:h-4 sm:w-4" />
+                            <span className="hidden sm:inline">Adicionar Tag (T)</span>
+                            <span className="sm:hidden">Tag (T)</span>
                           </Button>
 
-                          <div className="flex gap-4">
+                          <div className="grid grid-cols-2 gap-2 sm:flex sm:gap-3 md:gap-4">
                             <Button
-                              size="lg"
+                              size="sm"
                               variant="destructive"
                               onClick={() => handleMatchModeAction('dislike')}
-                              className="flex-1 gap-2"
+                              className="flex-1 gap-1 sm:gap-2 text-xs sm:text-sm py-3 sm:py-4"
                             >
-                              <ArrowLeft className="h-5 w-5" />
-                              Rejeitar
+                              <ArrowLeft className="h-3 w-3 sm:h-4 sm:w-4 md:h-5 md:w-5" />
+                              <span className="hidden sm:inline">Rejeitar</span>
+                              <span className="sm:hidden">👎</span>
                             </Button>
+                            <div className="col-span-2 sm:col-span-1 sm:flex-shrink-0">
+                              <Button
+                                size="sm"
+                                onClick={() => window.open(property.link, '_blank')}
+                                variant="outline"
+                                className="w-full gap-1 sm:gap-2 text-xs sm:text-sm py-3 sm:py-4"
+                              >
+                                <span className="hidden sm:inline">Ver Detalhes</span>
+                                <span className="sm:hidden">Ver</span>
+                              </Button>
+                            </div>
                             <Button
-                              size="lg"
-                              onClick={() => window.open(property.link, '_blank')}
-                              variant="outline"
-                              className="gap-2"
-                            >
-                              Ver Detalhes
-                            </Button>
-                            <Button
-                              size="lg"
+                              size="sm"
                               onClick={() => handleMatchModeAction('like')}
-                              className="flex-1 gap-2 bg-pink-600 hover:bg-pink-700"
+                              className="flex-1 gap-1 sm:gap-2 bg-pink-600 hover:bg-pink-700 text-xs sm:text-sm py-3 sm:py-4"
                             >
-                              <ArrowRight className="h-5 w-5" />
-                              Curtir
+                              <ArrowRight className="h-3 w-3 sm:h-4 sm:w-4 md:h-5 md:w-5" />
+                              <span className="hidden sm:inline">Curtir</span>
+                              <span className="sm:hidden">❤️</span>
                             </Button>
                           </div>
                         </div>
