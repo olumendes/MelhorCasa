@@ -614,7 +614,7 @@ export default function Index() {
           toast.info("Encontrada nova propriedade!");
           return [...prev, newProperty2];
         } else {
-          toast.info("Propriedade já existe ou foi processada, pulando duplicata");
+          toast.info("Propriedade j�� existe ou foi processada, pulando duplicata");
           return prev;
         }
       });
@@ -1431,27 +1431,27 @@ export default function Index() {
           </DialogHeader>
 
           {matchModeProperties.length > 0 && currentMatchIndex < matchModeProperties.length && (
-            <div className="overflow-y-auto max-h-[70vh]">
-              <div className="relative">
+            <div className="overflow-y-auto flex-1 min-h-0">
+              <div className="relative h-full">
                 {(() => {
                   const property = matchModeProperties[currentMatchIndex];
                   return (
-                    <Card className="overflow-hidden">
-                      <div className="relative">
+                    <Card className="overflow-hidden h-full flex flex-col">
+                      <div className="relative flex-shrink-0">
                         <img
                           src={property.imagem}
                           alt={property.nome}
-                          className="w-full h-64 object-cover"
+                          className="w-full h-40 sm:h-48 md:h-64 object-cover"
                           onError={(e) => {
                             (e.target as HTMLImageElement).src = "https://images.unsplash.com/photo-1570129477492-45c003edd2be?w=600&h=400&fit=crop";
                           }}
                         />
-                        <Badge className="absolute top-3 right-3 bg-blue-600">
-                          {currentMatchIndex + 1} de {matchModeProperties.length}
+                        <Badge className="absolute top-2 right-2 sm:top-3 sm:right-3 bg-blue-600 text-xs sm:text-sm">
+                          {currentMatchIndex + 1}/{matchModeProperties.length}
                         </Badge>
                       </div>
 
-                      <CardContent className="p-6">
+                      <CardContent className="p-3 sm:p-4 md:p-6 flex-1 overflow-y-auto">
                         <h3 className="font-bold text-xl text-gray-900 mb-2">
                           {property.nome}
                         </h3>
