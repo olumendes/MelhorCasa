@@ -797,7 +797,7 @@ export default function Index() {
                   >
                     <Heart className="h-4 w-4" />
                     <span className="hidden sm:inline">Curtidas</span>
-                    <span className="sm:hidden">��️</span>
+                    <span className="sm:hidden">❤️</span>
                     {likedProperties.length > 0 && (
                       <Badge variant="secondary" className="ml-1 text-xs">
                         {likedProperties.length}
@@ -971,7 +971,7 @@ export default function Index() {
                 const [field, direction] = value.split('-') as [SortOption['field'], SortOption['direction']];
                 setSortOption({ field, direction });
               }}>
-                <SelectTrigger className="w-48">
+                <SelectTrigger className="w-full sm:w-48">
                   <SelectValue />
                 </SelectTrigger>
                 <SelectContent>
