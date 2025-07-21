@@ -1310,42 +1310,47 @@ export default function Index() {
                 )}
                 
                                                 <div className="space-y-2">
-                  <div className="flex gap-2">
-                                        <Button
+                  <div className="grid grid-cols-3 gap-1.5 sm:gap-2">
+                    <Button
                       size="sm"
                       variant="destructive"
                       onClick={() => handleDislike(property.id)}
-                      className="flex-1 gap-2"
+                      className="gap-1 text-xs sm:text-sm"
                     >
-                      <ThumbsDown className="h-4 w-4" />
+                      <ThumbsDown className="h-3 w-3 sm:h-4 sm:w-4" />
+                      <span className="hidden sm:inline">Não</span>
                     </Button>
                     <Button
                       size="sm"
                       onClick={() => window.open(property.link, '_blank')}
                       variant="outline"
-                      className="flex-1"
+                      className="text-xs sm:text-sm"
                     >
-                      Ver Detalhes
+                      <span className="hidden sm:inline">Ver Detalhes</span>
+                      <span className="sm:hidden">Ver</span>
                     </Button>
-                                        <Button
+                    <Button
                       size="sm"
                       onClick={() => handleLike(property.id)}
-                      className="flex-1 gap-2 bg-pink-600 hover:bg-pink-700"
+                      className="gap-1 bg-pink-600 hover:bg-pink-700 text-xs sm:text-sm"
                     >
-                      <Heart className="h-4 w-4" />
+                      <Heart className="h-3 w-3 sm:h-4 sm:w-4" />
+                      <span className="hidden sm:inline">Sim</span>
                     </Button>
                   </div>
                   <Button
                     size="sm"
                     variant="outline"
                     onClick={() => openTagModal(property)}
-                    className="w-full gap-2"
+                    className="w-full gap-1 sm:gap-2 text-xs sm:text-sm"
                   >
-                    <Tag className="h-4 w-4" />
-                    Adicionar Tag
+                    <Tag className="h-3 w-3 sm:h-4 sm:w-4" />
+                    <span className="hidden sm:inline">Adicionar Tag</span>
+                    <span className="sm:hidden">Tag</span>
                   </Button>
                   <div className="text-xs text-center text-gray-500">
-                    ← Arraste para rejeitar | Arraste para curtir →
+                    <span className="hidden sm:inline">← Arraste para rejeitar | Arraste para curtir →</span>
+                    <span className="sm:hidden">Arraste ←→ ou use botões</span>
                   </div>
                 </div>
               </CardContent>
