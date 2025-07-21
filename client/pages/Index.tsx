@@ -739,17 +739,6 @@ export default function Index() {
                   <span className="text-xs sm:text-sm">Match</span>
                 </Button>
               </div>
-              <Button
-                onClick={startMatchMode}
-                variant="default"
-                size="sm"
-                className="gap-2 flex-1 sm:flex-none bg-gradient-to-r from-pink-500 to-purple-600 hover:from-pink-600 hover:to-purple-700"
-                disabled={filteredProperties.length === 0}
-              >
-                <Zap className="h-4 w-4" />
-                <span className="hidden sm:inline">Modo Match</span>
-                <span className="sm:hidden">⚡</span>
-              </Button>
 
               <Link to="/casas-com-tags">
                 <Button
