@@ -99,18 +99,21 @@ export default function Dislikes() {
     <div className="min-h-screen bg-gradient-to-br from-red-50 via-white to-orange-50">
       {/* Header */}
       <header className="bg-white/80 backdrop-blur-sm border-b border-gray-200 sticky top-0 z-50">
-        <div className="container mx-auto px-4 sm:px-6 py-4">
-          <div className="flex items-center justify-between">
-            <div className="flex items-center gap-3">
+        <div className="container mx-auto px-3 sm:px-6 py-3 sm:py-4">
+          <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3 sm:gap-0">
+            <div className="flex items-center gap-2 sm:gap-3">
               <Link to="/">
-                <Button variant="outline" size="sm" className="gap-2">
-                  <ArrowLeft className="h-4 w-4" />
-                  Voltar
+                <Button variant="outline" size="sm" className="gap-1 sm:gap-2 text-xs sm:text-sm">
+                  <ArrowLeft className="h-3 w-3 sm:h-4 sm:w-4" />
+                  <span className="hidden xs:inline">Voltar</span>
                 </Button>
               </Link>
               <div>
-                <h1 className="text-xl sm:text-2xl font-bold text-gray-900">Casas Rejeitadas</h1>
-                <p className="text-sm text-gray-600">Imóveis que você não curtiu</p>
+                <h1 className="text-lg sm:text-xl md:text-2xl font-bold text-gray-900">
+                  <span className="hidden sm:inline">Casas Rejeitadas</span>
+                  <span className="sm:hidden">Rejeitadas</span>
+                </h1>
+                <p className="text-xs sm:text-sm text-gray-600 hidden xs:block">Imóveis que você não curtiu</p>
               </div>
             </div>
             
