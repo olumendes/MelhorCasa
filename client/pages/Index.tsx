@@ -709,19 +709,36 @@ export default function Index() {
     <div className="min-h-screen bg-gradient-to-br from-blue-50 via-white to-purple-50">
       {/* Header */}
       <header className="bg-white/80 backdrop-blur-sm border-b border-gray-200 sticky top-0 z-50">
-        <div className="container mx-auto px-4 sm:px-6 py-4">
-          <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
-            <div className="flex items-center gap-3">
-              <div className="p-2 bg-blue-600 rounded-lg">
-                <Home className="h-6 w-6 text-white" />
-              </div>
-              <div>
-                                <h1 className="text-xl sm:text-2xl font-bold text-gray-900">Melhor Casa</h1>
-                <p className="text-sm text-gray-600 hidden sm:block">Ferramenta elegante para coleta de imóveis</p>
+        <div className="container mx-auto px-3 sm:px-6 py-3 sm:py-4">
+          <div className="space-y-3">
+            {/* Logo and title row */}
+            <div className="flex items-center justify-between">
+              <div className="flex items-center gap-2 sm:gap-3">
+                <div className="p-1.5 sm:p-2 bg-blue-600 rounded-lg">
+                  <Home className="h-5 w-5 sm:h-6 sm:w-6 text-white" />
+                </div>
+                <div>
+                  <h1 className="text-lg sm:text-xl md:text-2xl font-bold text-gray-900">Melhor Casa</h1>
+                  <p className="text-xs sm:text-sm text-gray-600 hidden xs:block">Ferramenta elegante para coleta de imóveis</p>
+                </div>
               </div>
             </div>
-            
-                                                            <div className="flex flex-wrap items-center gap-2 sm:gap-3 w-full sm:w-auto">
+
+            {/* Navigation buttons - optimized for mobile */}
+            <div className="grid grid-cols-2 sm:grid-cols-3 lg:flex gap-1.5 sm:gap-2">
+              {/* Row 1: Primary actions */}
+              <div className="col-span-2 sm:col-span-1 lg:contents">
+                <Button
+                  onClick={startMatchMode}
+                  variant="default"
+                  size="sm"
+                  className="gap-1 sm:gap-2 bg-gradient-to-r from-pink-500 to-purple-600 hover:from-pink-600 hover:to-purple-700 w-full lg:w-auto"
+                  disabled={filteredProperties.length === 0}
+                >
+                  <Zap className="h-3 w-3 sm:h-4 sm:w-4" />
+                  <span className="text-xs sm:text-sm">Match</span>
+                </Button>
+              </div>
               <Button
                 onClick={startMatchMode}
                 variant="default"
