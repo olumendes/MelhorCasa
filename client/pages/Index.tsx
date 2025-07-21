@@ -1645,10 +1645,10 @@ export default function Index() {
           </DialogHeader>
           <div className="space-y-3 sm:space-y-4 overflow-y-auto">
             <div className="space-y-2">
-              <Label htmlFor="matchTag">Nome da Tag</Label>
+              <Label htmlFor="matchTag" className="text-sm sm:text-base">Nome da Tag</Label>
               <Input
                 id="matchTag"
-                placeholder="Ex: Favorita, Próxima ao trabalho, Boa localização"
+                placeholder="Ex: Favorita, Boa localização"
                 value={matchModeTagInput}
                 onChange={(e) => setMatchModeTagInput(e.target.value)}
                 onKeyDown={(e) => {
@@ -1660,13 +1660,14 @@ export default function Index() {
                   }
                 }}
                 autoFocus
+                className="text-sm sm:text-base"
               />
             </div>
 
             {availableTags.length > 0 && (
               <div className="space-y-2">
-                <Label>Tags Existentes</Label>
-                <div className="flex flex-wrap gap-1 max-h-32 overflow-y-auto">
+                <Label className="text-sm sm:text-base">Tags Existentes</Label>
+                <div className="flex flex-wrap gap-1 max-h-24 sm:max-h-32 overflow-y-auto p-1 border rounded">
                   {availableTags.map(tag => {
                     const currentProperty = matchModeProperties[currentMatchIndex];
                     const hasTag = currentProperty?.tags?.includes(tag);
@@ -1674,7 +1675,7 @@ export default function Index() {
                       <Badge
                         key={tag}
                         variant={hasTag ? "default" : "outline"}
-                        className={`cursor-pointer ${
+                        className={`cursor-pointer text-xs transition-colors ${
                           hasTag
                             ? "bg-purple-100 text-purple-800"
                             : "hover:bg-blue-50"
