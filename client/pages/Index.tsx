@@ -797,7 +797,7 @@ export default function Index() {
                   >
                     <Heart className="h-4 w-4" />
                     <span className="hidden sm:inline">Curtidas</span>
-                    <span className="sm:hidden">❤️</span>
+                    <span className="sm:hidden">��️</span>
                     {likedProperties.length > 0 && (
                       <Badge variant="secondary" className="ml-1 text-xs">
                         {likedProperties.length}
@@ -959,12 +959,13 @@ export default function Index() {
                 </Card>
 
                 {/* Filters */}
-        <Card className="mb-8 bg-white/60 backdrop-blur-sm">
-          <CardHeader>
-            <CardTitle className="text-xl flex items-center justify-between">
+        <Card className="mb-6 sm:mb-8 bg-white/60 backdrop-blur-sm">
+          <CardHeader className="pb-3 sm:pb-6">
+            <CardTitle className="text-lg sm:text-xl flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3 sm:gap-0">
               <div className="flex items-center gap-2">
-                <Filter className="h-5 w-5" />
-                Filtros e Ordenação
+                <Filter className="h-4 w-4 sm:h-5 sm:w-5" />
+                <span className="hidden sm:inline">Filtros e Ordenação</span>
+                <span className="sm:hidden">Filtros</span>
               </div>
               <Select value={`${sortOption.field}-${sortOption.direction}`} onValueChange={(value) => {
                 const [field, direction] = value.split('-') as [SortOption['field'], SortOption['direction']];
