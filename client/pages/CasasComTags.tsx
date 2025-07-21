@@ -171,32 +171,37 @@ export default function CasasComTags() {
     <div className="min-h-screen bg-gradient-to-br from-purple-50 via-white to-pink-50">
       {/* Header */}
       <header className="bg-white/80 backdrop-blur-sm border-b border-gray-200 sticky top-0 z-50">
-        <div className="container mx-auto px-4 sm:px-6 py-4">
-          <div className="flex items-center justify-between">
-            <div className="flex items-center gap-3">
+        <div className="container mx-auto px-3 sm:px-6 py-3 sm:py-4">
+          <div className="space-y-3">
+            {/* Top row - Logo and title */}
+            <div className="flex items-center gap-2 sm:gap-3">
               <Link to="/">
-                <Button variant="outline" size="sm" className="gap-2">
-                  <ArrowLeft className="h-4 w-4" />
-                  Voltar
+                <Button variant="outline" size="sm" className="gap-1 sm:gap-2 text-xs sm:text-sm">
+                  <ArrowLeft className="h-3 w-3 sm:h-4 sm:w-4" />
+                  <span className="hidden xs:inline">Voltar</span>
                 </Button>
               </Link>
-              <div className="flex items-center gap-3">
-                <div className="p-2 bg-purple-600 rounded-lg">
-                  <Tag className="h-6 w-6 text-white" />
+              <div className="flex items-center gap-2 sm:gap-3">
+                <div className="p-1.5 sm:p-2 bg-purple-600 rounded-lg">
+                  <Tag className="h-5 w-5 sm:h-6 sm:w-6 text-white" />
                 </div>
                 <div>
-                  <h1 className="text-xl sm:text-2xl font-bold text-gray-900">Casas com Tags</h1>
-                  <p className="text-sm text-gray-600">Todas as suas casas organizadas por tags</p>
+                  <h1 className="text-lg sm:text-xl md:text-2xl font-bold text-gray-900">
+                    <span className="hidden sm:inline">Casas com Tags</span>
+                    <span className="sm:hidden">Tags</span>
+                  </h1>
+                  <p className="text-xs sm:text-sm text-gray-600 hidden xs:block">Todas as suas casas organizadas por tags</p>
                 </div>
               </div>
             </div>
-            
-            {/* Status Filter */}
-            <div className="flex gap-2">
+
+            {/* Status Filter - responsive */}
+            <div className="grid grid-cols-3 gap-1.5 sm:flex sm:gap-2">
               <Button
                 variant={statusFilter === 'all' ? 'default' : 'outline'}
                 size="sm"
                 onClick={() => setStatusFilter('all')}
+                className="text-xs sm:text-sm"
               >
                 Todas
               </Button>
@@ -204,19 +209,21 @@ export default function CasasComTags() {
                 variant={statusFilter === 'liked' ? 'default' : 'outline'}
                 size="sm"
                 onClick={() => setStatusFilter('liked')}
-                className="gap-2"
+                className="gap-1 sm:gap-2 text-xs sm:text-sm"
               >
-                <Heart className="h-4 w-4" />
-                Curtidas
+                <Heart className="h-3 w-3 sm:h-4 sm:w-4" />
+                <span className="hidden sm:inline">Curtidas</span>
+                <span className="sm:hidden">❤️</span>
               </Button>
               <Button
                 variant={statusFilter === 'disliked' ? 'default' : 'outline'}
                 size="sm"
                 onClick={() => setStatusFilter('disliked')}
-                className="gap-2"
+                className="gap-1 sm:gap-2 text-xs sm:text-sm"
               >
-                <ThumbsDown className="h-4 w-4" />
-                Rejeitadas
+                <ThumbsDown className="h-3 w-3 sm:h-4 sm:w-4" />
+                <span className="hidden sm:inline">Rejeitadas</span>
+                <span className="sm:hidden">👎</span>
               </Button>
             </div>
           </div>
