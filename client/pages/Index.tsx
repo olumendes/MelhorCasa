@@ -1022,25 +1022,25 @@ export default function Index() {
           <CardContent className="px-3 sm:px-6">
             <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 sm:gap-6">
               {/* Price Filter */}
-              <div className="space-y-3">
+              <div className="space-y-2 sm:space-y-3">
                 <Label className="text-sm font-medium">Valor (R$)</Label>
                 <div className="space-y-2">
-                  <div className="flex gap-2">
+                  <div className="flex flex-col sm:flex-row gap-2">
                     <Input
-                      placeholder="Valor mínimo"
+                      placeholder="Mínimo"
                       value={filters.valorMin}
                       onChange={(e) => setFilters(prev => ({ ...prev, valorMin: e.target.value }))}
-                      className="flex-1"
+                      className="flex-1 text-sm"
                     />
                     <Input
-                      placeholder="Valor máximo"
+                      placeholder="Máximo"
                       value={filters.valorMax}
                       onChange={(e) => setFilters(prev => ({ ...prev, valorMax: e.target.value }))}
-                      className="flex-1"
+                      className="flex-1 text-sm"
                     />
                   </div>
                   <div className="text-xs text-gray-600 text-center">
-                    Digite valores como: 500000 ou 1500000
+                    Ex: 500000
                   </div>
                 </div>
               </div>
@@ -1361,7 +1361,7 @@ export default function Index() {
                 Nenhum imóvel encontrado
               </h3>
               <p className="text-gray-600 mb-6">
-                Inicie o scraping para começar a coletar dados reais do QuintoAndar ou importe um arquivo Excel
+                Inicie o scraping para come��ar a coletar dados reais do QuintoAndar ou importe um arquivo Excel
               </p>
               <div className="flex flex-col sm:flex-row gap-3 justify-center">
                 <Button onClick={handleStartScraping} className="gap-2">
