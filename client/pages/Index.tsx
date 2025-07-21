@@ -614,7 +614,7 @@ export default function Index() {
           toast.info("Encontrada nova propriedade!");
           return [...prev, newProperty2];
         } else {
-          toast.info("Propriedade j�� existe ou foi processada, pulando duplicata");
+          toast.info("Propriedade já existe ou foi processada, pulando duplicata");
           return prev;
         }
       });
@@ -1452,34 +1452,34 @@ export default function Index() {
                       </div>
 
                       <CardContent className="p-3 sm:p-4 md:p-6 flex-1 overflow-y-auto">
-                        <h3 className="font-bold text-xl text-gray-900 mb-2">
+                        <h3 className="font-bold text-lg sm:text-xl text-gray-900 mb-2 line-clamp-2">
                           {property.nome}
                         </h3>
 
-                        <div className="flex items-center gap-2 mb-3">
-                          <MapPin className="h-4 w-4 text-gray-500" />
-                          <p className="text-sm text-gray-600">{property.localizacao}</p>
+                        <div className="flex items-start gap-2 mb-3">
+                          <MapPin className="h-3 w-3 sm:h-4 sm:w-4 text-gray-500 mt-0.5 flex-shrink-0" />
+                          <p className="text-xs sm:text-sm text-gray-600 line-clamp-2">{property.localizacao}</p>
                         </div>
 
-                        <div className="text-3xl font-bold text-green-600 mb-4">
+                        <div className="text-xl sm:text-2xl md:text-3xl font-bold text-green-600 mb-3 sm:mb-4">
                           {property.valor}
                         </div>
 
-                        <div className="flex flex-wrap gap-2 mb-4">
-                          <Badge variant="secondary" className="gap-1">
+                        <div className="flex flex-wrap gap-1.5 sm:gap-2 mb-3 sm:mb-4">
+                          <Badge variant="secondary" className="gap-1 text-xs">
                             <Maximize2 className="h-3 w-3" />
                             {property.m2}
                           </Badge>
-                          <Badge variant="secondary" className="gap-1">
+                          <Badge variant="secondary" className="gap-1 text-xs">
                             <Home className="h-3 w-3" />
                             {property.quartos}
                           </Badge>
-                          <Badge variant="secondary" className="gap-1">
+                          <Badge variant="secondary" className="gap-1 text-xs">
                             <Car className="h-3 w-3" />
                             {property.garagem} vagas
                           </Badge>
                           {property.distancia && userLocation && (
-                            <Badge variant="outline" className="gap-1 border-blue-200 text-blue-700">
+                            <Badge variant="outline" className="gap-1 border-blue-200 text-blue-700 text-xs">
                               <MapPin className="h-3 w-3" />
                               {property.distancia.toFixed(1)} km
                             </Badge>
