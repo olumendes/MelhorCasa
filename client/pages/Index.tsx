@@ -1262,17 +1262,17 @@ export default function Index() {
                 </Badge>
               </div>
               
-              <CardContent className="p-6">
-                <h3 className="font-bold text-lg text-gray-900 mb-2 line-clamp-2">
+              <CardContent className="p-3 sm:p-4 md:p-6">
+                <h3 className="font-bold text-base sm:text-lg text-gray-900 mb-2 line-clamp-2">
                   {property.nome}
                 </h3>
-                
-                <div className="flex items-center gap-2 mb-3">
-                  <MapPin className="h-4 w-4 text-gray-500" />
-                  <p className="text-sm text-gray-600 line-clamp-1">{property.localizacao}</p>
+
+                <div className="flex items-start gap-2 mb-3">
+                  <MapPin className="h-3 w-3 sm:h-4 sm:w-4 text-gray-500 mt-0.5 flex-shrink-0" />
+                  <p className="text-xs sm:text-sm text-gray-600 line-clamp-2">{property.localizacao}</p>
                 </div>
-                
-                <div className="text-2xl font-bold text-green-600 mb-4">
+
+                <div className="text-lg sm:text-xl md:text-2xl font-bold text-green-600 mb-3 sm:mb-4">
                   {property.valor}
                 </div>
                 
