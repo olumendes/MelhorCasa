@@ -177,9 +177,10 @@ export default function Cofrinho() {
             
             <Dialog open={isAddMoneyOpen} onOpenChange={setIsAddMoneyOpen}>
               <DialogTrigger asChild>
-                <Button className="gap-2 bg-green-600 hover:bg-green-700">
-                  <Plus className="h-4 w-4" />
-                  Adicionar Dinheiro
+                <Button className="gap-1 sm:gap-2 bg-green-600 hover:bg-green-700 text-xs sm:text-sm px-3 sm:px-4">
+                  <Plus className="h-3 w-3 sm:h-4 sm:w-4" />
+                  <span className="hidden sm:inline">Adicionar Dinheiro</span>
+                  <span className="sm:hidden">+ Dinheiro</span>
                 </Button>
               </DialogTrigger>
               <DialogContent className="sm:max-w-md">
