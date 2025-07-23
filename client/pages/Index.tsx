@@ -1053,7 +1053,7 @@ export default function Index() {
                     onValueChange={([min, max]) =>
                       setFilters(prev => ({ ...prev, m2Min: min, m2Max: max }))
                     }
-                    max={1000}
+                    max={2000}
                     min={0}
                     step={10}
                     className="w-full"
@@ -1075,7 +1075,7 @@ export default function Index() {
                       onValueChange={([max]) =>
                         setFilters(prev => ({ ...prev, distanciaMax: max }))
                       }
-                      max={100}
+                      max={200}
                       min={1}
                       step={1}
                       className="w-full"
