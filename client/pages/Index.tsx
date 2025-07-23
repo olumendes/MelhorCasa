@@ -193,17 +193,18 @@ export default function Index() {
     // Filter properties based on current filters
   const applyFilters = (propertiesToFilter: Property[]) => {
     return propertiesToFilter.filter(property => {
-      const enhanced = enhanceProperty(property);
+      // Use existing enhanced values or enhance if not already done
+      const enhanced = property.valorNumerico ? property : enhanceProperty(property);
 
       // Price filter
       const valorMin = filters.valorMin ? parseInt(filters.valorMin.replace(/[^\d]/g, '')) : 0;
       const valorMax = filters.valorMax ? parseInt(filters.valorMax.replace(/[^\d]/g, '')) : Infinity;
-      if (enhanced.valorNumerico < valorMin || enhanced.valorNumerico > valorMax) {
+      if (enhanced.valorNumerico! < valorMin || enhanced.valorNumerico! > valorMax) {
         return false;
       }
 
       // Size filter
-      if (enhanced.m2Numerico < filters.m2Min || enhanced.m2Numerico > filters.m2Max) {
+      if (enhanced.m2Numerico! < filters.m2Min || enhanced.m2Numerico! > filters.m2Max) {
         return false;
       }
 
@@ -217,7 +218,7 @@ export default function Index() {
         return false;
       }
 
-            // Distance filter
+      // Distance filter
       if (userLocation && enhanced.distancia && enhanced.distancia > filters.distanciaMax) {
         return false;
       }
