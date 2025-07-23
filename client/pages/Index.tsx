@@ -1295,26 +1295,40 @@ export default function Index() {
                     }
                   </p>
                   {filteredProperties.length === 0 && properties.length > 0 && (
-                    <Button
-                      size="sm"
-                      variant="outline"
-                      onClick={() => {
-                        setFilters({
-                          valorMin: "",
-                          valorMax: "",
-                          m2Min: 0,
-                          m2Max: 2000,
-                          quartos: "all",
-                          vagas: "all",
-                          distanciaMax: 100,
-                          tags: []
-                        });
-                        toast.info("Filtros resetados manualmente");
-                      }}
-                      className="mt-2 text-xs"
-                    >
-                      Resetar Filtros
-                    </Button>
+                    <div className="mt-2 space-y-1">
+                      <Button
+                        size="sm"
+                        variant="outline"
+                        onClick={() => {
+                          setFilters({
+                            valorMin: "",
+                            valorMax: "",
+                            m2Min: 0,
+                            m2Max: 2000,
+                            quartos: "all",
+                            vagas: "all",
+                            distanciaMax: 100,
+                            tags: []
+                          });
+                          setShowAllProperties(false);
+                          toast.info("Filtros resetados manualmente");
+                        }}
+                        className="text-xs w-full"
+                      >
+                        Resetar Filtros
+                      </Button>
+                      <Button
+                        size="sm"
+                        variant={showAllProperties ? "default" : "outline"}
+                        onClick={() => {
+                          setShowAllProperties(!showAllProperties);
+                          toast.info(showAllProperties ? "Filtros ativados" : "Mostrando todas as propriedades");
+                        }}
+                        className="text-xs w-full"
+                      >
+                        {showAllProperties ? "Ativar Filtros" : "Mostrar Todas"}
+                      </Button>
+                    </div>
                   )}
                 </div>
                 <Home className="h-8 w-8 text-blue-600" />
