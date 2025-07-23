@@ -88,11 +88,11 @@ export default function Index() {
     valorMin: "",
     valorMax: "",
     m2Min: 0,
-    m2Max: 1000,
+    m2Max: 2000,
     quartos: "all",
     vagas: "all",
-      distanciaMax: 50,
-  tags: []
+    distanciaMax: 100,
+    tags: []
   });
     const fileInputRef = useRef<HTMLInputElement>(null);
 
@@ -271,7 +271,7 @@ export default function Index() {
       setIsSettingsOpen(false);
       toast.success("Localização salva com sucesso!");
     } else {
-      toast.error("Não foi possível encontrar as coordenadas para este endereço");
+      toast.error("N��o foi possível encontrar as coordenadas para este endereço");
     }
   };
 
