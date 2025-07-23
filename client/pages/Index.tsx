@@ -161,10 +161,10 @@ export default function Index() {
   const enhanceProperty = (property: Property): Property => {
     const enhanced = {
       ...property,
-      valorNumerico: parseNumericValue(property.valor),
-      m2Numerico: parseNumericValue(property.m2),
-      quartosNumerico: parseNumericValue(property.quartos),
-      garagemNumerico: parseNumericValue(property.garagem)
+      valorNumerico: parseNumericValue(property.valor || ""),
+      m2Numerico: parseNumericValue(property.m2 || ""),
+      quartosNumerico: parseNumericValue(property.quartos || ""),
+      garagemNumerico: parseNumericValue(property.garagem || "")
     };
 
     // Add mock coordinates for demonstration (in real app, these would come from geocoding)
