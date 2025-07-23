@@ -1244,7 +1244,7 @@ export default function Index() {
                 <div>
                   <p className="text-sm font-medium text-gray-600">Última Atualização</p>
                   <p className="text-lg font-bold text-green-600">
-                    {properties.length > 0 ? "Agora há pouco" : "Nenhuma"}
+                    {properties.length > 0 ? "Agora h�� pouco" : "Nenhuma"}
                   </p>
                 </div>
                 <div className={`w-3 h-3 rounded-full ${properties.length > 0 ? 'bg-green-500 animate-pulse' : 'bg-gray-400'}`} />
@@ -1449,7 +1449,7 @@ export default function Index() {
             </DialogTitle>
             <div className="text-xs sm:text-sm text-gray-600">
               <span className="hidden sm:inline">Use as setas: ← rejeitar, → curtir, T para adicionar tag, Esc para sair</span>
-              <span className="sm:hidden">Setas: ← rejeitar, → curtir, T = tag</span>
+              <span className="sm:hidden">Arraste: ← rejeitar, → curtir | Setas: ←→ | T = tag</span>
             </div>
           </DialogHeader>
 
