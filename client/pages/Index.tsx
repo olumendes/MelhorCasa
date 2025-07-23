@@ -61,7 +61,24 @@ interface TouchPosition {
 
 export default function Index() {
   const [isScrapingActive, setIsScrapingActive] = useState(false);
-    const [properties, setProperties] = useState<Property[]>([]);
+    const [properties, setProperties] = useState<Property[]>([
+    // Propriedade de teste para debug
+    {
+      id: 'test-1',
+      nome: 'Apartamento Teste',
+      imagem: 'https://images.unsplash.com/photo-1570129477492-45c003edd2be?w=400&h=300&fit=crop',
+      valor: 'R$ 500.000',
+      m2: '80 m²',
+      localizacao: 'São Paulo, SP',
+      link: 'https://www.quintoandar.com.br',
+      quartos: '2 quartos',
+      garagem: '1',
+      valorNumerico: 500000,
+      m2Numerico: 80,
+      quartosNumerico: 2,
+      vagasNumerico: 1
+    }
+  ]);
   const [filteredProperties, setFilteredProperties] = useState<Property[]>([]);
   const [likedProperties, setLikedProperties] = useState<Property[]>([]);
   const [dislikedProperties, setDislikedProperties] = useState<Property[]>([]);
