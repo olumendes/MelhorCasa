@@ -77,8 +77,9 @@ export default function Index() {
   const [selectedPropertyForTag, setSelectedPropertyForTag] = useState<Property | null>(null);
   const [newTagInput, setNewTagInput] = useState("");
   const [availableTags, setAvailableTags] = useState<string[]>([]);
-    const [tagSearchInput, setTagSearchInput] = useState("");
+  const [tagSearchInput, setTagSearchInput] = useState("");
   const [selectedTagsFilter, setSelectedTagsFilter] = useState<string[]>([]);
+  const [showAllProperties, setShowAllProperties] = useState(false);
   const [locationInput, setLocationInput] = useState("");
   const [sortOption, setSortOption] = useState<SortOption>({ field: 'valor', direction: 'desc' });
   const [touchStart, setTouchStart] = useState<TouchPosition | null>(null);
