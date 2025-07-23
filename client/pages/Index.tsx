@@ -245,7 +245,10 @@ export default function Index() {
       return; // Exit early, will trigger this useEffect again with deduplicated data
     }
 
-    const enhanced = properties.map(enhanceProperty);
+    // Enhance properties that don't have numeric values yet
+    const enhanced = properties.map(property =>
+      property.valorNumerico ? property : enhanceProperty(property)
+    );
     const filtered = applyFilters(enhanced);
     const sorted = sortProperties(filtered);
     setFilteredProperties(sorted);
