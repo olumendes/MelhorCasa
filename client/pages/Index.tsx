@@ -1771,6 +1771,9 @@ export default function Index() {
                             {/* Ver detalhes button - full width */}
                             <Button
                               size="sm"
+                              onTouchStart={(e) => e.stopPropagation()}
+                              onTouchMove={(e) => e.stopPropagation()}
+                              onTouchEnd={(e) => e.stopPropagation()}
                               onClick={(e) => {
                                 e.preventDefault();
                                 e.stopPropagation();
@@ -1786,7 +1789,13 @@ export default function Index() {
                                       url = 'https://' + url;
                                     }
 
-                                    window.open(url, '_blank', 'noopener,noreferrer');
+                                    // Use location.href for better mobile compatibility
+                                    if (window.innerWidth <= 768) {
+                                      window.location.href = url;
+                                    } else {
+                                      window.open(url, '_blank', 'noopener,noreferrer');
+                                    }
+
                                     toast.success('Abrindo detalhes do imóvel...');
                                   } catch (error) {
                                     console.error('Error opening link:', error);
@@ -1798,9 +1807,10 @@ export default function Index() {
                               }}
                               variant="outline"
                               className="w-full gap-1 sm:gap-2 text-xs sm:text-sm py-3 sm:py-4 touch-manipulation"
+                              style={{ pointerEvents: 'auto' }}
                             >
                               <span className="hidden sm:inline">Ver Detalhes</span>
-                              <span className="sm:hidden">Ver</span>
+                              <span className="sm:hidden">🔗 Ver</span>
                             </Button>
                           </div>
                         </div>
