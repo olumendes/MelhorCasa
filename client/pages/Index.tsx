@@ -1244,7 +1244,7 @@ export default function Index() {
                 <div>
                   <p className="text-sm font-medium text-gray-600">Última Atualização</p>
                   <p className="text-lg font-bold text-green-600">
-                    {properties.length > 0 ? "Agora h�� pouco" : "Nenhuma"}
+                    {properties.length > 0 ? "Agora há pouco" : "Nenhuma"}
                   </p>
                 </div>
                 <div className={`w-3 h-3 rounded-full ${properties.length > 0 ? 'bg-green-500 animate-pulse' : 'bg-gray-400'}`} />
@@ -1460,15 +1460,22 @@ export default function Index() {
                   const property = matchModeProperties[currentMatchIndex];
                   return (
                     <Card
-                      className="overflow-hidden h-full flex flex-col cursor-pointer"
-                      onTouchStart={(e) => handleTouchStart(e, property.id)}
-                      onTouchMove={(e) => handleTouchMove(e, property.id)}
-                      onTouchEnd={() => {
+                      className="overflow-hidden h-full flex flex-col cursor-pointer select-none transition-transform active:scale-95"
+                      onTouchStart={(e) => {
+                        e.preventDefault();
+                        handleTouchStart(e, property.id);
+                      }}
+                      onTouchMove={(e) => {
+                        e.preventDefault();
+                        handleTouchMove(e, property.id);
+                      }}
+                      onTouchEnd={(e) => {
+                        e.preventDefault();
                         if (!touchStart || !touchEnd) return;
                         const distanceX = touchStart.x - touchEnd.x;
                         const distanceY = touchStart.y - touchEnd.y;
-                        const isLeftSwipe = distanceX > 50;
-                        const isRightSwipe = distanceX < -50;
+                        const isLeftSwipe = distanceX > 30; // Reduced threshold for easier swiping
+                        const isRightSwipe = distanceX < -30;
                         const isVerticalSwipe = Math.abs(distanceY) > Math.abs(distanceX);
 
                         if (!isVerticalSwipe) {
