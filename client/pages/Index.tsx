@@ -73,6 +73,8 @@ export default function Index() {
   const [matchModeProperties, setMatchModeProperties] = useState<Property[]>([]);
   const [matchModeTagInput, setMatchModeTagInput] = useState("");
   const [isMatchModeTagModalOpen, setIsMatchModeTagModalOpen] = useState(false);
+  const [swipeDirection, setSwipeDirection] = useState<'left' | 'right' | null>(null);
+  const [isSwipeAnimating, setIsSwipeAnimating] = useState(false);
   const [isTagModalOpen, setIsTagModalOpen] = useState(false);
   const [selectedPropertyForTag, setSelectedPropertyForTag] = useState<Property | null>(null);
   const [newTagInput, setNewTagInput] = useState("");
