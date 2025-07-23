@@ -129,7 +129,10 @@ export default function Index() {
 
   // Function to parse numeric values from strings
   const parseNumericValue = (valueStr: string): number => {
-    return parseInt(valueStr.replace(/[^\d]/g, '')) || 0;
+    if (!valueStr) return 0;
+    // Handle different number formats and extract only digits
+    const cleaned = valueStr.toString().replace(/[^\d]/g, '');
+    return parseInt(cleaned) || 0;
   };
 
         // Function to check if property link already exists
