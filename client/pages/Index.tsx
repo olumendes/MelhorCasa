@@ -195,49 +195,67 @@ export default function Index() {
 
     // Filter properties based on current filters
   const applyFilters = (propertiesToFilter: Property[]) => {
-    return propertiesToFilter.filter(property => {
-      // Use existing enhanced values or enhance if not already done
-      const enhanced = property.valorNumerico ? property : enhanceProperty(property);
+    return propertiesToFilter.filter((property, index) => {
+      try {
+        // Use existing enhanced values or enhance if not already done
+        const enhanced = property.valorNumerico ? property : enhanceProperty(property);
 
-      // Price filter - only apply if values are set
-      const valorMin = filters.valorMin ? parseInt(filters.valorMin.replace(/[^\d]/g, '')) : 0;
-      const valorMax = filters.valorMax ? parseInt(filters.valorMax.replace(/[^\d]/g, '')) : Infinity;
-      if (filters.valorMin && enhanced.valorNumerico! < valorMin) {
-        return false;
-      }
-      if (filters.valorMax && enhanced.valorNumerico! > valorMax) {
-        return false;
-      }
+        // Price filter - only apply if values are set and valid
+        if (filters.valorMin && filters.valorMin.trim()) {
+          const valorMin = parseInt(filters.valorMin.replace(/[^\d]/g, ''));
+          if (valorMin > 0 && (!enhanced.valorNumerico || enhanced.valorNumerico < valorMin)) {
+            return false;
+          }
+        }
+        if (filters.valorMax && filters.valorMax.trim()) {
+          const valorMax = parseInt(filters.valorMax.replace(/[^\d]/g, ''));
+          if (valorMax > 0 && (!enhanced.valorNumerico || enhanced.valorNumerico > valorMax)) {
+            return false;
+          }
+        }
 
-      // Size filter - be more permissive
-      const m2Value = enhanced.m2Numerico || 0;
-      if (m2Value > 0 && (m2Value < filters.m2Min || m2Value > filters.m2Max)) {
-        return false;
-      }
+        // Size filter - only exclude if property has size data and it's outside range
+        const m2Value = enhanced.m2Numerico || 0;
+        if (m2Value > 0) {
+          if (m2Value < filters.m2Min || m2Value > filters.m2Max) {
+            return false;
+          }
+        }
 
-      // Rooms filter
-      if (filters.quartos !== "all" && enhanced.quartosNumerico !== parseInt(filters.quartos)) {
-        return false;
-      }
+        // Rooms filter - only apply if not "all" and property has room data
+        if (filters.quartos !== "all" && enhanced.quartosNumerico !== undefined) {
+          const requiredRooms = parseInt(filters.quartos);
+          if (!isNaN(requiredRooms) && enhanced.quartosNumerico !== requiredRooms) {
+            return false;
+          }
+        }
 
-      // Parking filter
-      if (filters.vagas !== "all" && enhanced.garagemNumerico !== parseInt(filters.vagas)) {
-        return false;
-      }
+        // Parking filter - only apply if not "all" and property has parking data
+        if (filters.vagas !== "all" && enhanced.garagemNumerico !== undefined) {
+          const requiredVagas = parseInt(filters.vagas);
+          if (!isNaN(requiredVagas) && enhanced.garagemNumerico !== requiredVagas) {
+            return false;
+          }
+        }
 
-      // Distance filter - only apply if user location is set
-      if (userLocation && enhanced.distancia && enhanced.distancia > filters.distanciaMax) {
-        return false;
-      }
-
-      // Tags filter
-      if (filters.tags.length > 0) {
-        if (!property.tags || !filters.tags.some(tag => property.tags!.includes(tag))) {
+        // Distance filter - only apply if user location is set AND property has location
+        if (userLocation && enhanced.distancia !== undefined && enhanced.distancia > filters.distanciaMax) {
           return false;
         }
-      }
 
-      return true;
+        // Tags filter - only apply if tags are selected
+        if (filters.tags.length > 0) {
+          if (!property.tags || !filters.tags.some(tag => property.tags!.includes(tag))) {
+            return false;
+          }
+        }
+
+        return true;
+      } catch (error) {
+        console.error(`Error filtering property ${index}:`, error, property);
+        // If there's an error, include the property rather than exclude it
+        return true;
+      }
     });
   };
 
@@ -1764,7 +1782,7 @@ export default function Index() {
               <Label htmlFor="matchTag" className="text-sm sm:text-base">Nome da Tag</Label>
               <Input
                 id="matchTag"
-                placeholder="Ex: Favorita, Boa localizaç��o"
+                placeholder="Ex: Favorita, Boa localização"
                 value={matchModeTagInput}
                 onChange={(e) => setMatchModeTagInput(e.target.value)}
                 onKeyDown={(e) => {
