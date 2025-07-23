@@ -1576,7 +1576,12 @@ export default function Index() {
                   const property = matchModeProperties[currentMatchIndex];
                   return (
                     <Card
-                      className="overflow-hidden h-full flex flex-col cursor-pointer select-none transition-transform active:scale-95"
+                      className={`overflow-hidden h-full flex flex-col cursor-pointer select-none transition-all duration-300 active:scale-95 ${
+                        isSwipeAnimating ? (
+                          swipeDirection === 'left' ? 'transform -translate-x-full rotate-12 opacity-0' :
+                          swipeDirection === 'right' ? 'transform translate-x-full -rotate-12 opacity-0' : ''
+                        ) : ''
+                      }`}
                       onTouchStart={(e) => {
                         e.preventDefault();
                         handleTouchStart(e, property.id);
@@ -1584,22 +1589,64 @@ export default function Index() {
                       onTouchMove={(e) => {
                         e.preventDefault();
                         handleTouchMove(e, property.id);
+
+                        // Add visual feedback during swipe
+                        if (touchStart && touchEnd) {
+                          const distanceX = touchStart.x - touchEnd.x;
+                          const card = e.currentTarget as HTMLElement;
+                          const isLeftSwipe = distanceX > 10;
+                          const isRightSwipe = distanceX < -10;
+
+                          if (isLeftSwipe) {
+                            card.style.transform = `translateX(-${Math.min(Math.abs(distanceX), 50)}px) rotate(${Math.min(Math.abs(distanceX) / 10, 5)}deg)`;
+                            card.style.backgroundColor = 'rgba(239, 68, 68, 0.1)';
+                          } else if (isRightSwipe) {
+                            card.style.transform = `translateX(${Math.min(Math.abs(distanceX), 50)}px) rotate(-${Math.min(Math.abs(distanceX) / 10, 5)}deg)`;
+                            card.style.backgroundColor = 'rgba(34, 197, 94, 0.1)';
+                          } else {
+                            card.style.transform = '';
+                            card.style.backgroundColor = '';
+                          }
+                        }
                       }}
                       onTouchEnd={(e) => {
                         e.preventDefault();
-                        if (!touchStart || !touchEnd) return;
+                        const card = e.currentTarget as HTMLElement;
+
+                        if (!touchStart || !touchEnd) {
+                          // Reset card position
+                          card.style.transform = '';
+                          card.style.backgroundColor = '';
+                          return;
+                        }
+
                         const distanceX = touchStart.x - touchEnd.x;
                         const distanceY = touchStart.y - touchEnd.y;
-                        const isLeftSwipe = distanceX > 30; // Reduced threshold for easier swiping
+                        const isLeftSwipe = distanceX > 30;
                         const isRightSwipe = distanceX < -30;
                         const isVerticalSwipe = Math.abs(distanceY) > Math.abs(distanceX);
 
-                        if (!isVerticalSwipe) {
-                          if (isLeftSwipe) {
-                            handleMatchModeAction('dislike');
-                          } else if (isRightSwipe) {
-                            handleMatchModeAction('like');
-                          }
+                        if (!isVerticalSwipe && (isLeftSwipe || isRightSwipe)) {
+                          // Start animation
+                          setIsSwipeAnimating(true);
+                          setSwipeDirection(isLeftSwipe ? 'left' : 'right');
+
+                          // Execute action after animation
+                          setTimeout(() => {
+                            if (isLeftSwipe) {
+                              handleMatchModeAction('dislike');
+                            } else {
+                              handleMatchModeAction('like');
+                            }
+
+                            // Reset animation state
+                            setIsSwipeAnimating(false);
+                            setSwipeDirection(null);
+                          }, 300);
+                        } else {
+                          // Reset card position for incomplete swipes
+                          card.style.transform = '';
+                          card.style.backgroundColor = '';
                         }
 
                         setTouchStart(null);
