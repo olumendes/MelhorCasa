@@ -199,15 +199,19 @@ export default function Index() {
       // Use existing enhanced values or enhance if not already done
       const enhanced = property.valorNumerico ? property : enhanceProperty(property);
 
-      // Price filter
+      // Price filter - only apply if values are set
       const valorMin = filters.valorMin ? parseInt(filters.valorMin.replace(/[^\d]/g, '')) : 0;
       const valorMax = filters.valorMax ? parseInt(filters.valorMax.replace(/[^\d]/g, '')) : Infinity;
-      if (enhanced.valorNumerico! < valorMin || enhanced.valorNumerico! > valorMax) {
+      if (filters.valorMin && enhanced.valorNumerico! < valorMin) {
+        return false;
+      }
+      if (filters.valorMax && enhanced.valorNumerico! > valorMax) {
         return false;
       }
 
-      // Size filter
-      if (enhanced.m2Numerico! < filters.m2Min || enhanced.m2Numerico! > filters.m2Max) {
+      // Size filter - be more permissive
+      const m2Value = enhanced.m2Numerico || 0;
+      if (m2Value > 0 && (m2Value < filters.m2Min || m2Value > filters.m2Max)) {
         return false;
       }
 
@@ -221,7 +225,7 @@ export default function Index() {
         return false;
       }
 
-      // Distance filter
+      // Distance filter - only apply if user location is set
       if (userLocation && enhanced.distancia && enhanced.distancia > filters.distanciaMax) {
         return false;
       }
@@ -854,7 +858,7 @@ export default function Index() {
                 </DialogTrigger>
                 <DialogContent className="sm:max-w-4xl max-h-[80vh] overflow-hidden">
                   <DialogHeader>
-                    <DialogTitle>Casas Curtidas ❤��</DialogTitle>
+                    <DialogTitle>Casas Curtidas ❤️</DialogTitle>
                   </DialogHeader>
                   <div className="overflow-y-auto max-h-[60vh] space-y-4">
                     {likedProperties.length === 0 ? (
