@@ -452,10 +452,16 @@ export default function Index() {
       return;
     }
 
-    // Adjust index if necessary
+    // Adjust index if necessary and reset position states
     if (currentMatchIndex >= updatedMatchProperties.length) {
       setCurrentMatchIndex(0);
     }
+
+    // Reset touch and animation states to ensure next card appears correctly
+    setTouchStart(null);
+    setTouchEnd(null);
+    setIsSwipeAnimating(false);
+    setSwipeDirection(null);
   };
 
     // Match Mode tag functions
@@ -1639,9 +1645,13 @@ export default function Index() {
                               handleMatchModeAction('like');
                             }
 
-                            // Reset animation state
+                            // Reset animation state and card position
                             setIsSwipeAnimating(false);
                             setSwipeDirection(null);
+
+                            // Ensure card returns to default position
+                            card.style.transform = '';
+                            card.style.backgroundColor = '';
                           }, 300);
                         } else {
                           // Reset card position for incomplete swipes
@@ -1756,14 +1766,30 @@ export default function Index() {
                               onClick={(e) => {
                                 e.preventDefault();
                                 e.stopPropagation();
-                                if (property.link && property.link !== '#') {
-                                  window.open(property.link, '_blank', 'noopener,noreferrer');
+
+                                // Additional validation for mobile
+                                console.log('Clicking Ver detalhes for:', property.nome, 'Link:', property.link);
+
+                                if (property.link && property.link !== '#' && property.link.trim() !== '') {
+                                  try {
+                                    // Ensure the link starts with http/https
+                                    let url = property.link;
+                                    if (!url.startsWith('http://') && !url.startsWith('https://')) {
+                                      url = 'https://' + url;
+                                    }
+
+                                    window.open(url, '_blank', 'noopener,noreferrer');
+                                    toast.success('Abrindo detalhes do imóvel...');
+                                  } catch (error) {
+                                    console.error('Error opening link:', error);
+                                    toast.error('Erro ao abrir o link do imóvel');
+                                  }
                                 } else {
                                   toast.error('Link não disponível para esta propriedade');
                                 }
                               }}
                               variant="outline"
-                              className="w-full gap-1 sm:gap-2 text-xs sm:text-sm py-3 sm:py-4"
+                              className="w-full gap-1 sm:gap-2 text-xs sm:text-sm py-3 sm:py-4 touch-manipulation"
                             >
                               <span className="hidden sm:inline">Ver Detalhes</span>
                               <span className="sm:hidden">Ver</span>
