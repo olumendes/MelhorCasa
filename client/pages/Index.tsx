@@ -261,7 +261,14 @@ export default function Index() {
 
     // Show helpful message if no properties match filters
     if (properties.length > 0 && filtered.length === 0) {
-      console.log(`${properties.length} propriedades disponíveis, mas nenhuma passa pelos filtros atuais`);
+      console.log('Debug filtering:', {
+        totalProperties: properties.length,
+        enhancedCount: enhanced.length,
+        filteredCount: filtered.length,
+        currentFilters: filters,
+        sampleEnhanced: enhanced[0],
+        sampleOriginal: properties[0]
+      });
     }
 
     setFilteredProperties(sorted);
