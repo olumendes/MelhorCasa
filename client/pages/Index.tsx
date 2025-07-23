@@ -1726,36 +1726,47 @@ export default function Index() {
                             <span className="sm:hidden">Tag (T)</span>
                           </Button>
 
-                          <div className="grid grid-cols-2 gap-2 sm:flex sm:gap-3 md:gap-4">
-                            <Button
-                              size="sm"
-                              variant="destructive"
-                              onClick={() => handleMatchModeAction('dislike')}
-                              className="flex-1 gap-1 sm:gap-2 text-xs sm:text-sm py-3 sm:py-4"
-                            >
-                              <ArrowLeft className="h-3 w-3 sm:h-4 sm:w-4 md:h-5 md:w-5" />
-                              <span className="hidden sm:inline">Rejeitar</span>
-                              <span className="sm:hidden">👎</span>
-                            </Button>
-                            <div className="col-span-2 sm:col-span-1 sm:flex-shrink-0">
+                          <div className="space-y-2">
+                            {/* Main action buttons - side by side on mobile */}
+                            <div className="grid grid-cols-2 gap-2">
                               <Button
                                 size="sm"
-                                onClick={() => window.open(property.link, '_blank')}
-                                variant="outline"
-                                className="w-full gap-1 sm:gap-2 text-xs sm:text-sm py-3 sm:py-4"
+                                variant="destructive"
+                                onClick={() => handleMatchModeAction('dislike')}
+                                className="gap-1 sm:gap-2 text-xs sm:text-sm py-3 sm:py-4"
                               >
-                                <span className="hidden sm:inline">Ver Detalhes</span>
-                                <span className="sm:hidden">Ver</span>
+                                <ArrowLeft className="h-3 w-3 sm:h-4 sm:w-4 md:h-5 md:w-5" />
+                                <span className="hidden sm:inline">Rejeitar</span>
+                                <span className="sm:hidden">👎</span>
+                              </Button>
+                              <Button
+                                size="sm"
+                                onClick={() => handleMatchModeAction('like')}
+                                className="gap-1 sm:gap-2 bg-pink-600 hover:bg-pink-700 text-xs sm:text-sm py-3 sm:py-4"
+                              >
+                                <ArrowRight className="h-3 w-3 sm:h-4 sm:w-4 md:h-5 md:w-5" />
+                                <span className="hidden sm:inline">Curtir</span>
+                                <span className="sm:hidden">❤️</span>
                               </Button>
                             </div>
+
+                            {/* Ver detalhes button - full width */}
                             <Button
                               size="sm"
-                              onClick={() => handleMatchModeAction('like')}
-                              className="flex-1 gap-1 sm:gap-2 bg-pink-600 hover:bg-pink-700 text-xs sm:text-sm py-3 sm:py-4"
+                              onClick={(e) => {
+                                e.preventDefault();
+                                e.stopPropagation();
+                                if (property.link && property.link !== '#') {
+                                  window.open(property.link, '_blank', 'noopener,noreferrer');
+                                } else {
+                                  toast.error('Link não disponível para esta propriedade');
+                                }
+                              }}
+                              variant="outline"
+                              className="w-full gap-1 sm:gap-2 text-xs sm:text-sm py-3 sm:py-4"
                             >
-                              <ArrowRight className="h-3 w-3 sm:h-4 sm:w-4 md:h-5 md:w-5" />
-                              <span className="hidden sm:inline">Curtir</span>
-                              <span className="sm:hidden">❤️</span>
+                              <span className="hidden sm:inline">Ver Detalhes</span>
+                              <span className="sm:hidden">Ver</span>
                             </Button>
                           </div>
                         </div>
