@@ -1771,43 +1771,40 @@ export default function Index() {
                             {/* Ver detalhes button - full width */}
                             <Button
                               size="sm"
-                              onTouchStart={(e) => e.stopPropagation()}
-                              onTouchMove={(e) => e.stopPropagation()}
-                              onTouchEnd={(e) => e.stopPropagation()}
-                              onClick={(e) => {
-                                e.preventDefault();
-                                e.stopPropagation();
+                              onClick={() => {
+                                console.log('=== DEBUG BUTTON CLICK ===');
+                                console.log('Property name:', property.nome);
+                                console.log('Property link:', property.link);
+                                console.log('Window width:', window.innerWidth);
 
-                                // Additional validation for mobile
-                                console.log('Clicking Ver detalhes for:', property.nome, 'Link:', property.link);
-
-                                if (property.link && property.link !== '#' && property.link.trim() !== '') {
-                                  try {
-                                    // Ensure the link starts with http/https
-                                    let url = property.link;
-                                    if (!url.startsWith('http://') && !url.startsWith('https://')) {
-                                      url = 'https://' + url;
-                                    }
-
-                                    // Use location.href for better mobile compatibility
-                                    if (window.innerWidth <= 768) {
-                                      window.location.href = url;
-                                    } else {
-                                      window.open(url, '_blank', 'noopener,noreferrer');
-                                    }
-
-                                    toast.success('Abrindo detalhes do imóvel...');
-                                  } catch (error) {
-                                    console.error('Error opening link:', error);
-                                    toast.error('Erro ao abrir o link do imóvel');
-                                  }
-                                } else {
+                                if (!property.link || property.link === '#' || property.link.trim() === '') {
+                                  console.log('Link inválido ou vazio');
                                   toast.error('Link não disponível para esta propriedade');
+                                  return;
+                                }
+
+                                try {
+                                  let url = property.link.trim();
+                                  console.log('URL original:', url);
+
+                                  // Ensure the link starts with http/https
+                                  if (!url.startsWith('http://') && !url.startsWith('https://')) {
+                                    url = 'https://' + url;
+                                  }
+
+                                  console.log('URL final:', url);
+
+                                  // Simple direct navigation for mobile
+                                  window.open(url, '_blank');
+                                  toast.success('Abrindo link do imóvel...');
+
+                                } catch (error) {
+                                  console.error('Erro ao abrir link:', error);
+                                  toast.error('Erro ao abrir o link: ' + error.message);
                                 }
                               }}
                               variant="outline"
-                              className="w-full gap-1 sm:gap-2 text-xs sm:text-sm py-3 sm:py-4 touch-manipulation"
-                              style={{ pointerEvents: 'auto' }}
+                              className="w-full gap-1 sm:gap-2 text-xs sm:text-sm py-3 sm:py-4"
                             >
                               <span className="hidden sm:inline">Ver Detalhes</span>
                               <span className="sm:hidden">🔗 Ver</span>
