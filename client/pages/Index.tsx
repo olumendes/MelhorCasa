@@ -658,6 +658,9 @@ export default function Index() {
               !isDuplicateProperty(newProp, prev) && !isPropertyAlreadyProcessed(newProp)
             );
 
+            // Enhance imported properties with numeric values
+            const enhancedNewProperties = newProperties.map(property => enhanceProperty(property));
+
             const duplicatesCount = importedProperties.length - newProperties.length;
 
             if (duplicatesCount > 0) {
@@ -666,7 +669,7 @@ export default function Index() {
               toast.success(`${newProperties.length} imóveis importados do arquivo ${file.name}!`);
             }
 
-            return [...prev, ...newProperties];
+            return [...prev, ...enhancedNewProperties];
           });
         } catch (error) {
           toast.error("Erro ao processar o arquivo Excel. Verifique o formato.");
