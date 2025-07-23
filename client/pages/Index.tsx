@@ -289,15 +289,17 @@ export default function Index() {
     const enhanced = properties.map(property =>
       property.valorNumerico ? property : enhanceProperty(property)
     );
-    const filtered = applyFilters(enhanced);
-    const sorted = sortProperties(filtered);
+
+    // If showAllProperties is true, bypass filtering completely
+    const result = showAllProperties ? enhanced : applyFilters(enhanced);
+    const sorted = sortProperties(result);
 
     // Show helpful message if no properties match filters
-    if (properties.length > 0 && filtered.length === 0) {
+    if (properties.length > 0 && result.length === 0 && !showAllProperties) {
       console.log('Debug filtering:', {
         totalProperties: properties.length,
         enhancedCount: enhanced.length,
-        filteredCount: filtered.length,
+        filteredCount: result.length,
         currentFilters: filters,
         sampleEnhanced: enhanced[0],
         sampleOriginal: properties[0]
