@@ -307,7 +307,7 @@ export default function Index() {
     }
 
     setFilteredProperties(sorted);
-  }, [properties, filters, userLocation, sortOption]);
+  }, [properties, filters, userLocation, sortOption, showAllProperties]);
 
   const handleSaveLocation = async () => {
     if (!locationInput.trim()) {
