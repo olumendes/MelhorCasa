@@ -271,7 +271,7 @@ export default function Index() {
       setIsSettingsOpen(false);
       toast.success("Localização salva com sucesso!");
     } else {
-      toast.error("N��o foi possível encontrar as coordenadas para este endereço");
+      toast.error("Não foi possível encontrar as coordenadas para este endereço");
     }
   };
 
@@ -1172,10 +1172,10 @@ export default function Index() {
                     valorMin: "",
                     valorMax: "",
                     m2Min: 0,
-                    m2Max: 1000,
+                    m2Max: 2000,
                     quartos: "all",
                     vagas: "all",
-                    distanciaMax: 50,
+                    distanciaMax: 100,
                     tags: []
                   })}
                   className="w-full"
@@ -1397,10 +1397,10 @@ export default function Index() {
                   valorMin: "",
                   valorMax: "",
                   m2Min: 0,
-                  m2Max: 1000,
+                  m2Max: 2000,
                   quartos: "all",
                   vagas: "all",
-                  distanciaMax: 50,
+                  distanciaMax: 100,
                   tags: []
                 })}
               >
