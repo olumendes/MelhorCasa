@@ -696,17 +696,20 @@ export default function Index() {
 
             // Reset filters after import to show all imported properties
             if (newProperties.length > 0) {
-              setFilters({
-                valorMin: "",
-                valorMax: "",
-                m2Min: 0,
-                m2Max: 2000,
-                quartos: "all",
-                vagas: "all",
-                distanciaMax: 100,
-                tags: []
-              });
-              toast.info("Filtros resetados para mostrar todas as propriedades importadas");
+              // Use setTimeout to ensure state update happens after properties are added
+              setTimeout(() => {
+                setFilters({
+                  valorMin: "",
+                  valorMax: "",
+                  m2Min: 0,
+                  m2Max: 2000,
+                  quartos: "all",
+                  vagas: "all",
+                  distanciaMax: 100,
+                  tags: []
+                });
+                toast.info("Filtros resetados para mostrar todas as propriedades importadas");
+              }, 100);
             }
 
             return [...prev, ...enhancedNewProperties];
@@ -851,7 +854,7 @@ export default function Index() {
                 </DialogTrigger>
                 <DialogContent className="sm:max-w-4xl max-h-[80vh] overflow-hidden">
                   <DialogHeader>
-                    <DialogTitle>Casas Curtidas ❤️</DialogTitle>
+                    <DialogTitle>Casas Curtidas ❤��</DialogTitle>
                   </DialogHeader>
                   <div className="overflow-y-auto max-h-[60vh] space-y-4">
                     {likedProperties.length === 0 ? (
