@@ -251,6 +251,18 @@ export default function Index() {
     );
     const filtered = applyFilters(enhanced);
     const sorted = sortProperties(filtered);
+
+    // Debug logging for mobile issues
+    if (properties.length > 0 && filtered.length === 0) {
+      console.log('Filtering debug:', {
+        totalProperties: properties.length,
+        enhancedProperties: enhanced.length,
+        filteredProperties: filtered.length,
+        filters: filters,
+        sampleProperty: enhanced[0]
+      });
+    }
+
     setFilteredProperties(sorted);
   }, [properties, filters, userLocation, sortOption]);
 
