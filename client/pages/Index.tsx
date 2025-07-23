@@ -511,6 +511,14 @@ export default function Index() {
     return () => window.removeEventListener('keydown', handleKeyDown);
   }, [isMatchModeOpen, isMatchModeTagModalOpen, currentMatchIndex, matchModeProperties]);
 
+  // Reset animation states when card index changes
+  useEffect(() => {
+    setIsSwipeAnimating(false);
+    setSwipeDirection(null);
+    setTouchStart(null);
+    setTouchEnd(null);
+  }, [currentMatchIndex]);
+
     const handleLike = (propertyId: string) => {
     const property = properties.find(p => p.id === propertyId);
     if (!property) return;
@@ -1185,7 +1193,7 @@ export default function Index() {
                       className="w-full"
                     />
                     <div className="text-xs text-gray-600 text-center">
-                      Até {filters.distanciaMax} km da sua localização
+                      Até {filters.distanciaMax} km da sua localiza��ão
                     </div>
                   </div>
                 </div>
