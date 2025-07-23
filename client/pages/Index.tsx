@@ -1441,7 +1441,30 @@ export default function Index() {
                 {(() => {
                   const property = matchModeProperties[currentMatchIndex];
                   return (
-                    <Card className="overflow-hidden h-full flex flex-col">
+                    <Card
+                      className="overflow-hidden h-full flex flex-col cursor-pointer"
+                      onTouchStart={(e) => handleTouchStart(e, property.id)}
+                      onTouchMove={(e) => handleTouchMove(e, property.id)}
+                      onTouchEnd={() => {
+                        if (!touchStart || !touchEnd) return;
+                        const distanceX = touchStart.x - touchEnd.x;
+                        const distanceY = touchStart.y - touchEnd.y;
+                        const isLeftSwipe = distanceX > 50;
+                        const isRightSwipe = distanceX < -50;
+                        const isVerticalSwipe = Math.abs(distanceY) > Math.abs(distanceX);
+
+                        if (!isVerticalSwipe) {
+                          if (isLeftSwipe) {
+                            handleMatchModeAction('dislike');
+                          } else if (isRightSwipe) {
+                            handleMatchModeAction('like');
+                          }
+                        }
+
+                        setTouchStart(null);
+                        setTouchEnd(null);
+                      }}
+                    >
                       <div className="relative flex-shrink-0">
                         <img
                           src={property.imagem}
