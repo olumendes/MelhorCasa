@@ -606,6 +606,19 @@ export default function Index() {
             setProperties(prev => {
         if (!isDuplicateProperty(newProperty1, prev) && !isPropertyAlreadyProcessed(newProperty1)) {
           toast.info("Encontrada nova propriedade!");
+          // Reset filters when adding new properties to ensure they are visible
+          setTimeout(() => {
+            setFilters({
+              valorMin: "",
+              valorMax: "",
+              m2Min: 0,
+              m2Max: 2000,
+              quartos: "all",
+              vagas: "all",
+              distanciaMax: 100,
+              tags: []
+            });
+          }, 100);
           return [...prev, newProperty1];
         } else {
           toast.info("Propriedade já existe ou foi processada, pulando duplicata");
