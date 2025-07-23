@@ -128,11 +128,25 @@ export default function Index() {
   };
 
   // Function to parse numeric values from strings
-  const parseNumericValue = (valueStr: string): number => {
-    if (!valueStr) return 0;
-    // Handle different number formats and extract only digits
-    const cleaned = valueStr.toString().replace(/[^\d]/g, '');
-    return parseInt(cleaned) || 0;
+  const parseNumericValue = (valueStr: string | number | undefined | null): number => {
+    if (valueStr === null || valueStr === undefined) return 0;
+
+    // If it's already a number, return it
+    if (typeof valueStr === 'number') return valueStr;
+
+    // Convert to string and handle different formats
+    const str = valueStr.toString().trim();
+    if (!str || str === '' || str === '-' || str === 'N/A') return 0;
+
+    // Extract digits and handle decimal points
+    const cleaned = str.replace(/[^\d.,]/g, '');
+    if (!cleaned) return 0;
+
+    // Handle decimal formats (both . and , as decimal separators)
+    const normalizedStr = cleaned.replace(',', '.');
+    const parsed = parseFloat(normalizedStr);
+
+    return isNaN(parsed) ? 0 : Math.floor(parsed);
   };
 
         // Function to check if property link already exists
