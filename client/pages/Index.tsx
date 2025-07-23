@@ -684,6 +684,21 @@ export default function Index() {
               toast.success(`${newProperties.length} imóveis importados do arquivo ${file.name}!`);
             }
 
+            // Reset filters after import to show all imported properties
+            if (newProperties.length > 0) {
+              setFilters({
+                valorMin: "",
+                valorMax: "",
+                m2Min: 0,
+                m2Max: 2000,
+                quartos: "all",
+                vagas: "all",
+                distanciaMax: 100,
+                tags: []
+              });
+              toast.info("Filtros resetados para mostrar todas as propriedades importadas");
+            }
+
             return [...prev, ...enhancedNewProperties];
           });
         } catch (error) {
