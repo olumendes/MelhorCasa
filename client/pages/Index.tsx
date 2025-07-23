@@ -1259,6 +1259,28 @@ export default function Index() {
                       <span className="text-lg text-gray-500">/{properties.length}</span>
                     }
                   </p>
+                  {filteredProperties.length === 0 && properties.length > 0 && (
+                    <Button
+                      size="sm"
+                      variant="outline"
+                      onClick={() => {
+                        setFilters({
+                          valorMin: "",
+                          valorMax: "",
+                          m2Min: 0,
+                          m2Max: 2000,
+                          quartos: "all",
+                          vagas: "all",
+                          distanciaMax: 100,
+                          tags: []
+                        });
+                        toast.info("Filtros resetados manualmente");
+                      }}
+                      className="mt-2 text-xs"
+                    >
+                      Resetar Filtros
+                    </Button>
+                  )}
                 </div>
                 <Home className="h-8 w-8 text-blue-600" />
               </div>
@@ -1742,7 +1764,7 @@ export default function Index() {
               <Label htmlFor="matchTag" className="text-sm sm:text-base">Nome da Tag</Label>
               <Input
                 id="matchTag"
-                placeholder="Ex: Favorita, Boa localização"
+                placeholder="Ex: Favorita, Boa localizaç��o"
                 value={matchModeTagInput}
                 onChange={(e) => setMatchModeTagInput(e.target.value)}
                 onKeyDown={(e) => {
