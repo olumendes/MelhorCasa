@@ -740,7 +740,7 @@ export default function Index() {
               toast.success(`${newProperties.length} imóveis importados do arquivo ${file.name}!`);
             }
 
-            // Reset filters after import to show all imported properties
+            // Reset filters and activate show all mode after import
             if (newProperties.length > 0) {
               // Use setTimeout to ensure state update happens after properties are added
               setTimeout(() => {
@@ -754,7 +754,9 @@ export default function Index() {
                   distanciaMax: 100,
                   tags: []
                 });
-                toast.info("Filtros resetados para mostrar todas as propriedades importadas");
+                // Activate show all mode to bypass any filtering issues
+                setShowAllProperties(true);
+                toast.success(`${newProperties.length} propriedades importadas! Modo "Mostrar Todas" ativado.`);
               }, 100);
             }
 
