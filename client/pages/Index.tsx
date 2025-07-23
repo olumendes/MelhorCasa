@@ -1614,11 +1614,9 @@ export default function Index() {
                         ) : ''
                       }`}
                       onTouchStart={(e) => {
-                        e.preventDefault();
                         handleTouchStart(e, property.id);
                       }}
                       onTouchMove={(e) => {
-                        e.preventDefault();
                         handleTouchMove(e, property.id);
 
                         // Add visual feedback during swipe
@@ -1641,7 +1639,6 @@ export default function Index() {
                         }
                       }}
                       onTouchEnd={(e) => {
-                        e.preventDefault();
                         const card = e.currentTarget as HTMLElement;
 
                         if (!touchStart || !touchEnd) {
