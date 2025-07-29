@@ -1229,9 +1229,9 @@ export default function Index() {
                 <Label className="text-sm font-medium">Tamanho (m²)</Label>
                 <div className="space-y-2">
                   <Slider
-                    value={[filters.m2Min, filters.m2Max]}
+                    value={[tempFilters.m2Min, tempFilters.m2Max]}
                     onValueChange={([min, max]) =>
-                      setFilters(prev => ({ ...prev, m2Min: min, m2Max: max }))
+                      setTempFilters(prev => ({ ...prev, m2Min: min, m2Max: max }))
                     }
                     max={2000}
                     min={0}
@@ -1239,8 +1239,8 @@ export default function Index() {
                     className="w-full"
                   />
                   <div className="flex justify-between text-xs text-gray-600">
-                    <span>{filters.m2Min} m²</span>
-                    <span>{filters.m2Max} m²</span>
+                    <span>{tempFilters.m2Min} m²</span>
+                    <span>{tempFilters.m2Max} m²</span>
                   </div>
                 </div>
               </div>
