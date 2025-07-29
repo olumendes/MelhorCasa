@@ -642,7 +642,7 @@ export default function Index() {
           return 0;
       }
 
-      // Debug para verificar a ordenação
+      // Debug para verificar a ordena��ão
       if (sortOption.field === 'valor') {
         console.log(`Sorting ${a.nome}: ${aValue} vs ${b.nome}: ${bValue}, direction: ${sortOption.direction}`);
       }
@@ -1344,24 +1344,24 @@ export default function Index() {
                 </div>
               </div>
 
-                            {/* Clear Filters */}
-              <div className="space-y-3 flex items-end">
-                <Button
-                  variant="outline"
-                                    onClick={() => setFilters({
-                    valorMin: "",
-                    valorMax: "",
-                    m2Min: 0,
-                    m2Max: 2000,
-                    quartos: "all",
-                    vagas: "all",
-                    distanciaMax: 100,
-                    tags: []
-                  })}
-                  className="w-full"
-                >
-                  Limpar Filtros
-                </Button>
+                            {/* Filter Action Buttons */}
+              <div className="space-y-3 flex flex-col items-end md:col-span-full lg:col-span-1">
+                <div className="flex flex-col gap-2 w-full">
+                  <Button
+                    onClick={applyFiltersNow}
+                    className="w-full bg-blue-600 hover:bg-blue-700"
+                    disabled={JSON.stringify(tempFilters) === JSON.stringify(filters)}
+                  >
+                    Aplicar Filtros
+                  </Button>
+                  <Button
+                    variant="outline"
+                    onClick={resetFilters}
+                    className="w-full"
+                  >
+                    Resetar Filtros
+                  </Button>
+                </div>
               </div>
             </div>
           </CardContent>
