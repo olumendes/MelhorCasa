@@ -1425,7 +1425,7 @@ export default function Index() {
                   }}
                 />
                 <Badge className="absolute top-3 right-3 bg-blue-600">
-                  QuintoAndar
+                  {property.site || 'QuintoAndar'}
                 </Badge>
               </div>
               
