@@ -1312,15 +1312,15 @@ export default function Index() {
                 <Label className="text-sm font-medium">Filtrar por Tags</Label>
                 <div className="space-y-2">
                   <div className="flex flex-wrap gap-1 min-h-[2rem] p-2 border rounded-md bg-white">
-                    {filters.tags.length === 0 ? (
+                    {tempFilters.tags.length === 0 ? (
                       <span className="text-sm text-gray-400">Selecione tags para filtrar</span>
                     ) : (
-                      filters.tags.map(tag => (
+                      tempFilters.tags.map(tag => (
                         <Badge
                           key={tag}
                           variant="secondary"
                           className="cursor-pointer hover:bg-red-100"
-                          onClick={() => setFilters(prev => ({ ...prev, tags: prev.tags.filter(t => t !== tag) }))}
+                          onClick={() => setTempFilters(prev => ({ ...prev, tags: prev.tags.filter(t => t !== tag) }))}
                         >
                           {tag} <X className="h-3 w-3 ml-1" />
                         </Badge>
