@@ -642,12 +642,14 @@ export default function Index() {
           return 0;
       }
 
-      // Debug para verificar a ordena��ão
-      if (sortOption.field === 'valor') {
-        console.log(`Sorting ${a.nome}: ${aValue} vs ${b.nome}: ${bValue}, direction: ${sortOption.direction}`);
+      const result = sortOption.direction === 'asc' ? aValue - bValue : bValue - aValue;
+
+      // Debug ordenação
+      if (sortOption.field === 'valor' && Math.random() < 0.1) {
+        console.log(`Sorting: ${a.nome}(${aValue}) vs ${b.nome}(${bValue}) = ${result} (${sortOption.direction})`);
       }
 
-      return sortOption.direction === 'asc' ? aValue - bValue : bValue - aValue;
+      return result;
     });
   };
 
