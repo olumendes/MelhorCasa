@@ -74,6 +74,7 @@ export default function Index() {
       link: 'https://www.quintoandar.com.br',
       quartos: '2 quartos',
       garagem: '1',
+      site: 'QuintoAndar',
       valorNumerico: 500000,
       m2Numerico: 80,
       quartosNumerico: 2,
