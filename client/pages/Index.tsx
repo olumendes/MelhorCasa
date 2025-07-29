@@ -1261,7 +1261,7 @@ export default function Index() {
                       className="w-full"
                     />
                     <div className="text-xs text-gray-600 text-center">
-                      Até {filters.distanciaMax} km da sua localiza��ão
+                      Até {tempFilters.distanciaMax} km da sua localização
                     </div>
                   </div>
                 </div>
@@ -1856,7 +1856,7 @@ export default function Index() {
 
                                 if (!property.link || property.link === '#' || property.link.trim() === '') {
                                   console.log('Link inválido ou vazio');
-                                  toast.error('Link não disponível para esta propriedade');
+                                  toast.error('Link n��o disponível para esta propriedade');
                                   return;
                                 }
 
