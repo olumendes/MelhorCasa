@@ -1379,11 +1379,20 @@ export default function Index() {
             <CardContent className="p-6">
               <div className="flex items-center justify-between">
                 <div>
-                  <p className="text-sm font-medium text-gray-600">Fonte</p>
-                  <p className="text-xl font-bold text-purple-600">QuintoAndar</p>
+                  <p className="text-sm font-medium text-gray-600">Fontes</p>
+                  {(() => {
+                    const uniqueSites = [...new Set(properties.map(p => p.site || 'QuintoAndar'))];
+                    if (uniqueSites.length === 1) {
+                      return <p className="text-xl font-bold text-purple-600">{uniqueSites[0]}</p>;
+                    } else if (uniqueSites.length <= 3) {
+                      return <p className="text-sm font-bold text-purple-600">{uniqueSites.join(', ')}</p>;
+                    } else {
+                      return <p className="text-sm font-bold text-purple-600">{uniqueSites.length} sites diferentes</p>;
+                    }
+                  })()}
                 </div>
                 <div className="w-8 h-8 bg-purple-600 rounded-full flex items-center justify-center">
-                  <span className="text-white font-bold text-sm">Q</span>
+                  <span className="text-white font-bold text-sm">{[...new Set(properties.map(p => p.site || 'QuintoAndar'))].length}</span>
                 </div>
               </div>
             </CardContent>
