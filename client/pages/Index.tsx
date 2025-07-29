@@ -153,15 +153,50 @@ export default function Index() {
     const str = valueStr.toString().trim();
     if (!str || str === '' || str === '-' || str === 'N/A') return 0;
 
-    // Extract digits and handle decimal points
+    // Extract only digits, dots and commas
     const cleaned = str.replace(/[^\d.,]/g, '');
     if (!cleaned) return 0;
 
-    // Handle decimal formats (both . and , as decimal separators)
-    const normalizedStr = cleaned.replace(',', '.');
-    const parsed = parseFloat(normalizedStr);
+    // Handle Brazilian number format
+    // Examples: 1.200.000 = 1200000, 1.200.000,50 = 1200000.5, 1200000 = 1200000
+    let normalizedStr = cleaned;
 
-    return isNaN(parsed) ? 0 : Math.floor(parsed);
+    // Check if it's Brazilian format with dots as thousand separators
+    const dotCount = (cleaned.match(/\./g) || []).length;
+    const commaCount = (cleaned.match(/,/g) || []).length;
+
+    if (dotCount > 1 || (dotCount === 1 && commaCount === 1)) {
+      // Brazilian format: 1.200.000 or 1.200.000,50
+      // Remove dots (thousand separators) and replace comma with dot (decimal)
+      normalizedStr = cleaned.replace(/\./g, '').replace(',', '.');
+    } else if (dotCount === 1 && commaCount === 0) {
+      // Could be: 1200000.50 (English) or 1.200 (Brazilian thousands)
+      // Check if dot is followed by 1-2 digits (likely decimal) or 3+ digits (likely thousands)
+      const parts = cleaned.split('.');
+      if (parts.length === 2 && parts[1].length <= 2) {
+        // Likely decimal: 1200000.50
+        normalizedStr = cleaned;
+      } else {
+        // Likely thousands: 1.200 -> 1200
+        normalizedStr = cleaned.replace(/\./g, '');
+      }
+    } else if (dotCount === 0 && commaCount === 1) {
+      // Brazilian decimal: 1200000,50 -> 1200000.50
+      normalizedStr = cleaned.replace(',', '.');
+    } else {
+      // Only digits or multiple separators - remove all separators except last
+      normalizedStr = cleaned.replace(/[.,]/g, '');
+    }
+
+    const parsed = parseFloat(normalizedStr);
+    const result = isNaN(parsed) ? 0 : Math.floor(parsed);
+
+    // Debug log para verificar conversões
+    if (str !== cleaned && result > 0) {
+      console.log(`Converted: "${str}" -> "${cleaned}" -> "${normalizedStr}" -> ${result}`);
+    }
+
+    return result;
   };
 
         // Function to check if property link already exists
@@ -975,7 +1010,7 @@ export default function Index() {
                 </DialogTrigger>
                 <DialogContent className="sm:max-w-4xl max-h-[80vh] overflow-hidden">
                   <DialogHeader>
-                    <DialogTitle>Casas Curtidas ❤️</DialogTitle>
+                    <DialogTitle>Casas Curtidas ❤��</DialogTitle>
                   </DialogHeader>
                   <div className="overflow-y-auto max-h-[60vh] space-y-4">
                     {likedProperties.length === 0 ? (
