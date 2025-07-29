@@ -1290,8 +1290,8 @@ export default function Index() {
               {/* Parking Filter */}
               <div className="space-y-3">
                 <Label className="text-sm font-medium">Vagas de Garagem</Label>
-                <Select value={filters.vagas} onValueChange={(value) =>
-                  setFilters(prev => ({ ...prev, vagas: value }))
+                <Select value={tempFilters.vagas} onValueChange={(value) =>
+                  setTempFilters(prev => ({ ...prev, vagas: value }))
                 }>
                   <SelectTrigger>
                     <SelectValue placeholder="Selecione" />
@@ -1656,7 +1656,7 @@ export default function Index() {
             </DialogTitle>
             <div className="text-xs sm:text-sm text-gray-600">
               <span className="hidden sm:inline">Use as setas: ← rejeitar, → curtir, T para adicionar tag, Esc para sair</span>
-              <span className="sm:hidden">Arraste: ← rejeitar, → curtir | Setas: ←→ | T = tag</span>
+              <span className="sm:hidden">Arraste: ← rejeitar, → curtir | Setas: ←�� | T = tag</span>
             </div>
           </DialogHeader>
 
