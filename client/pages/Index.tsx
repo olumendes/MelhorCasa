@@ -1700,6 +1700,9 @@ export default function Index() {
                         <Badge className="absolute top-2 right-2 sm:top-3 sm:right-3 bg-blue-600 text-xs sm:text-sm">
                           {currentMatchIndex + 1}/{matchModeProperties.length}
                         </Badge>
+                        <Badge className="absolute top-2 left-2 sm:top-3 sm:left-3 bg-purple-600 text-xs sm:text-sm">
+                          {property.site || 'QuintoAndar'}
+                        </Badge>
                       </div>
 
                       <CardContent className="p-3 sm:p-4 md:p-6 flex-1 overflow-y-auto">
