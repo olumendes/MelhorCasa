@@ -633,6 +633,11 @@ export default function Index() {
 
       return result;
     });
+
+    // Log final para debug
+    console.log(`Ordenação ${sortOption.field} ${sortOption.direction} aplicada. Total: ${sorted.length} propriedades`);
+
+    return sorted;
   };
 
       // Load user location and liked/disliked properties from localStorage on component mount
