@@ -824,7 +824,8 @@ export default function Index() {
       "Localização": property.localizacao,
       Link: property.link,
       Quartos: property.quartos,
-      Garagem: property.garagem
+      Garagem: property.garagem,
+      Site: property.site || 'QuintoAndar'
     }));
     
     const worksheet = XLSX.utils.json_to_sheet(exportData);
