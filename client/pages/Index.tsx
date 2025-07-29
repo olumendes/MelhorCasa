@@ -1329,12 +1329,12 @@ export default function Index() {
                   </div>
                   {availableTags.length > 0 && (
                     <div className="flex flex-wrap gap-1">
-                      {availableTags.filter(tag => !filters.tags.includes(tag)).map(tag => (
+                      {availableTags.filter(tag => !tempFilters.tags.includes(tag)).map(tag => (
                         <Badge
                           key={tag}
                           variant="outline"
                           className="cursor-pointer hover:bg-blue-50"
-                          onClick={() => setFilters(prev => ({ ...prev, tags: [...prev.tags, tag] }))}
+                          onClick={() => setTempFilters(prev => ({ ...prev, tags: [...prev.tags, tag] }))}
                         >
                           <Plus className="h-3 w-3 mr-1" /> {tag}
                         </Badge>
