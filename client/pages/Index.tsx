@@ -1213,8 +1213,8 @@ export default function Index() {
                     />
                     <Input
                       placeholder="Máximo"
-                      value={filters.valorMax}
-                      onChange={(e) => setFilters(prev => ({ ...prev, valorMax: e.target.value }))}
+                      value={tempFilters.valorMax}
+                      onChange={(e) => setTempFilters(prev => ({ ...prev, valorMax: e.target.value }))}
                       className="flex-1 text-sm"
                     />
                   </div>
