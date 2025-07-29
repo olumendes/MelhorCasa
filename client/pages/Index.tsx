@@ -1207,8 +1207,8 @@ export default function Index() {
                   <div className="flex flex-col sm:flex-row gap-2">
                     <Input
                       placeholder="Mínimo"
-                      value={filters.valorMin}
-                      onChange={(e) => setFilters(prev => ({ ...prev, valorMin: e.target.value }))}
+                      value={tempFilters.valorMin}
+                      onChange={(e) => setTempFilters(prev => ({ ...prev, valorMin: e.target.value }))}
                       className="flex-1 text-sm"
                     />
                     <Input
