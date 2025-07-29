@@ -1386,18 +1386,7 @@ export default function Index() {
                         size="sm"
                         variant="outline"
                         onClick={() => {
-                          setFilters({
-                            valorMin: "",
-                            valorMax: "",
-                            m2Min: 0,
-                            m2Max: 2000,
-                            quartos: "all",
-                            vagas: "all",
-                            distanciaMax: 100,
-                            tags: []
-                          });
-                          setShowAllProperties(false);
-                          toast.info("Filtros resetados manualmente");
+                          resetFilters();
                         }}
                         className="text-xs w-full"
                       >
