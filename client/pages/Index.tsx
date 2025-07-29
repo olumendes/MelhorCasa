@@ -22,6 +22,7 @@ interface Property {
   link: string;
   quartos: string;
   garagem: string;
+  site?: string; // Nova propriedade para capturar a fonte/site
   latitude?: number;
   longitude?: number;
   valorNumerico?: number;
@@ -753,7 +754,8 @@ export default function Index() {
             localizacao: row["Localização"] || row.localizacao || "Localização não informada",
             link: row.Link || row.link || "#",
             quartos: row.Quartos || row.quartos || "0 quartos",
-            garagem: row.Garagem || row.garagem || "0"
+            garagem: row.Garagem || row.garagem || "0",
+            site: row.Site || row.site || "QuintoAndar" // Captura a coluna Site do XLSX
           }));
           
                               // Filter out duplicates and already processed properties
