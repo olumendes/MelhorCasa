@@ -1251,7 +1251,7 @@ export default function Index() {
                   <Label className="text-sm font-medium">Distância máxima (km)</Label>
                   <div className="space-y-2">
                     <Slider
-                      value={[filters.distanciaMax]}
+                      value={[tempFilters.distanciaMax]}
                       onValueChange={([max]) =>
                         setFilters(prev => ({ ...prev, distanciaMax: max }))
                       }
