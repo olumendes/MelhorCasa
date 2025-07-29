@@ -1253,7 +1253,7 @@ export default function Index() {
                     <Slider
                       value={[tempFilters.distanciaMax]}
                       onValueChange={([max]) =>
-                        setFilters(prev => ({ ...prev, distanciaMax: max }))
+                        setTempFilters(prev => ({ ...prev, distanciaMax: max }))
                       }
                       max={200}
                       min={1}
