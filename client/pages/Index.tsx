@@ -104,6 +104,17 @@ export default function Index() {
   const [locationInput, setLocationInput] = useState("");
   const [sortOption, setSortOption] = useState<SortOption>({ field: 'valor', direction: 'desc' });
   const [touchStart, setTouchStart] = useState<TouchPosition | null>(null);
+  const [tempFilters, setTempFilters] = useState<Filters>({
+    valorMin: "",
+    valorMax: "",
+    m2Min: 0,
+    m2Max: 2000,
+    quartos: "all",
+    vagas: "all",
+    distanciaMax: 100,
+    tags: []
+  });
+  const [filtersApplied, setFiltersApplied] = useState(false);
   const [touchEnd, setTouchEnd] = useState<TouchPosition | null>(null);
   const [swipedCard, setSwipedCard] = useState<string | null>(null);
   const [filters, setFilters] = useState<Filters>({
@@ -295,6 +306,30 @@ export default function Index() {
     });
   };
 
+  const applyFiltersNow = () => {
+    setFilters(tempFilters);
+    setFiltersApplied(true);
+    toast.info("Filtros aplicados!");
+  };
+
+  const resetFilters = () => {
+    const resetValues = {
+      valorMin: "",
+      valorMax: "",
+      m2Min: 0,
+      m2Max: 2000,
+      quartos: "all",
+      vagas: "all",
+      distanciaMax: 100,
+      tags: []
+    };
+    setTempFilters(resetValues);
+    setFilters(resetValues);
+    setFiltersApplied(false);
+    setShowAllProperties(false);
+    toast.info("Filtros resetados!");
+  };
+
       // Update filtered properties when properties or filters change
   useEffect(() => {
     // First deduplicate the properties
@@ -329,6 +364,11 @@ export default function Index() {
 
     setFilteredProperties(sorted);
   }, [properties, filters, userLocation, sortOption, showAllProperties]);
+
+  // Initialize tempFilters with current filters
+  useEffect(() => {
+    setTempFilters(filters);
+  }, []);
 
   const handleSaveLocation = async () => {
     if (!locationInput.trim()) {
@@ -580,6 +620,8 @@ export default function Index() {
 
   // Sorting function
   const sortProperties = (propertiesToSort: Property[]): Property[] => {
+    if (!propertiesToSort || propertiesToSort.length === 0) return [];
+
     return [...propertiesToSort].sort((a, b) => {
       let aValue: number, bValue: number;
 
@@ -598,6 +640,11 @@ export default function Index() {
           break;
         default:
           return 0;
+      }
+
+      // Debug para verificar a ordenação
+      if (sortOption.field === 'valor') {
+        console.log(`Sorting ${a.nome}: ${aValue} vs ${b.nome}: ${bValue}, direction: ${sortOption.direction}`);
       }
 
       return sortOption.direction === 'asc' ? aValue - bValue : bValue - aValue;
