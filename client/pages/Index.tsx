@@ -1270,8 +1270,8 @@ export default function Index() {
               {/* Rooms Filter */}
               <div className="space-y-3">
                 <Label className="text-sm font-medium">Quartos</Label>
-                <Select value={filters.quartos} onValueChange={(value) =>
-                  setFilters(prev => ({ ...prev, quartos: value }))
+                <Select value={tempFilters.quartos} onValueChange={(value) =>
+                  setTempFilters(prev => ({ ...prev, quartos: value }))
                 }>
                   <SelectTrigger>
                     <SelectValue placeholder="Selecione" />
@@ -1856,7 +1856,7 @@ export default function Index() {
 
                                 if (!property.link || property.link === '#' || property.link.trim() === '') {
                                   console.log('Link inválido ou vazio');
-                                  toast.error('Link n��o disponível para esta propriedade');
+                                  toast.error('Link não disponível para esta propriedade');
                                   return;
                                 }
 
