@@ -2024,6 +2024,60 @@ export default function Index() {
         </DialogContent>
       </Dialog>
 
+      {/* Site Selection Modal */}
+      <Dialog open={isSelectSiteOpen} onOpenChange={setIsSelectSiteOpen}>
+        <DialogContent className="sm:max-w-md">
+          <DialogHeader>
+            <DialogTitle>Selecionar Site para Importação</DialogTitle>
+            <p className="text-sm text-gray-600">
+              Escolha o site de origem do arquivo XLSX para usar o mapeamento correto das colunas.
+            </p>
+          </DialogHeader>
+          <div className="space-y-4">
+            <div className="grid grid-cols-2 gap-2">
+              {[
+                { value: 'quintoandar', label: 'QuintoAndar' },
+                { value: 'imovelnaweb', label: 'Imóvel na Web' },
+                { value: 'olx', label: 'OLX' },
+                { value: 'zapimoveis', label: 'ZAP Imóveis' },
+                { value: 'vivareal', label: 'VivaReal' },
+                { value: 'netimoveis', label: 'Netimóveis' },
+                { value: 'loft', label: 'Loft' },
+                { value: 'chavesnamao', label: 'Chaves na Mão' },
+                { value: 'casamineira', label: 'Casa Mineira' }
+              ].map((site) => (
+                <Button
+                  key={site.value}
+                  variant={selectedSite === site.value ? "default" : "outline"}
+                  onClick={() => setSelectedSite(site.value)}
+                  className="justify-start text-sm h-auto py-2"
+                >
+                  {site.label}
+                </Button>
+              ))}
+            </div>
+            <div className="flex gap-2 justify-end">
+              <Button
+                variant="outline"
+                onClick={() => {
+                  setIsSelectSiteOpen(false);
+                  setSelectedSite('');
+                  setPendingFile(null);
+                }}
+              >
+                Cancelar
+              </Button>
+              <Button
+                onClick={processSelectedFile}
+                disabled={!selectedSite}
+              >
+                Importar Arquivo
+              </Button>
+            </div>
+          </div>
+        </DialogContent>
+      </Dialog>
+
       {/* Tag Modal */}
       <Dialog open={isTagModalOpen} onOpenChange={setIsTagModalOpen}>
         <DialogContent className="sm:max-w-md">
