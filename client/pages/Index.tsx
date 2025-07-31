@@ -960,8 +960,9 @@ export default function Index() {
             }
           }
 
-          if (fieldName === 'nome' || fieldName === 'valor' || fieldName === 'imagem') {
-            console.log(`Found ${fieldName}: "${value}" in column "${column}"`);
+          // Only log first few items to avoid spam
+          if ((fieldName === 'nome' || fieldName === 'valor' || fieldName === 'imagem') && Math.random() < 0.1) {
+            console.log(`Found ${fieldName}: "${value.substring(0, 50)}..." in column "${column}"`);
           }
           return value;
         }
