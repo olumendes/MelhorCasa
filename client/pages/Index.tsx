@@ -1959,9 +1959,27 @@ export default function Index() {
                           <p className="text-xs sm:text-sm text-gray-600 line-clamp-2">{property.localizacao}</p>
                         </div>
 
-                        <div className="text-xl sm:text-2xl md:text-3xl font-bold text-green-600 mb-3 sm:mb-4">
+                        <div className="text-xl sm:text-2xl md:text-3xl font-bold text-green-600 mb-2">
                           {property.valor}
                         </div>
+
+                        {/* Condomínio */}
+                        {property.condominio && (
+                          <div className="text-sm text-gray-600 mb-3">
+                            <span className="font-medium">Condomínio:</span> {property.condominio}
+                          </div>
+                        )}
+
+                        {/* Endereço detalhado se disponível */}
+                        {(property.rua || property.bairro) && (
+                          <div className="flex items-start gap-2 mb-3">
+                            <MapPin className="h-3 w-3 sm:h-4 sm:w-4 text-gray-500 mt-0.5 flex-shrink-0" />
+                            <div className="text-xs sm:text-sm text-gray-600">
+                              {property.rua && <p>{property.rua}</p>}
+                              {property.bairro && <p>{property.bairro}</p>}
+                            </div>
+                          </div>
+                        )}
 
                         <div className="flex flex-wrap gap-1.5 sm:gap-2 mb-3 sm:mb-4">
                           <Badge variant="secondary" className="gap-1 text-xs">
