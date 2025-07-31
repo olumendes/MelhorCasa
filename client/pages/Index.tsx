@@ -943,20 +943,36 @@ export default function Index() {
 
           // Special processing for nome field
           if (fieldName === 'nome') {
-            // Remove HTML tags
+            // Remove HTML tags and entities
             value = value.replace(/<[^>]*>/g, '');
             value = value.replace(/&amp;lt;/g, '<').replace(/&amp;gt;/g, '>');
             value = value.replace(/&lt;/g, '<').replace(/&gt;/g, '>');
+            value = value.replace(/&nbsp;/g, ' ');
+            value = value.replace(/&quot;/g, '"');
+            value = value.replace(/&amp;/g, '&');
 
-            // Extract first sentence or first 100 characters
-            const sentences = value.split(/[.!?]/);
-            if (sentences.length > 0 && sentences[0].length > 0) {
-              value = sentences[0].trim();
+            // Remove extra whitespace
+            value = value.replace(/\s+/g, ' ').trim();
+
+            // Extract meaningful title - look for patterns
+            // Try to find the actual property title before description
+            const patterns = [
+              /^([^–-]+)[–-]/, // Title before dash
+              /^([^.!?]+)[.!?]/, // First sentence
+              /^(.{1,100})\s+(Características|Detalhes|Localização|Com\s+\d+)/, // Before common description words
+            ];
+
+            for (const pattern of patterns) {
+              const match = value.match(pattern);
+              if (match && match[1] && match[1].trim().length > 10) {
+                value = match[1].trim();
+                break;
+              }
             }
 
-            // Limit to 150 characters
-            if (value.length > 150) {
-              value = value.substring(0, 150) + '...';
+            // Limit to 120 characters for better display
+            if (value.length > 120) {
+              value = value.substring(0, 117) + '...';
             }
           }
 
