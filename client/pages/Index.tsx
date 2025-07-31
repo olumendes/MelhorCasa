@@ -977,7 +977,7 @@ export default function Index() {
           }
 
           // Only log first few items to avoid spam
-          if ((fieldName === 'nome' || fieldName === 'valor' || fieldName === 'imagem') && Math.random() < 0.1) {
+          if ((fieldName === 'nome' || fieldName === 'valor' || fieldName === 'imagem') && Math.random() < 0.02) {
             console.log(`Found ${fieldName}: "${value.substring(0, 50)}..." in column "${column}"`);
           }
           return value;
@@ -1955,7 +1955,7 @@ export default function Index() {
               Avalie imóveis de forma rápida e intuitiva
             </DialogDescription>
             <div className="text-xs sm:text-sm text-gray-600">
-              <span className="hidden sm:inline">Use as setas: �� rejeitar, → curtir, T para adicionar tag, Esc para sair</span>
+              <span className="hidden sm:inline">Use as setas: ← rejeitar, → curtir, T para adicionar tag, Esc para sair</span>
               <span className="sm:hidden">Arraste: ← rejeitar, → curtir | Setas: ←�� | T = tag</span>
             </div>
           </DialogHeader>
