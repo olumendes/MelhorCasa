@@ -1870,7 +1870,7 @@ export default function Index() {
                     <span className="sm:hidden">Tag</span>
                   </Button>
                   <div className="text-xs text-center text-gray-500">
-                    <span className="hidden sm:inline">← Arraste para rejeitar | Arraste para curtir →</span>
+                    <span className="hidden sm:inline">�� Arraste para rejeitar | Arraste para curtir →</span>
                     <span className="sm:hidden">Arraste ←→ ou use botões</span>
                   </div>
                 </div>
@@ -2318,6 +2318,9 @@ export default function Index() {
         <DialogContent className="sm:max-w-md">
           <DialogHeader>
             <DialogTitle>Adicionar Tag</DialogTitle>
+            <DialogDescription>
+              Adicione uma etiqueta personalizada para organizar seus imóveis
+            </DialogDescription>
             {selectedPropertyForTag && (
               <p className="text-sm text-gray-600">
                 Adicionando tag para: {selectedPropertyForTag.nome}
