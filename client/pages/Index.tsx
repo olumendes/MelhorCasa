@@ -879,7 +879,7 @@ export default function Index() {
       site: ['Site', 'site']
     },
     netimoveis: {
-      nome: ['Título', 'titulo', 'Nome', 'nome'],
+      nome: ['T��tulo', 'titulo', 'Nome', 'nome'],
       imagem: ['Imagem', 'imagem', 'Foto', 'foto'],
       valor: ['Valor', 'valor', 'Preço', 'preco'],
       m2: ['Área', 'area', 'M²', 'm2'],
@@ -1951,6 +1951,9 @@ export default function Index() {
               <span className="hidden sm:inline">Modo Match - Tinder de Casas</span>
               <span className="sm:hidden">Match Mode</span>
             </DialogTitle>
+            <DialogDescription className="text-xs sm:text-sm text-gray-600">
+              Avalie imóveis de forma rápida e intuitiva
+            </DialogDescription>
             <div className="text-xs sm:text-sm text-gray-600">
               <span className="hidden sm:inline">Use as setas: ← rejeitar, → curtir, T para adicionar tag, Esc para sair</span>
               <span className="sm:hidden">Arraste: ← rejeitar, → curtir | Setas: ←�� | T = tag</span>
