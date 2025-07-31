@@ -877,6 +877,52 @@ export default function Index() {
       quartos: ['Quartos', 'quartos'],
       garagem: ['Vagas', 'vagas'],
       site: ['Site', 'site']
+    },
+    netimoveis: {
+      nome: ['Título', 'titulo', 'Nome', 'nome'],
+      imagem: ['Imagem', 'imagem', 'Foto', 'foto'],
+      valor: ['Valor', 'valor', 'Preço', 'preco'],
+      m2: ['Área', 'area', 'M²', 'm2'],
+      localizacao: ['Endereço', 'endereco', 'Localização', 'localizacao'],
+      link: ['Link', 'link', 'URL', 'url'],
+      quartos: ['Quartos', 'quartos'],
+      garagem: ['Garagem', 'garagem', 'Vagas', 'vagas'],
+      site: ['Site', 'site']
+    },
+    loft: {
+      nome: ['Título', 'titulo', 'Nome', 'nome'],
+      imagem: ['Imagem', 'imagem'],
+      valor: ['Preço', 'preco', 'Valor', 'valor'],
+      m2: ['Área', 'area', 'M²', 'm2'],
+      localizacao: ['Endereço', 'endereco'],
+      link: ['Link', 'link'],
+      quartos: ['Quartos', 'quartos'],
+      garagem: ['Vagas', 'vagas'],
+      site: ['Site', 'site']
+    },
+    chavesnamao: {
+      nome: ['Título', 'titulo', 'Descrição', 'descricao'],
+      imagem: ['Foto', 'foto', 'Imagem', 'imagem'],
+      valor: ['Valor', 'valor', 'Preço', 'preco'],
+      m2: ['Área', 'area', 'Tamanho', 'tamanho'],
+      localizacao: ['Localização', 'localizacao', 'Endereço', 'endereco'],
+      link: ['Link', 'link'],
+      quartos: ['Quartos', 'quartos'],
+      garagem: ['Garagem', 'garagem'],
+      site: ['Site', 'site']
+    },
+    casamineira: {
+      nome: ['Título', 'titulo', 'Nome', 'nome'],
+      imagem: ['Imagem', 'imagem', 'Foto', 'foto'],
+      valor: ['Preço', 'preco', 'Valor', 'valor'],
+      m2: ['Área', 'area', 'M²', 'm2'],
+      rua: ['Rua', 'rua', 'Endereço', 'endereco'],
+      bairro: ['Bairro', 'bairro'],
+      localizacao: ['Localização', 'localizacao'],
+      link: ['Link', 'link'],
+      quartos: ['Quartos', 'quartos'],
+      garagem: ['Garagem', 'garagem', 'Vagas', 'vagas'],
+      site: ['Site', 'site']
     }
   };
 
