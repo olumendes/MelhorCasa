@@ -969,7 +969,8 @@ export default function Index() {
       }
     }
 
-    if (fieldName === 'nome' || fieldName === 'valor' || fieldName === 'imagem') {
+    // Only log missing critical fields
+    if ((fieldName === 'nome' || fieldName === 'valor') && Math.random() < 0.2) {
       console.log(`No ${fieldName} found in columns:`, mapping);
     }
     return '';
