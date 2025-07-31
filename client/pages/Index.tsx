@@ -1920,9 +1920,17 @@ export default function Index() {
                     >
                       <div className="relative flex-shrink-0">
                         <img
-                          src={property.imagem}
+                          src={currentImageIndex[property.id] === 1 && property.imagem2 ? property.imagem2 : property.imagem}
                           alt={property.nome}
-                          className="w-full h-40 sm:h-48 md:h-64 object-cover"
+                          className="w-full h-40 sm:h-48 md:h-64 object-cover cursor-pointer"
+                          onClick={() => {
+                            if (property.imagem2) {
+                              setCurrentImageIndex(prev => ({
+                                ...prev,
+                                [property.id]: prev[property.id] === 1 ? 0 : 1
+                              }));
+                            }
+                          }}
                           onError={(e) => {
                             (e.target as HTMLImageElement).src = "https://images.unsplash.com/photo-1570129477492-45c003edd2be?w=600&h=400&fit=crop";
                           }}
@@ -1933,6 +1941,12 @@ export default function Index() {
                         <Badge className="absolute top-2 left-2 sm:top-3 sm:left-3 bg-purple-600 text-xs sm:text-sm">
                           {property.site || 'QuintoAndar'}
                         </Badge>
+                        {property.imagem2 && (
+                          <div className="absolute bottom-2 right-2 sm:bottom-3 sm:right-3 flex gap-1">
+                            <div className={`w-2 h-2 rounded-full ${currentImageIndex[property.id] === 0 ? 'bg-white' : 'bg-white/50'}`} />
+                            <div className={`w-2 h-2 rounded-full ${currentImageIndex[property.id] === 1 ? 'bg-white' : 'bg-white/50'}`} />
+                          </div>
+                        )}
                       </div>
 
                       <CardContent className="p-3 sm:p-4 md:p-6 flex-1 overflow-y-auto">
