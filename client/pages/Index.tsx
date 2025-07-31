@@ -894,81 +894,95 @@ export default function Index() {
     if (file && (file.name.endsWith('.xlsx') || file.name.endsWith('.xls'))) {
       setPendingFile(file);
       setIsSelectSiteOpen(true);
-      reader.onload = (e) => {
-        try {
-          const data = new Uint8Array(e.target?.result as ArrayBuffer);
-          const workbook = XLSX.read(data, { type: 'array' });
-          const sheetName = workbook.SheetNames[0];
-          const worksheet = workbook.Sheets[sheetName];
-          const jsonData = XLSX.utils.sheet_to_json(worksheet) as any[];
-          
-          // Convert Excel data to our Property interface
-          const importedProperties: Property[] = jsonData.map((row, index) => ({
-            id: `imported-${Date.now()}-${index}`,
-            nome: row.Nome || row.nome || `Imóvel Importado ${index + 1}`,
-            imagem: row.Imagem || row.imagem || "https://cdn.builder.io/api/v1/image/assets%2FTEMP%2Fdefault-house",
-            valor: row.Valor || row.valor || "R$ 0",
-            m2: row["M²"] || row.m2 || "0 m²",
-            localizacao: row["Localização"] || row.localizacao || "Localização não informada",
-            link: row.Link || row.link || "#",
-            quartos: row.Quartos || row.quartos || "0 quartos",
-            garagem: row.Garagem || row.garagem || "0",
-            site: row.Site || row.site || "QuintoAndar" // Captura a coluna Site do XLSX
-          }));
-          
-                              // Filter out duplicates and already processed properties
-          setProperties(prev => {
-            const newProperties = importedProperties.filter(newProp =>
-              !isDuplicateProperty(newProp, prev) && !isPropertyAlreadyProcessed(newProp)
-            );
-
-            // Enhance imported properties with numeric values
-            const enhancedNewProperties = newProperties.map(property => enhanceProperty(property));
-
-            const duplicatesCount = importedProperties.length - newProperties.length;
-
-            if (duplicatesCount > 0) {
-              toast.info(`${newProperties.length} novos imóveis importados, ${duplicatesCount} duplicatas/já processadas ignoradas`);
-            } else {
-              toast.success(`${newProperties.length} imóveis importados do arquivo ${file.name}!`);
-            }
-
-            // Reset filters and activate show all mode after import
-            if (newProperties.length > 0) {
-              // Use setTimeout to ensure state update happens after properties are added
-              setTimeout(() => {
-                setFilters({
-                  valorMin: "",
-                  valorMax: "",
-                  m2Min: 0,
-                  m2Max: 2000,
-                  quartos: "all",
-                  vagas: "all",
-                  distanciaMax: 100,
-                  tags: []
-                });
-                // Activate show all mode to bypass any filtering issues
-                setShowAllProperties(true);
-                toast.success(`${newProperties.length} propriedades importadas! Modo "Mostrar Todas" ativado.`);
-              }, 100);
-            }
-
-            return [...prev, ...enhancedNewProperties];
-          });
-        } catch (error) {
-          toast.error("Erro ao processar o arquivo Excel. Verifique o formato.");
-          console.error("Error parsing Excel file:", error);
-        }
-      };
-      reader.readAsArrayBuffer(file);
     } else {
       toast.error("Por favor, selecione um arquivo Excel (.xlsx ou .xls)");
     }
-    
+
     // Reset input value
     if (event.target) {
       event.target.value = '';
     }
+  };
+
+  const processSelectedFile = () => {
+    if (!pendingFile || !selectedSite) return;
+
+    const mapping = siteColumnMappings[selectedSite as keyof typeof siteColumnMappings];
+    if (!mapping) {
+      toast.error("Site não suportado");
+      return;
+    }
+
+    const reader = new FileReader();
+    reader.onload = (e) => {
+      try {
+        const data = new Uint8Array(e.target?.result as ArrayBuffer);
+        const workbook = XLSX.read(data, { type: 'array' });
+        const sheetName = workbook.SheetNames[0];
+        const worksheet = workbook.Sheets[sheetName];
+        const jsonData = XLSX.utils.sheet_to_json(worksheet) as any[];
+
+        // Convert Excel data using site-specific mapping
+        const importedProperties: Property[] = jsonData.map((row, index) => ({
+          id: `imported-${Date.now()}-${index}`,
+          nome: getColumnValue(row, mapping.nome) || `Imóvel Importado ${index + 1}`,
+          imagem: getColumnValue(row, mapping.imagem) || "https://cdn.builder.io/api/v1/image/assets%2FTEMP%2Fdefault-house",
+          imagem2: getColumnValue(row, mapping.imagem2 || []),
+          valor: getColumnValue(row, mapping.valor) || "R$ 0",
+          condominio: getColumnValue(row, mapping.condominio || []),
+          m2: getColumnValue(row, mapping.m2) || "0 m²",
+          rua: getColumnValue(row, mapping.rua || []),
+          bairro: getColumnValue(row, mapping.bairro || []),
+          localizacao: getColumnValue(row, mapping.localizacao) ||
+                      `${getColumnValue(row, mapping.rua || [])} ${getColumnValue(row, mapping.bairro || [])}`.trim() ||
+                      "Localização não informada",
+          link: getColumnValue(row, mapping.link) || "#",
+          quartos: getColumnValue(row, mapping.quartos) || "0 quartos",
+          garagem: getColumnValue(row, mapping.garagem) || "0",
+          vantagens: getColumnValue(row, mapping.vantagens || []),
+          palavrasChaves: getColumnValue(row, mapping.palavrasChaves || []),
+          site: getColumnValue(row, mapping.site) || selectedSite
+        }));
+
+        // Filter out duplicates and already processed properties
+        setProperties(prev => {
+          const newProperties = importedProperties.filter(newProp =>
+            !isDuplicateProperty(newProp, prev) && !isPropertyAlreadyProcessed(newProp)
+          );
+
+          // Enhance imported properties with numeric values
+          const enhancedNewProperties = newProperties.map(property => enhanceProperty(property));
+
+          const duplicatesCount = importedProperties.length - newProperties.length;
+
+          if (duplicatesCount > 0) {
+            toast.info(`${newProperties.length} novos imóveis importados do ${selectedSite}, ${duplicatesCount} duplicatas/já processadas ignoradas`);
+          } else {
+            toast.success(`${newProperties.length} imóveis importados do ${selectedSite}!`);
+          }
+
+          // Reset filters and activate show all mode after import
+          if (newProperties.length > 0) {
+            setTimeout(() => {
+              resetFilters();
+              setShowAllProperties(true);
+            }, 100);
+          }
+
+          return [...prev, ...enhancedNewProperties];
+        });
+
+        // Close modal and reset
+        setIsSelectSiteOpen(false);
+        setSelectedSite('');
+        setPendingFile(null);
+
+      } catch (error) {
+        toast.error("Erro ao processar o arquivo Excel. Verifique o formato.");
+        console.error("Error parsing Excel file:", error);
+      }
+    };
+    reader.readAsArrayBuffer(pendingFile);
   };
 
   const handleExportData = () => {
