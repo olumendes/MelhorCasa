@@ -2014,6 +2014,28 @@ export default function Index() {
                           </div>
                         )}
 
+                        {/* Vantagens */}
+                        {property.vantagens && (
+                          <div className="mb-3 sm:mb-4">
+                            <p className="text-sm font-medium text-gray-700 mb-1">Vantagens:</p>
+                            <p className="text-sm text-gray-600 line-clamp-3">{property.vantagens}</p>
+                          </div>
+                        )}
+
+                        {/* Palavras-chave */}
+                        {property.palavrasChaves && (
+                          <div className="mb-4 sm:mb-5">
+                            <p className="text-sm font-medium text-gray-700 mb-2">Palavras-chave:</p>
+                            <div className="flex flex-wrap gap-1">
+                              {property.palavrasChaves.split(',').slice(0, 4).map((palavra, index) => (
+                                <Badge key={index} variant="outline" className="text-xs">
+                                  {palavra.trim()}
+                                </Badge>
+                              ))}
+                            </div>
+                          </div>
+                        )}
+
                         <div className="space-y-2 sm:space-y-3 mt-4 sm:mt-6">
                           <Button
                             onClick={() => setIsMatchModeTagModalOpen(true)}
