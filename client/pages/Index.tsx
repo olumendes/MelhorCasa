@@ -509,7 +509,7 @@ export default function Index() {
   // Match Mode functions
   const startMatchMode = () => {
     if (filteredProperties.length === 0) {
-      toast.error("Nenhuma propriedade dispon��vel para o modo match");
+      toast.error("Nenhuma propriedade disponível para o modo match");
       return;
     }
     setMatchModeProperties([...filteredProperties]);
@@ -1016,6 +1016,9 @@ export default function Index() {
 
           // Enhance imported properties with numeric values
           const enhancedNewProperties = newProperties.map(property => enhanceProperty(property));
+
+          // Initialize image indexes for new properties
+          initializeImageIndex(enhancedNewProperties);
 
           const duplicatesCount = importedProperties.length - newProperties.length;
 
@@ -1851,7 +1854,7 @@ export default function Index() {
                 Nenhum imóvel encontrado com esses filtros
               </h3>
               <p className="text-gray-600 mb-6">
-                Tente ajustar os filtros para ver mais resultados. Temos {properties.length} imóveis dispon��veis.
+                Tente ajustar os filtros para ver mais resultados. Temos {properties.length} imóveis disponíveis.
               </p>
                             <Button
                 variant="outline"
