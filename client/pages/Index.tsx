@@ -509,7 +509,7 @@ export default function Index() {
   // Match Mode functions
   const startMatchMode = () => {
     if (filteredProperties.length === 0) {
-      toast.error("Nenhuma propriedade disponível para o modo match");
+      toast.error("Nenhuma propriedade dispon��vel para o modo match");
       return;
     }
     setMatchModeProperties([...filteredProperties]);
@@ -927,12 +927,30 @@ export default function Index() {
   };
 
   const getColumnValue = (row: any, mapping: string[]): string => {
+    if (!mapping || mapping.length === 0) return '';
+
     for (const column of mapping) {
       if (row[column] !== undefined && row[column] !== null && row[column] !== '') {
-        return row[column].toString();
+        const value = row[column].toString().trim();
+        if (value && value !== 'N/A' && value !== '-') {
+          return value;
+        }
       }
     }
     return '';
+  };
+
+  // Initialize image index for new properties
+  const initializeImageIndex = (properties: Property[]) => {
+    const newIndexes: {[key: string]: number} = {};
+    properties.forEach(prop => {
+      if (!currentImageIndex[prop.id]) {
+        newIndexes[prop.id] = 0;
+      }
+    });
+    if (Object.keys(newIndexes).length > 0) {
+      setCurrentImageIndex(prev => ({ ...prev, ...newIndexes }));
+    }
   };
 
   const handleFileUpload = (event: React.ChangeEvent<HTMLInputElement>) => {
@@ -1833,7 +1851,7 @@ export default function Index() {
                 Nenhum imóvel encontrado com esses filtros
               </h3>
               <p className="text-gray-600 mb-6">
-                Tente ajustar os filtros para ver mais resultados. Temos {properties.length} imóveis disponíveis.
+                Tente ajustar os filtros para ver mais resultados. Temos {properties.length} imóveis dispon��veis.
               </p>
                             <Button
                 variant="outline"
