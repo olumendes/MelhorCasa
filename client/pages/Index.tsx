@@ -1871,7 +1871,7 @@ export default function Index() {
                   </Button>
                   <div className="text-xs text-center text-gray-500">
                     <span className="hidden sm:inline">�� Arraste para rejeitar | Arraste para curtir →</span>
-                    <span className="sm:hidden">Arraste ←→ ou use botões</span>
+                    <span className="sm:hidden">Arraste ←→ ou use bot��es</span>
                   </div>
                 </div>
               </CardContent>
@@ -2392,6 +2392,9 @@ export default function Index() {
               <span className="hidden sm:inline">Adicionar Tag no Modo Match</span>
               <span className="sm:hidden">Adicionar Tag</span>
             </DialogTitle>
+            <DialogDescription className="text-xs sm:text-sm text-gray-600">
+              Adicione uma etiqueta para organizar melhor este imóvel
+            </DialogDescription>
             {currentMatchIndex < matchModeProperties.length && (
               <p className="text-xs sm:text-sm text-gray-600 line-clamp-2">
                 <span className="hidden sm:inline">Adicionando tag para:</span>
