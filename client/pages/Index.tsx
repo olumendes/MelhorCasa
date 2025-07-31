@@ -1298,6 +1298,9 @@ export default function Index() {
                 <DialogContent className="sm:max-w-md">
                   <DialogHeader>
                     <DialogTitle>Configurações de Localização</DialogTitle>
+                    <DialogDescription>
+                      Configure sua localização para calcular distâncias dos imóveis
+                    </DialogDescription>
                   </DialogHeader>
                   <div className="space-y-4">
                     <div className="space-y-2">
