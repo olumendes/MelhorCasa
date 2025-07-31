@@ -929,8 +929,8 @@ export default function Index() {
   const getColumnValue = (row: any, mapping: string[], fieldName = ''): string => {
     if (!mapping || mapping.length === 0) return '';
 
-    // Debug: log available columns for first property
-    if (fieldName === 'nome' && Math.random() < 0.1) {
+    // Debug: log available columns for first property (reduced frequency)
+    if (fieldName === 'nome' && Math.random() < 0.02) {
       console.log(`=== DEBUG ${fieldName} ===`);
       console.log('Available columns:', Object.keys(row));
       console.log('Looking for:', mapping);
@@ -1871,7 +1871,7 @@ export default function Index() {
                   </Button>
                   <div className="text-xs text-center text-gray-500">
                     <span className="hidden sm:inline">�� Arraste para rejeitar | Arraste para curtir →</span>
-                    <span className="sm:hidden">Arraste ←→ ou use bot��es</span>
+                    <span className="sm:hidden">Arraste ←→ ou use botões</span>
                   </div>
                 </div>
               </CardContent>
@@ -1955,7 +1955,7 @@ export default function Index() {
               Avalie imóveis de forma rápida e intuitiva
             </DialogDescription>
             <div className="text-xs sm:text-sm text-gray-600">
-              <span className="hidden sm:inline">Use as setas: ← rejeitar, → curtir, T para adicionar tag, Esc para sair</span>
+              <span className="hidden sm:inline">Use as setas: �� rejeitar, → curtir, T para adicionar tag, Esc para sair</span>
               <span className="sm:hidden">Arraste: ← rejeitar, → curtir | Setas: ←�� | T = tag</span>
             </div>
           </DialogHeader>
