@@ -22,7 +22,14 @@ interface Property {
   link: string;
   quartos: string;
   garagem: string;
-  site?: string; // Nova propriedade para capturar a fonte/site
+  site?: string;
+  // Novos campos para diferentes sites
+  vantagens?: string;
+  condominio?: string;
+  rua?: string;
+  bairro?: string;
+  palavrasChaves?: string;
+  imagem2?: string; // Segunda imagem
   latitude?: number;
   longitude?: number;
   valorNumerico?: number;
@@ -97,6 +104,10 @@ export default function Index() {
     tags: []
   });
   const [filtersApplied, setFiltersApplied] = useState(false);
+  const [isSelectSiteOpen, setIsSelectSiteOpen] = useState(false);
+  const [selectedSite, setSelectedSite] = useState<string>('');
+  const [pendingFile, setPendingFile] = useState<File | null>(null);
+  const [currentImageIndex, setCurrentImageIndex] = useState<{[key: string]: number}>({});
   const [touchEnd, setTouchEnd] = useState<TouchPosition | null>(null);
   const [swipedCard, setSwipedCard] = useState<string | null>(null);
   const [filters, setFilters] = useState<Filters>({
