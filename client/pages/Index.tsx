@@ -990,12 +990,18 @@ export default function Index() {
     const exportData = properties.map(property => ({
       Nome: property.nome,
       Imagem: property.imagem,
+      Imagem2: property.imagem2 || '',
       Valor: property.valor,
+      Condominio: property.condominio || '',
       "M²": property.m2,
+      Rua: property.rua || '',
+      Bairro: property.bairro || '',
       "Localização": property.localizacao,
       Link: property.link,
       Quartos: property.quartos,
       Garagem: property.garagem,
+      Vantagens: property.vantagens || '',
+      PalavrasChaves: property.palavrasChaves || '',
       Site: property.site || 'QuintoAndar'
     }));
     
@@ -1703,7 +1709,7 @@ export default function Index() {
                 Nenhum imóvel encontrado
               </h3>
               <p className="text-gray-600 mb-6">
-                Inicie o scraping para começar a coletar dados reais do QuintoAndar ou importe um arquivo Excel
+                Inicie o scraping para come��ar a coletar dados reais do QuintoAndar ou importe um arquivo Excel
               </p>
               <div className="flex flex-col sm:flex-row gap-3 justify-center">
                 <Button onClick={handleStartScraping} className="gap-2">
