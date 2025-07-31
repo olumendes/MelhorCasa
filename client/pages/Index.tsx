@@ -938,8 +938,28 @@ export default function Index() {
 
     for (const column of mapping) {
       if (row[column] !== undefined && row[column] !== null && row[column] !== '') {
-        const value = row[column].toString().trim();
+        let value = row[column].toString().trim();
         if (value && value !== 'N/A' && value !== '-') {
+
+          // Special processing for nome field
+          if (fieldName === 'nome') {
+            // Remove HTML tags
+            value = value.replace(/<[^>]*>/g, '');
+            value = value.replace(/&amp;lt;/g, '<').replace(/&amp;gt;/g, '>');
+            value = value.replace(/&lt;/g, '<').replace(/&gt;/g, '>');
+
+            // Extract first sentence or first 100 characters
+            const sentences = value.split(/[.!?]/);
+            if (sentences.length > 0 && sentences[0].length > 0) {
+              value = sentences[0].trim();
+            }
+
+            // Limit to 150 characters
+            if (value.length > 150) {
+              value = value.substring(0, 150) + '...';
+            }
+          }
+
           if (fieldName === 'nome' || fieldName === 'valor' || fieldName === 'imagem') {
             console.log(`Found ${fieldName}: "${value}" in column "${column}"`);
           }
