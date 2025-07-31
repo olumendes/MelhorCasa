@@ -1003,23 +1003,23 @@ export default function Index() {
         // Convert Excel data using site-specific mapping
         const importedProperties: Property[] = jsonData.map((row, index) => ({
           id: `imported-${Date.now()}-${index}`,
-          nome: getColumnValue(row, mapping.nome) || `Imóvel Importado ${index + 1}`,
-          imagem: getColumnValue(row, mapping.imagem) || "https://cdn.builder.io/api/v1/image/assets%2FTEMP%2Fdefault-house",
-          imagem2: getColumnValue(row, mapping.imagem2 || []),
-          valor: getColumnValue(row, mapping.valor) || "R$ 0",
-          condominio: getColumnValue(row, mapping.condominio || []),
-          m2: getColumnValue(row, mapping.m2) || "0 m²",
-          rua: getColumnValue(row, mapping.rua || []),
-          bairro: getColumnValue(row, mapping.bairro || []),
-          localizacao: getColumnValue(row, mapping.localizacao) ||
-                      `${getColumnValue(row, mapping.rua || [])} ${getColumnValue(row, mapping.bairro || [])}`.trim() ||
+          nome: getColumnValue(row, mapping.nome, 'nome') || `Imóvel Importado ${index + 1}`,
+          imagem: getColumnValue(row, mapping.imagem, 'imagem') || "https://cdn.builder.io/api/v1/image/assets%2FTEMP%2Fdefault-house",
+          imagem2: getColumnValue(row, mapping.imagem2 || [], 'imagem2'),
+          valor: getColumnValue(row, mapping.valor, 'valor') || "R$ 0",
+          condominio: getColumnValue(row, mapping.condominio || [], 'condominio'),
+          m2: getColumnValue(row, mapping.m2, 'm2') || "0 m²",
+          rua: getColumnValue(row, mapping.rua || [], 'rua'),
+          bairro: getColumnValue(row, mapping.bairro || [], 'bairro'),
+          localizacao: getColumnValue(row, mapping.localizacao, 'localizacao') ||
+                      `${getColumnValue(row, mapping.rua || [], 'rua')} ${getColumnValue(row, mapping.bairro || [], 'bairro')}`.trim() ||
                       "Localização não informada",
-          link: getColumnValue(row, mapping.link) || "#",
-          quartos: getColumnValue(row, mapping.quartos) || "0 quartos",
-          garagem: getColumnValue(row, mapping.garagem) || "0",
-          vantagens: getColumnValue(row, mapping.vantagens || []),
-          palavrasChaves: getColumnValue(row, mapping.palavrasChaves || []),
-          site: getColumnValue(row, mapping.site) || selectedSite
+          link: getColumnValue(row, mapping.link, 'link') || "#",
+          quartos: getColumnValue(row, mapping.quartos, 'quartos') || "0 quartos",
+          garagem: getColumnValue(row, mapping.garagem, 'garagem') || "0",
+          vantagens: getColumnValue(row, mapping.vantagens || [], 'vantagens'),
+          palavrasChaves: getColumnValue(row, mapping.palavrasChaves || [], 'palavrasChaves'),
+          site: getColumnValue(row, mapping.site, 'site') || selectedSite
         }));
 
         // Filter out duplicates and already processed properties
