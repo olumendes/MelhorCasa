@@ -1683,7 +1683,29 @@ export default function Index() {
                     ))}
                   </div>
                 )}
-                
+
+                {/* Vantagens */}
+                {property.vantagens && (
+                  <div className="mb-3">
+                    <p className="text-xs font-medium text-gray-700 mb-1">Vantagens:</p>
+                    <p className="text-xs text-gray-600 line-clamp-2">{property.vantagens}</p>
+                  </div>
+                )}
+
+                {/* Palavras-chave */}
+                {property.palavrasChaves && (
+                  <div className="mb-4">
+                    <p className="text-xs font-medium text-gray-700 mb-1">Palavras-chave:</p>
+                    <div className="flex flex-wrap gap-1">
+                      {property.palavrasChaves.split(',').slice(0, 3).map((palavra, index) => (
+                        <Badge key={index} variant="outline" className="text-xs">
+                          {palavra.trim()}
+                        </Badge>
+                      ))}
+                    </div>
+                  </div>
+                )}
+
                                                 <div className="space-y-2">
                   <div className="grid grid-cols-3 gap-1.5 sm:gap-2">
                     <Button
