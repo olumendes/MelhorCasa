@@ -815,10 +815,85 @@ export default function Index() {
     toast.info("Scraping pausado.");
   };
 
+  // Site mappings for different XLSX structures
+  const siteColumnMappings = {
+    quintoandar: {
+      nome: ['Nome', 'nome', 'Título', 'titulo'],
+      imagem: ['Imagem', 'imagem', 'Foto', 'foto'],
+      valor: ['Valor', 'valor', 'Preço', 'preco'],
+      m2: ['M²', 'm2', 'Area', 'area'],
+      localizacao: ['Localização', 'localizacao', 'Endereço', 'endereco'],
+      link: ['Link', 'link', 'URL', 'url'],
+      quartos: ['Quartos', 'quartos'],
+      garagem: ['Garagem', 'garagem', 'Vagas', 'vagas'],
+      site: ['Site', 'site']
+    },
+    imovelnaweb: {
+      nome: ['Título', 'titulo', 'Nome', 'nome'],
+      imagem: ['Imagem1', 'imagem1'],
+      imagem2: ['Imagem2', 'imagem2'],
+      valor: ['Preço', 'preco', 'Valor', 'valor'],
+      condominio: ['Condominio', 'condominio', 'Condomínio'],
+      m2: ['Area', 'area', 'M²', 'm2'],
+      rua: ['Rua', 'rua', 'Endereço', 'endereco'],
+      bairro: ['Bairro', 'bairro'],
+      localizacao: ['Localização', 'localizacao'],
+      link: ['Link', 'link', 'URL', 'url'],
+      quartos: ['Quartos', 'quartos'],
+      garagem: ['Garagem', 'garagem', 'Vagas', 'vagas'],
+      vantagens: ['Vantagens', 'vantagens'],
+      palavrasChaves: ['PalavrasChaves', 'palavraschaves', 'Palavras-chave', 'Keywords'],
+      site: ['Site', 'site']
+    },
+    olx: {
+      nome: ['Título', 'titulo', 'Nome', 'nome'],
+      imagem: ['Imagem', 'imagem', 'Foto', 'foto'],
+      valor: ['Preço', 'preco', 'Valor', 'valor'],
+      m2: ['Tamanho', 'tamanho', 'M²', 'm2'],
+      localizacao: ['Localização', 'localizacao', 'Cidade', 'cidade'],
+      link: ['Link', 'link', 'URL', 'url'],
+      quartos: ['Quartos', 'quartos'],
+      garagem: ['Garagem', 'garagem'],
+      site: ['Site', 'site']
+    },
+    zapimoveis: {
+      nome: ['Título', 'titulo', 'Nome', 'nome'],
+      imagem: ['Imagem', 'imagem'],
+      valor: ['Valor', 'valor', 'Preço', 'preco'],
+      m2: ['Área', 'area', 'M²', 'm2'],
+      localizacao: ['Endereço', 'endereco', 'Localização', 'localizacao'],
+      link: ['Link', 'link'],
+      quartos: ['Quartos', 'quartos'],
+      garagem: ['Vagas', 'vagas', 'Garagem', 'garagem'],
+      site: ['Site', 'site']
+    },
+    vivareal: {
+      nome: ['Título', 'titulo', 'Nome', 'nome'],
+      imagem: ['Foto', 'foto', 'Imagem', 'imagem'],
+      valor: ['Preço', 'preco', 'Valor', 'valor'],
+      m2: ['Área útil', 'area', 'M²', 'm2'],
+      localizacao: ['Endereço', 'endereco', 'Localização', 'localizacao'],
+      link: ['Link', 'link'],
+      quartos: ['Quartos', 'quartos'],
+      garagem: ['Vagas', 'vagas'],
+      site: ['Site', 'site']
+    }
+  };
+
+  const getColumnValue = (row: any, mapping: string[]): string => {
+    for (const column of mapping) {
+      if (row[column] !== undefined && row[column] !== null && row[column] !== '') {
+        return row[column].toString();
+      }
+    }
+    return '';
+  };
+
   const handleFileUpload = (event: React.ChangeEvent<HTMLInputElement>) => {
     const file = event.target.files?.[0];
     if (file && (file.name.endsWith('.xlsx') || file.name.endsWith('.xls'))) {
-      const reader = new FileReader();
+      setPendingFile(file);
+      setIsSelectSiteOpen(true);
       reader.onload = (e) => {
         try {
           const data = new Uint8Array(e.target?.result as ArrayBuffer);
