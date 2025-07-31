@@ -926,16 +926,30 @@ export default function Index() {
     }
   };
 
-  const getColumnValue = (row: any, mapping: string[]): string => {
+  const getColumnValue = (row: any, mapping: string[], fieldName = ''): string => {
     if (!mapping || mapping.length === 0) return '';
+
+    // Debug: log available columns for first property
+    if (fieldName === 'nome' && Math.random() < 0.1) {
+      console.log(`=== DEBUG ${fieldName} ===`);
+      console.log('Available columns:', Object.keys(row));
+      console.log('Looking for:', mapping);
+    }
 
     for (const column of mapping) {
       if (row[column] !== undefined && row[column] !== null && row[column] !== '') {
         const value = row[column].toString().trim();
         if (value && value !== 'N/A' && value !== '-') {
+          if (fieldName === 'nome' || fieldName === 'valor' || fieldName === 'imagem') {
+            console.log(`Found ${fieldName}: "${value}" in column "${column}"`);
+          }
           return value;
         }
       }
+    }
+
+    if (fieldName === 'nome' || fieldName === 'valor' || fieldName === 'imagem') {
+      console.log(`No ${fieldName} found in columns:`, mapping);
     }
     return '';
   };
