@@ -1024,7 +1024,9 @@ export default function Index() {
         const importedProperties: Property[] = jsonData.map((row, index) => ({
           id: `imported-${Date.now()}-${index}`,
           nome: getColumnValue(row, mapping.nome, 'nome') || `Imóvel Importado ${index + 1}`,
-          imagem: getColumnValue(row, mapping.imagem, 'imagem') || "https://cdn.builder.io/api/v1/image/assets%2FTEMP%2Fdefault-house",
+          imagem: getColumnValue(row, mapping.imagem, 'imagem') ||
+                  getColumnValue(row, ['Imagem', 'imagem', 'Foto', 'foto', 'Image', 'image'], 'imagem-fallback') ||
+                  "https://cdn.builder.io/api/v1/image/assets%2FTEMP%2Fdefault-house",
           imagem2: getColumnValue(row, mapping.imagem2 || [], 'imagem2'),
           valor: getColumnValue(row, mapping.valor, 'valor') || "R$ 0",
           condominio: getColumnValue(row, mapping.condominio || [], 'condominio'),
