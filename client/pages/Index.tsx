@@ -862,7 +862,7 @@ export default function Index() {
       imagem: ['Imagem', 'imagem'],
       valor: ['Valor', 'valor', 'Preço', 'preco'],
       m2: ['Área', 'area', 'M²', 'm2'],
-      localizacao: ['Endereço', 'endereco', 'Localização', 'localizacao'],
+      localizacao: ['Endereço', 'endereco', 'Localizaç��o', 'localizacao'],
       link: ['Link', 'link'],
       quartos: ['Quartos', 'quartos'],
       garagem: ['Vagas', 'vagas', 'Garagem', 'garagem'],
@@ -2136,6 +2136,12 @@ export default function Index() {
                             <Car className="h-3 w-3" />
                             {property.garagem} vagas
                           </Badge>
+                          {property.banheiros && (
+                            <Badge variant="secondary" className="gap-1 text-xs">
+                              <Bath className="h-3 w-3" />
+                              {property.banheiros}
+                            </Badge>
+                          )}
                           {property.distancia && userLocation && (
                             <Badge variant="outline" className="gap-1 border-blue-200 text-blue-700 text-xs">
                               <MapPin className="h-3 w-3" />
