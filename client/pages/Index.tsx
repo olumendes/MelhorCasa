@@ -356,6 +356,9 @@ export default function Index() {
         return true;
       }
     });
+
+    console.log(`Filtros aplicados: ${propertiesToFilter.length} -> ${filtered.length} propriedades`);
+    return filtered;
   };
 
   const applyFiltersNow = () => {
