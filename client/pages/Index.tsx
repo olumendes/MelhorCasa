@@ -1322,7 +1322,7 @@ export default function Index() {
                       />
                       {userLocation && (
                         <p className="text-sm text-gray-600">
-                          Localizaç��o atual: {userLocation.address}
+                          Localização atual: {userLocation.address}
                         </p>
                       )}
                     </div>
@@ -1797,6 +1797,12 @@ export default function Index() {
                     <Car className="h-3 w-3" />
                     {property.garagem} vagas
                   </Badge>
+                  {property.banheiros && (
+                    <Badge variant="secondary" className="gap-1">
+                      <Bath className="h-3 w-3" />
+                      {property.banheiros}
+                    </Badge>
+                  )}
                   {property.distancia && userLocation && (
                     <Badge variant="outline" className="gap-1 border-blue-200 text-blue-700">
                       <MapPin className="h-3 w-3" />
