@@ -449,10 +449,10 @@ export default function Index() {
     setFilteredProperties(sorted);
   }, [properties, filters, userLocation, sortOption, showAllProperties]);
 
-  // Initialize tempFilters with current filters
+  // Initialize and sync tempFilters with current filters
   useEffect(() => {
     setTempFilters(filters);
-  }, []);
+  }, [filters]);
 
   const handleSaveLocation = async () => {
     if (!locationInput.trim()) {
