@@ -1129,6 +1129,7 @@ export default function Index() {
       Link: property.link,
       Quartos: property.quartos,
       Garagem: property.garagem,
+      Banheiros: property.banheiros || '',
       Vantagens: property.vantagens || '',
       PalavrasChaves: property.palavrasChaves || '',
       Site: property.site || 'QuintoAndar'
