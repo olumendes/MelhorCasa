@@ -276,7 +276,11 @@ export default function Index() {
 
     // Filter properties based on current filters
   const applyFilters = (propertiesToFilter: Property[]) => {
-    return propertiesToFilter.filter((property, index) => {
+    console.log('=== APLICANDO FILTROS ===');
+    console.log('Total propriedades para filtrar:', propertiesToFilter.length);
+    console.log('Filtros ativos:', filters);
+
+    const filtered = propertiesToFilter.filter((property, index) => {
       try {
         // Use existing enhanced values or enhance if not already done
         const enhanced = property.valorNumerico ? property : enhanceProperty(property);
