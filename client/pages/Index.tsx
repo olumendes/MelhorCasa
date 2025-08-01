@@ -1588,6 +1588,25 @@ export default function Index() {
                 </Select>
               </div>
 
+              {/* Bathrooms Filter */}
+              <div className="space-y-3">
+                <Label className="text-sm font-medium">Banheiros</Label>
+                <Select value={tempFilters.banheiros} onValueChange={(value) =>
+                  setTempFilters(prev => ({ ...prev, banheiros: value }))
+                }>
+                  <SelectTrigger>
+                    <SelectValue placeholder="Selecione" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="all">Todos</SelectItem>
+                    <SelectItem value="1">1 banheiro</SelectItem>
+                    <SelectItem value="2">2 banheiros</SelectItem>
+                    <SelectItem value="3">3 banheiros</SelectItem>
+                    <SelectItem value="4">4+ banheiros</SelectItem>
+                  </SelectContent>
+                </Select>
+              </div>
+
                                           {/* Tags Filter */}
               <div className="space-y-3 md:col-span-2">
                 <Label className="text-sm font-medium">Filtrar por Tags</Label>
