@@ -1672,7 +1672,7 @@ export default function Index() {
                   <Button
                     onClick={applyFiltersNow}
                     className="w-full bg-blue-600 hover:bg-blue-700"
-                    disabled={JSON.stringify(tempFilters) === JSON.stringify(filters)}
+                    disabled={!hasFiltersChanged()}
                   >
                     Aplicar Filtros
                   </Button>
@@ -2276,7 +2276,7 @@ export default function Index() {
                               >
                                 <ArrowRight className="h-3 w-3 sm:h-4 sm:w-4 md:h-5 md:w-5" />
                                 <span className="hidden sm:inline">Curtir</span>
-                                <span className="sm:hidden">❤���</span>
+                                <span className="sm:hidden">❤️</span>
                               </Button>
                             </div>
 
