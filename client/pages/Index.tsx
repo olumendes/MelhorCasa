@@ -37,6 +37,7 @@ interface Property {
   m2Numerico?: number;
   quartosNumerico?: number;
   garagemNumerico?: number;
+  banheirosNumerico?: number;
   distancia?: number;
   tags?: string[];
 }
@@ -1987,7 +1988,7 @@ export default function Index() {
             </DialogDescription>
             <div className="text-xs sm:text-sm text-gray-600">
               <span className="hidden sm:inline">Use as setas: ← rejeitar, → curtir, T para adicionar tag, Esc para sair</span>
-              <span className="sm:hidden">Arraste: ← rejeitar, → curtir | Setas: ←��� | T = tag</span>
+              <span className="sm:hidden">Arraste: ← rejeitar, → curtir | Setas: ←�� | T = tag</span>
             </div>
           </DialogHeader>
 
