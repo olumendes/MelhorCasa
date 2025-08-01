@@ -363,7 +363,7 @@ export default function Index() {
 
   // Function to check if filters have changed
   const hasFiltersChanged = () => {
-    return (
+    const changed = (
       tempFilters.valorMin !== filters.valorMin ||
       tempFilters.valorMax !== filters.valorMax ||
       tempFilters.m2Min !== filters.m2Min ||
@@ -374,6 +374,17 @@ export default function Index() {
       tempFilters.distanciaMax !== filters.distanciaMax ||
       JSON.stringify(tempFilters.tags) !== JSON.stringify(filters.tags)
     );
+
+    // Debug para identificar o problema
+    if (Math.random() < 0.1) {
+      console.log('=== FILTROS COMPARAÇÃO ===');
+      console.log('tempFilters:', tempFilters);
+      console.log('filters:', filters);
+      console.log('hasChanged:', changed);
+      console.log('Button should be enabled:', changed);
+    }
+
+    return changed;
   };
 
   const resetFilters = () => {
