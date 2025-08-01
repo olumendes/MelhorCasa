@@ -862,7 +862,7 @@ export default function Index() {
       imagem: ['Imagem', 'imagem'],
       valor: ['Valor', 'valor', 'Preço', 'preco'],
       m2: ['Área', 'area', 'M²', 'm2'],
-      localizacao: ['Endereço', 'endereco', 'Localizaç��o', 'localizacao'],
+      localizacao: ['Endereço', 'endereco', 'Localização', 'localizacao'],
       link: ['Link', 'link'],
       quartos: ['Quartos', 'quartos'],
       garagem: ['Vagas', 'vagas', 'Garagem', 'garagem'],
@@ -1275,6 +1275,9 @@ export default function Index() {
                                 <Badge variant="secondary" className="text-xs">{property.m2}</Badge>
                                 <Badge variant="secondary" className="text-xs">{property.quartos}</Badge>
                                 <Badge variant="secondary" className="text-xs">{property.garagem} vagas</Badge>
+                                {property.banheiros && (
+                                  <Badge variant="secondary" className="text-xs">{property.banheiros} banheiros</Badge>
+                                )}
                               </div>
                               <Button
                                 size="sm"
