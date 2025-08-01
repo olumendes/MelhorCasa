@@ -102,6 +102,7 @@ export default function Index() {
     m2Max: 2000,
     quartos: "all",
     vagas: "all",
+    banheiros: "all",
     distanciaMax: 100,
     tags: []
   });
@@ -119,6 +120,7 @@ export default function Index() {
     m2Max: 2000,
     quartos: "all",
     vagas: "all",
+    banheiros: "all",
     distanciaMax: 100,
     tags: []
   });
@@ -350,6 +352,7 @@ export default function Index() {
       m2Max: 2000,
       quartos: "all",
       vagas: "all",
+      banheiros: "all",
       distanciaMax: 100,
       tags: []
     };
