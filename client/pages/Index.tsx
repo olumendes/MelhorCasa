@@ -777,6 +777,7 @@ export default function Index() {
               m2Max: 2000,
               quartos: "all",
               vagas: "all",
+              banheiros: "all",
               distanciaMax: 100,
               tags: []
             });
@@ -876,7 +877,7 @@ export default function Index() {
       nome: ['Título', 'titulo', 'Nome', 'nome'],
       imagem: ['Foto', 'foto', 'Imagem', 'imagem'],
       valor: ['Preço', 'preco', 'Valor', 'valor'],
-      m2: ['Área útil', 'area', 'M²', 'm2'],
+      m2: ['Área ��til', 'area', 'M²', 'm2'],
       localizacao: ['Endereço', 'endereco', 'Localização', 'localizacao'],
       link: ['Link', 'link'],
       quartos: ['Quartos', 'quartos'],
