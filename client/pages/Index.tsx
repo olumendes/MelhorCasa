@@ -7,7 +7,7 @@ import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle, Di
 import { Label } from "@/components/ui/label";
 import { Slider } from "@/components/ui/slider";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
-import { Play, Square, Upload, Download, Home, MapPin, Car, Maximize2, Settings, Filter, Heart, ThumbsDown, ArrowUpDown, Target, Tag, Plus, X, Search, ArrowLeft, ArrowRight, Zap, PiggyBank } from "lucide-react";
+import { Play, Square, Upload, Download, Home, MapPin, Car, Maximize2, Settings, Filter, Heart, ThumbsDown, ArrowUpDown, Target, Tag, Plus, X, Search, ArrowLeft, ArrowRight, Zap, PiggyBank, Bath } from "lucide-react";
 import { Link } from "react-router-dom";
 import { toast } from "sonner";
 import * as XLSX from 'xlsx';
@@ -1322,7 +1322,7 @@ export default function Index() {
                       />
                       {userLocation && (
                         <p className="text-sm text-gray-600">
-                          Localização atual: {userLocation.address}
+                          Localizaç��o atual: {userLocation.address}
                         </p>
                       )}
                     </div>
