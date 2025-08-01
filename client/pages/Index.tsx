@@ -923,6 +923,7 @@ export default function Index() {
       link: ['Link', 'link'],
       quartos: ['Quartos', 'quartos'],
       garagem: ['Garagem', 'garagem', 'Vagas', 'vagas'],
+      banheiros: ['Banheiros', 'banheiros', 'Banheiro', 'banheiro'],
       site: ['Site', 'site']
     }
   };
