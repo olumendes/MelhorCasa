@@ -415,6 +415,14 @@ export default function Index() {
     const result = showAllProperties ? enhanced : applyFilters(enhanced);
     const sorted = sortProperties(result);
 
+    // Debug log para verificar filtros
+    if (Math.random() < 0.1) {
+      console.log('=== FILTROS DEBUG ===');
+      console.log('Filtros ativos:', filters);
+      console.log(`Propriedades: ${properties.length} -> Filtradas: ${result.length}`);
+      console.log('showAllProperties:', showAllProperties);
+    }
+
     // Show helpful message if no properties match filters
     if (properties.length > 0 && result.length === 0 && !showAllProperties) {
       console.log('Debug filtering:', {
