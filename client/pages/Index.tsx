@@ -284,12 +284,18 @@ export default function Index() {
         // Price filter - only apply if values are set and valid
         if (filters.valorMin && filters.valorMin.trim()) {
           const valorMin = parseInt(filters.valorMin.replace(/[^\d]/g, ''));
+          if (Math.random() < 0.05) { // Debug 5% das vezes
+            console.log(`Filtro valorMin: ${valorMin}, Property valor: ${enhanced.valorNumerico} (${property.nome})`);
+          }
           if (valorMin > 0 && (!enhanced.valorNumerico || enhanced.valorNumerico < valorMin)) {
             return false;
           }
         }
         if (filters.valorMax && filters.valorMax.trim()) {
           const valorMax = parseInt(filters.valorMax.replace(/[^\d]/g, ''));
+          if (Math.random() < 0.05) { // Debug 5% das vezes
+            console.log(`Filtro valorMax: ${valorMax}, Property valor: ${enhanced.valorNumerico} (${property.nome})`);
+          }
           if (valorMax > 0 && (!enhanced.valorNumerico || enhanced.valorNumerico > valorMax)) {
             return false;
           }
