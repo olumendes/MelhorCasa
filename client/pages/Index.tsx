@@ -419,6 +419,11 @@ export default function Index() {
 
       // Update filtered properties when properties or filters change
   useEffect(() => {
+    console.log('=== useEffect FILTROS EXECUTANDO ===');
+    console.log('properties.length:', properties.length);
+    console.log('filters:', filters);
+    console.log('showAllProperties:', showAllProperties);
+
     // First deduplicate the properties
     const deduplicatedProperties = removeDuplicateProperties(properties);
 
