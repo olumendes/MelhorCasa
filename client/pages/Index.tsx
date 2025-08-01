@@ -22,6 +22,7 @@ interface Property {
   link: string;
   quartos: string;
   garagem: string;
+  banheiros?: string;
   site?: string;
   // Novos campos para diferentes sites
   vantagens?: string;
