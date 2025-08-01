@@ -355,9 +355,25 @@ export default function Index() {
   };
 
   const applyFiltersNow = () => {
+    console.log('Aplicando filtros:', tempFilters);
     setFilters(tempFilters);
     setFiltersApplied(true);
     toast.info("Filtros aplicados!");
+  };
+
+  // Function to check if filters have changed
+  const hasFiltersChanged = () => {
+    return (
+      tempFilters.valorMin !== filters.valorMin ||
+      tempFilters.valorMax !== filters.valorMax ||
+      tempFilters.m2Min !== filters.m2Min ||
+      tempFilters.m2Max !== filters.m2Max ||
+      tempFilters.quartos !== filters.quartos ||
+      tempFilters.vagas !== filters.vagas ||
+      tempFilters.banheiros !== filters.banheiros ||
+      tempFilters.distanciaMax !== filters.distanciaMax ||
+      JSON.stringify(tempFilters.tags) !== JSON.stringify(filters.tags)
+    );
   };
 
   const resetFilters = () => {
@@ -2260,7 +2276,7 @@ export default function Index() {
                               >
                                 <ArrowRight className="h-3 w-3 sm:h-4 sm:w-4 md:h-5 md:w-5" />
                                 <span className="hidden sm:inline">Curtir</span>
-                                <span className="sm:hidden">❤️</span>
+                                <span className="sm:hidden">❤���</span>
                               </Button>
                             </div>
 
