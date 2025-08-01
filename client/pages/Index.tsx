@@ -362,7 +362,11 @@ export default function Index() {
   };
 
   const applyFiltersNow = () => {
-    console.log('Aplicando filtros:', tempFilters);
+    console.log('=== BOTÃO APLICAR FILTROS CLICADO ===');
+    console.log('tempFilters (novos):', tempFilters);
+    console.log('filters (atuais):', filters);
+    console.log('Alterando filters para:', tempFilters);
+
     setFilters(tempFilters);
     setFiltersApplied(true);
     toast.info("Filtros aplicados!");
