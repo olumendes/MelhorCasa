@@ -54,6 +54,7 @@ interface Filters {
   m2Max: number;
   quartos: string;
   vagas: string;
+  banheiros: string;
   distanciaMax: number;
   tags: string[];
 }
