@@ -317,6 +317,14 @@ export default function Index() {
           }
         }
 
+        // Bathrooms filter - only apply if not "all" and property has bathroom data
+        if (filters.banheiros !== "all" && enhanced.banheirosNumerico !== undefined) {
+          const requiredBanheiros = parseInt(filters.banheiros);
+          if (!isNaN(requiredBanheiros) && enhanced.banheirosNumerico !== requiredBanheiros) {
+            return false;
+          }
+        }
+
         // Distance filter - only apply if user location is set AND property has location
         if (userLocation && enhanced.distancia !== undefined && enhanced.distancia > filters.distanciaMax) {
           return false;
@@ -1979,7 +1987,7 @@ export default function Index() {
             </DialogDescription>
             <div className="text-xs sm:text-sm text-gray-600">
               <span className="hidden sm:inline">Use as setas: ← rejeitar, → curtir, T para adicionar tag, Esc para sair</span>
-              <span className="sm:hidden">Arraste: ← rejeitar, → curtir | Setas: ←�� | T = tag</span>
+              <span className="sm:hidden">Arraste: ← rejeitar, → curtir | Setas: ←��� | T = tag</span>
             </div>
           </DialogHeader>
 
