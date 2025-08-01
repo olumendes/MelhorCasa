@@ -369,6 +369,7 @@ export default function Index() {
 
     setFilters(tempFilters);
     setFiltersApplied(true);
+    setShowAllProperties(false); // Ensure filters are actually applied
     toast.info("Filtros aplicados!");
   };
 
@@ -1730,7 +1731,7 @@ export default function Index() {
             <CardContent className="p-6">
               <div className="flex items-center justify-between">
                 <div>
-                  <p className="text-sm font-medium text-gray-600">Total de Imóveis</p>
+                  <p className="text-sm font-medium text-gray-600">Total de Im��veis</p>
                                     <p className="text-3xl font-bold text-blue-600">
                     {filteredProperties.length}
                     {filteredProperties.length !== properties.length &&
