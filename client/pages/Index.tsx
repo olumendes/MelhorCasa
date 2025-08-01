@@ -244,7 +244,8 @@ export default function Index() {
       valorNumerico: parseNumericValue(property.valor || ""),
       m2Numerico: parseNumericValue(property.m2 || ""),
       quartosNumerico: parseNumericValue(property.quartos || ""),
-      garagemNumerico: parseNumericValue(property.garagem || "")
+      garagemNumerico: parseNumericValue(property.garagem || ""),
+      banheirosNumerico: parseNumericValue(property.banheiros || "")
     };
 
     // Add mock coordinates for demonstration (in real app, these would come from geocoding)
