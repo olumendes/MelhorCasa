@@ -1146,6 +1146,18 @@ export default function Index() {
             palavrasChaves: getColumnValue(row, mapping.palavrasChaves || [], 'palavrasChaves'),
             site: getColumnValue(row, mapping.site, 'site') || selectedSite
           };
+        }).map((prop, index) => {
+          // Debug first few converted properties
+          if (index < 3) {
+            console.log(`Converted property ${index + 1}:`, {
+              nome: prop.nome,
+              link: prop.link,
+              valor: prop.valor,
+              m2: prop.m2,
+              site: prop.site
+            });
+          }
+          return prop;
         });
 
         // Filter out duplicates and already processed properties
@@ -2460,7 +2472,7 @@ export default function Index() {
           <DialogHeader>
             <DialogTitle>Adicionar Tag</DialogTitle>
             <DialogDescription>
-              Adicione uma etiqueta personalizada para organizar seus imóveis
+              Adicione uma etiqueta personalizada para organizar seus im��veis
             </DialogDescription>
             {selectedPropertyForTag && (
               <p className="text-sm text-gray-600">
