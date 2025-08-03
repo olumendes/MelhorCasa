@@ -1118,6 +1118,11 @@ export default function Index() {
           // Special handling for Casa Mineira
           const isExtraLinha = selectedSite === 'casamineira';
 
+          // Debug first few rows
+          if (index < 3) {
+            console.log(`Row ${index + 1} data:`, row);
+          }
+
           return {
             id: `imported-${Date.now()}-${index}`,
             nome: getColumnValue(row, mapping.nome, 'nome') || (isExtraLinha ? `Casa ${index + 1}` : `Imóvel Importado ${index + 1}`),
