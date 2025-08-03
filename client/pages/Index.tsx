@@ -1186,9 +1186,18 @@ export default function Index() {
               console.log(`Property ${index + 1} filtered out:`, {
                 name: newProp.nome,
                 link: newProp.link,
+                localizacao: newProp.localizacao,
+                valor: newProp.valor,
+                m2: newProp.m2,
+                quartos: newProp.quartos,
                 isDuplicate,
                 isProcessed
               });
+            }
+
+            // Special check for problematic links
+            if (newProp.link === "#" || newProp.link.includes('cookie') || newProp.link.includes('session')) {
+              console.log(`Property ${index + 1} has problematic link:`, newProp.link);
             }
 
             return !isDuplicate && !isProcessed;
@@ -1203,7 +1212,7 @@ export default function Index() {
           const duplicatesCount = importedProperties.length - newProperties.length;
 
           if (duplicatesCount > 0) {
-            toast.info(`${newProperties.length} novos imóveis importados do ${selectedSite}, ${duplicatesCount} duplicatas/j�� processadas ignoradas`);
+            toast.info(`${newProperties.length} novos imóveis importados do ${selectedSite}, ${duplicatesCount} duplicatas/já processadas ignoradas`);
           } else {
             toast.success(`${newProperties.length} imóveis importados do ${selectedSite}!`);
           }
