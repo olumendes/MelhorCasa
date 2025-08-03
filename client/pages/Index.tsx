@@ -1145,9 +1145,28 @@ export default function Index() {
 
         // Filter out duplicates and already processed properties
         setProperties(prev => {
-          const newProperties = importedProperties.filter(newProp =>
-            !isDuplicateProperty(newProp, prev) && !isPropertyAlreadyProcessed(newProp)
-          );
+          console.log('=== IMPORT DEBUG ===');
+          console.log('Total properties in XLSX:', importedProperties.length);
+          console.log('Existing properties:', prev.length);
+          console.log('Liked properties:', likedProperties.length);
+          console.log('Disliked properties:', dislikedProperties.length);
+
+          // Debug each property filtering
+          const newProperties = importedProperties.filter((newProp, index) => {
+            const isDuplicate = isDuplicateProperty(newProp, prev);
+            const isProcessed = isPropertyAlreadyProcessed(newProp);
+
+            if (isDuplicate || isProcessed) {
+              console.log(`Property ${index + 1} filtered out:`, {
+                name: newProp.nome,
+                link: newProp.link,
+                isDuplicate,
+                isProcessed
+              });
+            }
+
+            return !isDuplicate && !isProcessed;
+          });
 
           // Enhance imported properties with numeric values
           const enhancedNewProperties = newProperties.map(property => enhanceProperty(property));
