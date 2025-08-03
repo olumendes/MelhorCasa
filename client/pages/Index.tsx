@@ -224,8 +224,13 @@ export default function Index() {
       const sameSize = existing.m2 === newProperty.m2;
       const sameRooms = existing.quartos === newProperty.quartos;
 
-      // Consider duplicate if location + value + size match (more reliable than just link)
-      return sameLocation && sameValue && sameSize && sameRooms;
+      // Only consider duplicate if ALL criteria match exactly
+      // This is very strict - all 4 fields must be identical
+      const isExactDuplicate = sameLocation && sameValue && sameSize && sameRooms &&
+                              existing.localizacao && newProperty.localizacao && // both must have location
+                              existing.valor && newProperty.valor; // both must have value
+
+      return isExactDuplicate;
     });
   };
 
