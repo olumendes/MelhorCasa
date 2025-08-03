@@ -215,9 +215,18 @@ export default function Index() {
     return result;
   };
 
-        // Function to check if property link already exists
+        // Function to check if property already exists using multiple criteria
   const isDuplicateProperty = (newProperty: Property, existingProperties: Property[]): boolean => {
-    return existingProperties.some(existing => existing.link === newProperty.link);
+    return existingProperties.some(existing => {
+      // Check if it's the same property using multiple fields
+      const sameLocation = existing.localizacao === newProperty.localizacao;
+      const sameValue = existing.valor === newProperty.valor;
+      const sameSize = existing.m2 === newProperty.m2;
+      const sameRooms = existing.quartos === newProperty.quartos;
+
+      // Consider duplicate if location + value + size match (more reliable than just link)
+      return sameLocation && sameValue && sameSize && sameRooms;
+    });
   };
 
   // Function to check if property already exists in liked or disliked
@@ -1194,7 +1203,7 @@ export default function Index() {
           const duplicatesCount = importedProperties.length - newProperties.length;
 
           if (duplicatesCount > 0) {
-            toast.info(`${newProperties.length} novos imóveis importados do ${selectedSite}, ${duplicatesCount} duplicatas/já processadas ignoradas`);
+            toast.info(`${newProperties.length} novos imóveis importados do ${selectedSite}, ${duplicatesCount} duplicatas/j�� processadas ignoradas`);
           } else {
             toast.success(`${newProperties.length} imóveis importados do ${selectedSite}!`);
           }
