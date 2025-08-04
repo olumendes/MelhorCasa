@@ -1182,6 +1182,10 @@ export default function Index() {
           console.log('Liked properties:', likedProperties.length);
           console.log('Disliked properties:', dislikedProperties.length);
 
+          let duplicateCount = 0;
+          let processedCount = 0;
+          let acceptedCount = 0;
+
           // Debug each property filtering
           const newProperties = importedProperties.filter((newProp, index) => {
             const isDuplicate = isDuplicateProperty(newProp, prev);
