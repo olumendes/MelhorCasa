@@ -215,23 +215,10 @@ export default function Index() {
     return result;
   };
 
-        // Function to check if property already exists using multiple criteria
+        // Function to check if property already exists - DISABLED: always returns false
   const isDuplicateProperty = (newProperty: Property, existingProperties: Property[]): boolean => {
-    return existingProperties.some(existing => {
-      // Check if it's the same property using multiple fields
-      const sameLocation = existing.localizacao === newProperty.localizacao;
-      const sameValue = existing.valor === newProperty.valor;
-      const sameSize = existing.m2 === newProperty.m2;
-      const sameRooms = existing.quartos === newProperty.quartos;
-
-      // Only consider duplicate if ALL criteria match exactly
-      // This is very strict - all 4 fields must be identical
-      const isExactDuplicate = sameLocation && sameValue && sameSize && sameRooms &&
-                              existing.localizacao && newProperty.localizacao && // both must have location
-                              existing.valor && newProperty.valor; // both must have value
-
-      return isExactDuplicate;
-    });
+    // Duplicate detection disabled - always return false to accept all properties
+    return false;
   };
 
   // Function to check if property already exists in liked or disliked
