@@ -1000,7 +1000,7 @@ export default function Index() {
       site: ['Site', 'site']
     },
     casamineira: {
-      nome: ['Título', 'titulo', 'Nome', 'nome'],
+      nome: ['nome da casa', 'Título', 'titulo', 'Nome', 'nome'],
       imagem: ['Imagem', 'imagem', 'Foto', 'foto'],
       valor: ['Preço', 'preco', 'Valor', 'valor'],
       m2: ['Área', 'area', 'M²', 'm2'],
