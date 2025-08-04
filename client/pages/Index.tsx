@@ -96,6 +96,8 @@ export default function Index() {
   const [locationInput, setLocationInput] = useState("");
   const [sortOption, setSortOption] = useState<SortOption>({ field: 'valor', direction: 'desc' });
   const [touchStart, setTouchStart] = useState<TouchPosition | null>(null);
+  const [showHeader, setShowHeader] = useState(true);
+  const [lastScrollY, setLastScrollY] = useState(0);
   const [tempFilters, setTempFilters] = useState<Filters>({
     valorMin: "",
     valorMax: "",
