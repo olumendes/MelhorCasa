@@ -974,7 +974,7 @@ export default function Index() {
       imagem: ['Imagem', 'imagem', 'Foto', 'foto'],
       valor: ['Valor', 'valor', 'Pre��o', 'preco'],
       m2: ['Área', 'area', 'M²', 'm2'],
-      localizacao: ['Endereço', 'endereco', 'Localização', 'localizacao'],
+      localizacao: ['Endereço', 'endereco', 'Localiza��ão', 'localizacao'],
       link: ['Link', 'link', 'URL', 'url'],
       quartos: ['Quartos', 'quartos'],
       garagem: ['Garagem', 'garagem', 'Vagas', 'vagas'],
@@ -2249,8 +2249,20 @@ export default function Index() {
                         </Badge>
                         {property.imagem2 && (
                           <div className="absolute bottom-2 right-2 sm:bottom-3 sm:right-3 flex gap-1">
-                            <div className={`w-2 h-2 rounded-full ${currentImageIndex[property.id] === 0 ? 'bg-white' : 'bg-white/50'}`} />
-                            <div className={`w-2 h-2 rounded-full ${currentImageIndex[property.id] === 1 ? 'bg-white' : 'bg-white/50'}`} />
+                            <div
+                              className={`w-2 h-2 rounded-full cursor-pointer ${currentImageIndex[property.id] === 0 ? 'bg-white' : 'bg-white/50'}`}
+                              onClick={(e) => {
+                                e.stopPropagation();
+                                setCurrentImageIndex(prev => ({ ...prev, [property.id]: 0 }));
+                              }}
+                            />
+                            <div
+                              className={`w-2 h-2 rounded-full cursor-pointer ${currentImageIndex[property.id] === 1 ? 'bg-white' : 'bg-white/50'}`}
+                              onClick={(e) => {
+                                e.stopPropagation();
+                                setCurrentImageIndex(prev => ({ ...prev, [property.id]: 1 }));
+                              }}
+                            />
                           </div>
                         )}
                       </div>
