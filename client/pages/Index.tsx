@@ -925,7 +925,7 @@ export default function Index() {
       imagem2: ['Imagem2', 'imagem2'],
       valor: ['Preço', 'Preco', 'preco', 'Valor', 'valor'],
       condominio: ['Condominio', 'condominio', 'Condomínio'],
-      m2: ['Area', 'area', 'Área', 'área', 'M²', 'm2'],
+      m2: ['Area', 'area', 'Área', 'área', 'M��', 'm2'],
       rua: ['Rua', 'rua', 'Endereço', 'endereco'],
       bairro: ['Bairro', 'bairro'],
       localizacao: ['Localização', 'localizacao', 'Endereço', 'endereco'],
@@ -1889,12 +1889,8 @@ export default function Index() {
                   alt={property.nome}
                   className="w-full h-48 object-cover cursor-pointer"
                   onClick={() => {
-                    if (property.imagem2) {
-                      setCurrentImageIndex(prev => ({
-                        ...prev,
-                        [property.id]: prev[property.id] === 1 ? 0 : 1
-                      }));
-                    }
+                    // Always redirect to property link on image click
+                    window.open(property.link, '_blank');
                   }}
                   onError={(e) => {
                     (e.target as HTMLImageElement).src = "https://images.unsplash.com/photo-1570129477492-45c003edd2be?w=400&h=300&fit=crop";
@@ -2367,7 +2363,7 @@ export default function Index() {
                               >
                                 <ArrowLeft className="h-3 w-3 sm:h-4 sm:w-4 md:h-5 md:w-5" />
                                 <span className="hidden sm:inline">Rejeitar</span>
-                                <span className="sm:hidden">👎</span>
+                                <span className="sm:hidden">���</span>
                               </Button>
                               <Button
                                 size="sm"
