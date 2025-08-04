@@ -599,7 +599,7 @@ export default function Index() {
   // Match Mode functions
   const startMatchMode = () => {
     if (filteredProperties.length === 0) {
-      toast.error("Nenhuma propriedade disponível para o modo match");
+      toast.error("Nenhuma propriedade dispon��vel para o modo match");
       return;
     }
     setMatchModeProperties([...filteredProperties]);
@@ -1284,7 +1284,7 @@ export default function Index() {
   return (
     <div className="min-h-screen bg-gradient-to-br from-blue-50 via-white to-purple-50">
       {/* Header */}
-      <header className="bg-white/80 backdrop-blur-sm border-b border-gray-200 sticky top-0 z-50">
+      <header className={`bg-white/80 backdrop-blur-sm border-b border-gray-200 sticky top-0 z-50 transition-transform duration-300 ${showHeader ? 'translate-y-0' : '-translate-y-full'}`}>
         <div className="container mx-auto px-3 sm:px-6 py-3 sm:py-4">
           <div className="space-y-3">
             {/* Logo and title row */}
