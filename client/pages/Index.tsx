@@ -969,7 +969,7 @@ export default function Index() {
     netimoveis: {
       nome: ['T��tulo', 'titulo', 'Nome', 'nome'],
       imagem: ['Imagem', 'imagem', 'Foto', 'foto'],
-      valor: ['Valor', 'valor', 'Preço', 'preco'],
+      valor: ['Valor', 'valor', 'Pre��o', 'preco'],
       m2: ['Área', 'area', 'M²', 'm2'],
       localizacao: ['Endereço', 'endereco', 'Localização', 'localizacao'],
       link: ['Link', 'link', 'URL', 'url'],
@@ -1157,18 +1157,6 @@ export default function Index() {
             palavrasChaves: getColumnValue(row, mapping.palavrasChaves || [], 'palavrasChaves'),
             site: getColumnValue(row, mapping.site, 'site') || selectedSite
           };
-        }).map((prop, index) => {
-          // Debug first few converted properties
-          if (index < 3) {
-            console.log(`Converted property ${index + 1}:`, {
-              nome: prop.nome,
-              link: prop.link,
-              valor: prop.valor,
-              m2: prop.m2,
-              site: prop.site
-            });
-          }
-          return prop;
         });
 
         // Filter out duplicates and already processed properties
