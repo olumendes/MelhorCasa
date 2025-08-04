@@ -1132,10 +1132,7 @@ export default function Index() {
           // Special handling for Casa Mineira
           const isExtraLinha = selectedSite === 'casamineira';
 
-          // Debug first few rows
-          if (index < 3) {
-            console.log(`Row ${index + 1} data:`, row);
-          }
+          // Debug first few rows (removed for cleaner output)
 
           return {
             id: `imported-${Date.now()}-${index}`,
