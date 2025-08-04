@@ -492,6 +492,26 @@ export default function Index() {
     }
   };
 
+  // Control header visibility on scroll (mobile)
+  useEffect(() => {
+    const controlHeader = () => {
+      const currentScrollY = window.scrollY;
+
+      if (currentScrollY < lastScrollY || currentScrollY < 10) {
+        // Scrolling up or at top - show header
+        setShowHeader(true);
+      } else {
+        // Scrolling down - hide header
+        setShowHeader(false);
+      }
+
+      setLastScrollY(currentScrollY);
+    };
+
+    window.addEventListener('scroll', controlHeader);
+    return () => window.removeEventListener('scroll', controlHeader);
+  }, [lastScrollY]);
+
     // Swipe handling functions
   const handleTouchStart = (e: React.TouchEvent, propertyId: string) => {
     setTouchStart({
