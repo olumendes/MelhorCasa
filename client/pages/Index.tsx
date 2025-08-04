@@ -1901,8 +1901,20 @@ export default function Index() {
                 </Badge>
                 {property.imagem2 && (
                   <div className="absolute bottom-3 right-3 flex gap-1">
-                    <div className={`w-2 h-2 rounded-full ${currentImageIndex[property.id] === 0 ? 'bg-white' : 'bg-white/50'}`} />
-                    <div className={`w-2 h-2 rounded-full ${currentImageIndex[property.id] === 1 ? 'bg-white' : 'bg-white/50'}`} />
+                    <div
+                      className={`w-2 h-2 rounded-full cursor-pointer ${currentImageIndex[property.id] === 0 ? 'bg-white' : 'bg-white/50'}`}
+                      onClick={(e) => {
+                        e.stopPropagation();
+                        setCurrentImageIndex(prev => ({ ...prev, [property.id]: 0 }));
+                      }}
+                    />
+                    <div
+                      className={`w-2 h-2 rounded-full cursor-pointer ${currentImageIndex[property.id] === 1 ? 'bg-white' : 'bg-white/50'}`}
+                      onClick={(e) => {
+                        e.stopPropagation();
+                        setCurrentImageIndex(prev => ({ ...prev, [property.id]: 1 }));
+                      }}
+                    />
                   </div>
                 )}
               </div>
