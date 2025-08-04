@@ -1191,17 +1191,27 @@ export default function Index() {
             const isDuplicate = isDuplicateProperty(newProp, prev);
             const isProcessed = isPropertyAlreadyProcessed(newProp);
 
-            if (isDuplicate || isProcessed) {
-              console.log(`Property ${index + 1} filtered out:`, {
+            if (isDuplicate) {
+              duplicateCount++;
+              console.log(`Property ${index + 1} is duplicate:`, {
                 name: newProp.nome,
-                link: newProp.link,
                 localizacao: newProp.localizacao,
                 valor: newProp.valor,
                 m2: newProp.m2,
-                quartos: newProp.quartos,
-                isDuplicate,
-                isProcessed
+                quartos: newProp.quartos
               });
+            }
+
+            if (isProcessed) {
+              processedCount++;
+              console.log(`Property ${index + 1} already processed (liked/disliked):`, {
+                name: newProp.nome,
+                link: newProp.link
+              });
+            }
+
+            if (!isDuplicate && !isProcessed) {
+              acceptedCount++;
             }
 
             // Special check for problematic links
@@ -1211,6 +1221,9 @@ export default function Index() {
 
             return !isDuplicate && !isProcessed;
           });
+
+          console.log('=== IMPORT SUMMARY ===');
+          console.log(`Original: ${importedProperties.length}, Duplicates: ${duplicateCount}, Already Processed: ${processedCount}, Accepted: ${acceptedCount}`);
 
           // Enhance imported properties with numeric values
           const enhancedNewProperties = newProperties.map(property => enhanceProperty(property));
