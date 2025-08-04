@@ -239,30 +239,10 @@ export default function Index() {
     return isDuplicateProperty(newProperty, likedProperties) || isDuplicateProperty(newProperty, dislikedProperties);
   };
 
-  // Function to remove duplicates from property array using robust criteria
+  // Function to remove duplicates from property array - DISABLED: returns all properties
   const removeDuplicateProperties = (properties: Property[]): Property[] => {
-    const unique: Property[] = [];
-
-    properties.forEach(property => {
-      // Check if this property is already in our unique list
-      const isDuplicate = unique.some(existing => {
-        const sameLocation = existing.localizacao === property.localizacao;
-        const sameValue = existing.valor === property.valor;
-        const sameSize = existing.m2 === property.m2;
-        const sameRooms = existing.quartos === property.quartos;
-
-        // Only consider duplicate if ALL criteria match exactly
-        return sameLocation && sameValue && sameSize && sameRooms &&
-               existing.localizacao && property.localizacao && // both must have location
-               existing.valor && property.valor; // both must have value
-      });
-
-      if (!isDuplicate) {
-        unique.push(property);
-      }
-    });
-
-    return unique;
+    // Duplicate removal disabled - return all properties as requested
+    return properties;
   };
 
   // Function to enhance property with numeric values and distance
