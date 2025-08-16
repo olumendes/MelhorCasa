@@ -498,6 +498,142 @@ export default function Index() {
     }
   };
 
+  // Server communication functions
+  const startScraping = async () => {
+    try {
+      setScrapingStatus({ isRunning: true, progress: 'Iniciando scraping...', completed: false });
+
+      const response = await fetch('/api/scraper/start', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' }
+      });
+
+      if (!response.ok) {
+        throw new Error('Erro ao iniciar scraping');
+      }
+
+      const data = await response.json();
+      setScrapingStatus(data.status);
+      toast.success('Scraping iniciado! Aguarde a conclusão...');
+
+      // Poll for status updates
+      pollScrapingStatus();
+    } catch (error) {
+      console.error('Error starting scraping:', error);
+      toast.error('Erro ao iniciar scraping');
+      setScrapingStatus({ isRunning: false, progress: 'Erro ao iniciar', completed: false });
+    }
+  };
+
+  const stopScraping = async () => {
+    try {
+      const response = await fetch('/api/scraper/stop', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' }
+      });
+
+      if (!response.ok) {
+        throw new Error('Erro ao parar scraping');
+      }
+
+      const data = await response.json();
+      setScrapingStatus(data.status);
+      toast.info('Scraping interrompido');
+    } catch (error) {
+      console.error('Error stopping scraping:', error);
+      toast.error('Erro ao parar scraping');
+    }
+  };
+
+  const pollScrapingStatus = async () => {
+    try {
+      const response = await fetch('/api/scraper/status');
+      const status = await response.json();
+      setScrapingStatus(status);
+
+      if (status.completed && !status.isRunning) {
+        toast.success(`Scraping concluído! ${status.totalProperties || 0} imóveis coletados`);
+        // Auto-import the scraped data
+        await importScrapedData();
+      } else if (status.isRunning) {
+        // Continue polling
+        setTimeout(pollScrapingStatus, 2000);
+      }
+    } catch (error) {
+      console.error('Error polling scraping status:', error);
+    }
+  };
+
+  const importScrapedData = async () => {
+    try {
+      const response = await fetch('/api/scraper/import', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' }
+      });
+
+      if (!response.ok) {
+        throw new Error('Erro ao importar dados');
+      }
+
+      const data = await response.json();
+
+      // Add scraped properties to existing properties
+      setProperties(prev => {
+        const enhanced = data.properties.map((property: any) => enhanceProperty(property));
+        initializeImageIndex(enhanced);
+        return [...prev, ...enhanced];
+      });
+
+      // Reset filters and show all properties
+      setTimeout(() => {
+        resetFilters();
+        setShowAllProperties(true);
+      }, 100);
+
+      toast.success(data.message);
+    } catch (error) {
+      console.error('Error importing scraped data:', error);
+      toast.error('Erro ao importar dados do scraping');
+    }
+  };
+
+  // Server data persistence functions
+  const saveToServer = async (type: 'liked' | 'disliked' | 'cofrinho', property: Property) => {
+    try {
+      const userId = 'default'; // You can implement user identification later
+      const response = await fetch(`/api/user/${userId}/${type}`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ property })
+      });
+
+      if (!response.ok) {
+        throw new Error(`Erro ao salvar ${type}`);
+      }
+    } catch (error) {
+      console.error(`Error saving ${type}:`, error);
+      // Fallback to localStorage if server fails
+    }
+  };
+
+  const loadFromServer = async () => {
+    try {
+      const userId = 'default';
+      const response = await fetch(`/api/user/${userId}/data`);
+
+      if (response.ok) {
+        const data = await response.json();
+        setLikedProperties(data.likedProperties || []);
+        setDislikedProperties(data.dislikedProperties || []);
+        // Load cofrinho data if needed
+        return true;
+      }
+    } catch (error) {
+      console.error('Error loading from server:', error);
+    }
+    return false;
+  };
+
   // Control header visibility on scroll (mobile)
   useEffect(() => {
     const controlHeader = () => {
