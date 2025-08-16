@@ -908,6 +908,24 @@ export default function Index() {
 
   // Site mappings for different XLSX structures
   const siteColumnMappings = {
+    geral: {
+      nome: ['título', 'titulo', 'Título', 'nome', 'Nome'],
+      imagem: ['imagem', 'Imagem', 'foto', 'Foto'],
+      imagem2: ['imagem2', 'Imagem2', 'foto2', 'Foto2'],
+      valor: ['valor', 'Valor', 'preço', 'preco', 'Preço'],
+      condominio: ['condominio', 'condomínio', 'Condominio', 'Condomínio'],
+      m2: ['m2', 'M2', 'm²', 'M²', 'area', 'Area', 'Área'],
+      rua: ['rua', 'Rua', 'endereço', 'endereco', 'Endereço'],
+      bairro: ['bairro', 'Bairro'],
+      localizacao: ['localização', 'localizacao', 'Localização'],
+      link: ['link', 'Link', 'url', 'URL'],
+      quartos: ['quartos', 'Quartos'],
+      garagem: ['garagem', 'Garagem', 'vagas', 'Vagas'],
+      banheiros: ['banheiros', 'Banheiros', 'banheiro', 'Banheiro'],
+      vantagens: ['vantagens', 'Vantagens'],
+      palavrasChaves: ['palavras-chave', 'palavraschave', 'PalavrasChave'],
+      site: ['fonte', 'Fonte', 'site', 'Site']
+    },
     quintoandar: {
       nome: ['Nome', 'nome', 'Título', 'titulo'],
       imagem: ['Imagem', 'imagem', 'Foto', 'foto'],
