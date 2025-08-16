@@ -872,6 +872,8 @@ export default function Index() {
         if (!isDuplicateProperty(property, prev)) {
           const updated = [...prev, property];
           localStorage.setItem('dislikedProperties', JSON.stringify(updated));
+          // Save to server
+          saveToServer('disliked', property);
           return updated;
         }
         return prev;
