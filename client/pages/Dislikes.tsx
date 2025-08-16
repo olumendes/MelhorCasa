@@ -2,7 +2,7 @@ import { useState, useEffect } from "react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
-import { ArrowLeft, Home, MapPin, Car, Maximize2, Trash2, RotateCcw } from "lucide-react";
+import { ArrowLeft, Home, MapPin, Car, Maximize2, Trash2, RotateCcw, Tag, Filter, Plus, X, Search } from "lucide-react";
 import { Link } from "react-router-dom";
 
 interface Property {
@@ -22,10 +22,14 @@ interface Property {
   quartosNumerico?: number;
   garagemNumerico?: number;
   distancia?: number;
+  tags?: string[];
 }
 
 export default function Dislikes() {
   const [dislikedProperties, setDislikedProperties] = useState<Property[]>([]);
+  const [tagFilter, setTagFilter] = useState<string[]>([]);
+  const [availableTags, setAvailableTags] = useState<string[]>([]);
+  const [filteredProperties, setFilteredProperties] = useState<Property[]>([]);
 
   // Function to remove duplicates from property array based on link
   const removeDuplicateProperties = (properties: Property[]): Property[] => {
@@ -39,8 +43,10 @@ export default function Dislikes() {
     });
   };
 
-  useEffect(() => {
+    useEffect(() => {
     const savedDislikes = localStorage.getItem('dislikedProperties');
+    const savedTags = localStorage.getItem('availableTags');
+
     if (savedDislikes) {
       try {
         const dislikedData = JSON.parse(savedDislikes);
@@ -56,7 +62,27 @@ export default function Dislikes() {
         console.error('Error loading disliked properties:', error);
       }
     }
+
+    if (savedTags) {
+      try {
+        setAvailableTags(JSON.parse(savedTags));
+      } catch (error) {
+        console.error('Error loading available tags:', error);
+      }
+    }
   }, []);
+
+  // Filter properties based on selected tags
+  useEffect(() => {
+    if (tagFilter.length === 0) {
+      setFilteredProperties(dislikedProperties);
+    } else {
+      const filtered = dislikedProperties.filter(property =>
+        property.tags && tagFilter.some(tag => property.tags!.includes(tag))
+      );
+      setFilteredProperties(filtered);
+    }
+  }, [dislikedProperties, tagFilter]);
 
   const removeFromDislikes = (propertyId: string) => {
     const updatedDislikes = dislikedProperties.filter(p => p.id !== propertyId);
@@ -73,18 +99,21 @@ export default function Dislikes() {
     <div className="min-h-screen bg-gradient-to-br from-red-50 via-white to-orange-50">
       {/* Header */}
       <header className="bg-white/80 backdrop-blur-sm border-b border-gray-200 sticky top-0 z-50">
-        <div className="container mx-auto px-4 sm:px-6 py-4">
-          <div className="flex items-center justify-between">
-            <div className="flex items-center gap-3">
+        <div className="container mx-auto px-3 sm:px-6 py-3 sm:py-4">
+          <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3 sm:gap-0">
+            <div className="flex items-center gap-2 sm:gap-3">
               <Link to="/">
-                <Button variant="outline" size="sm" className="gap-2">
-                  <ArrowLeft className="h-4 w-4" />
-                  Voltar
+                <Button variant="outline" size="sm" className="gap-1 sm:gap-2 text-xs sm:text-sm">
+                  <ArrowLeft className="h-3 w-3 sm:h-4 sm:w-4" />
+                  <span className="hidden xs:inline">Voltar</span>
                 </Button>
               </Link>
               <div>
-                <h1 className="text-xl sm:text-2xl font-bold text-gray-900">Casas Rejeitadas</h1>
-                <p className="text-sm text-gray-600">Imóveis que você não curtiu</p>
+                <h1 className="text-lg sm:text-xl md:text-2xl font-bold text-gray-900">
+                  <span className="hidden sm:inline">Casas Rejeitadas</span>
+                  <span className="sm:hidden">Rejeitadas</span>
+                </h1>
+                <p className="text-xs sm:text-sm text-gray-600 hidden xs:block">Imóveis que você não curtiu</p>
               </div>
             </div>
             
@@ -103,14 +132,63 @@ export default function Dislikes() {
         </div>
       </header>
 
-      <div className="container mx-auto px-4 sm:px-6 py-6 sm:py-8">
+            <div className="container mx-auto px-3 sm:px-6 py-4 sm:py-6 md:py-8">
+        {/* Tag Filter */}
+        {availableTags.length > 0 && (
+          <Card className="mb-8 bg-white/60 backdrop-blur-sm">
+            <CardHeader>
+              <CardTitle className="text-lg flex items-center gap-2">
+                <Filter className="h-5 w-5" />
+                Filtrar por Tags
+              </CardTitle>
+            </CardHeader>
+            <CardContent>
+              <div className="space-y-3">
+                <div className="flex flex-wrap gap-1 min-h-[2rem] p-2 border rounded-md bg-white">
+                  {tagFilter.length === 0 ? (
+                    <span className="text-sm text-gray-400">Selecione tags para filtrar suas casas rejeitadas</span>
+                  ) : (
+                    tagFilter.map(tag => (
+                      <Badge
+                        key={tag}
+                        variant="secondary"
+                        className="cursor-pointer hover:bg-red-100"
+                        onClick={() => setTagFilter(prev => prev.filter(t => t !== tag))}
+                      >
+                        {tag} <X className="h-3 w-3 ml-1" />
+                      </Badge>
+                    ))
+                  )}
+                </div>
+                <div className="flex flex-wrap gap-1">
+                  {availableTags.filter(tag => !tagFilter.includes(tag)).map(tag => (
+                    <Badge
+                      key={tag}
+                      variant="outline"
+                      className="cursor-pointer hover:bg-blue-50"
+                      onClick={() => setTagFilter(prev => [...prev, tag])}
+                    >
+                      <Plus className="h-3 w-3 mr-1" /> {tag}
+                    </Badge>
+                  ))}
+                </div>
+              </div>
+            </CardContent>
+          </Card>
+        )}
+
         {/* Statistics */}
         <Card className="mb-8 bg-white/60 backdrop-blur-sm">
           <CardContent className="p-6">
             <div className="flex items-center justify-between">
               <div>
                 <p className="text-sm font-medium text-gray-600">Total Rejeitadas</p>
-                <p className="text-3xl font-bold text-red-600">{dislikedProperties.length}</p>
+                <p className="text-3xl font-bold text-red-600">
+                  {filteredProperties.length}
+                  {tagFilter.length > 0 && filteredProperties.length !== dislikedProperties.length && (
+                    <span className="text-lg text-gray-500">/{dislikedProperties.length}</span>
+                  )}
+                </p>
               </div>
               <div className="w-12 h-12 bg-red-100 rounded-full flex items-center justify-center">
                 <span className="text-red-600 text-xl">👎</span>
@@ -119,9 +197,9 @@ export default function Dislikes() {
           </CardContent>
         </Card>
 
-        {/* Properties Grid */}
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-          {dislikedProperties.map((property) => (
+                {/* Properties Grid */}
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 sm:gap-6">
+          {filteredProperties.map((property) => (
             <Card key={property.id} className="overflow-hidden bg-white/80 backdrop-blur-sm hover:shadow-lg transition-all duration-300">
               <div className="relative">
                 <img
@@ -151,7 +229,7 @@ export default function Dislikes() {
                   {property.valor}
                 </div>
                 
-                <div className="flex flex-wrap gap-2 mb-4">
+                                <div className="flex flex-wrap gap-2 mb-4">
                   <Badge variant="secondary" className="gap-1">
                     <Maximize2 className="h-3 w-3" />
                     {property.m2}
@@ -171,6 +249,18 @@ export default function Dislikes() {
                     </Badge>
                   )}
                 </div>
+
+                {/* Tags */}
+                {property.tags && property.tags.length > 0 && (
+                  <div className="flex flex-wrap gap-1 mb-4">
+                    {property.tags.map(tag => (
+                      <Badge key={tag} variant="default" className="text-xs bg-purple-100 text-purple-800">
+                        <Tag className="h-3 w-3 mr-1" />
+                        {tag}
+                      </Badge>
+                    ))}
+                  </div>
+                )}
                 
                 <div className="flex gap-2">
                   <Button
@@ -195,7 +285,7 @@ export default function Dislikes() {
           ))}
         </div>
 
-        {dislikedProperties.length === 0 && (
+                {filteredProperties.length === 0 && dislikedProperties.length === 0 && (
           <Card className="bg-white/60 backdrop-blur-sm">
             <CardContent className="p-12 text-center">
               <div className="text-6xl mb-4">😊</div>
@@ -211,6 +301,23 @@ export default function Dislikes() {
                   Voltar para a busca
                 </Button>
               </Link>
+            </CardContent>
+          </Card>
+        )}
+
+        {filteredProperties.length === 0 && dislikedProperties.length > 0 && (
+          <Card className="bg-white/60 backdrop-blur-sm">
+            <CardContent className="p-12 text-center">
+              <Search className="h-16 w-16 text-gray-400 mx-auto mb-4" />
+              <h3 className="text-xl font-semibold text-gray-900 mb-2">
+                Nenhuma casa encontrada com essas tags
+              </h3>
+              <p className="text-gray-600 mb-6">
+                Tente ajustar os filtros. Você tem {dislikedProperties.length} casas rejeitadas.
+              </p>
+              <Button variant="outline" onClick={() => setTagFilter([])}>
+                Limpar Filtros
+              </Button>
             </CardContent>
           </Card>
         )}

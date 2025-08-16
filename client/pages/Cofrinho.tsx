@@ -5,7 +5,7 @@ import { Badge } from "@/components/ui/badge";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
-import { ArrowLeft, PiggyBank, Target, Calendar, TrendingUp, Plus, Home, MapPin, Car, Maximize2 } from "lucide-react";
+import { ArrowLeft, PiggyBank, Target, Calendar, TrendingUp, Plus, Home, MapPin, Car, Maximize2, Tag, Search, X, Filter, Trash2 } from "lucide-react";
 import { Link } from "react-router-dom";
 import { toast } from "sonner";
 
@@ -35,13 +35,17 @@ export default function Cofrinho() {
   const [likedProperties, setLikedProperties] = useState<Property[]>([]);
   const [totalSavings, setTotalSavings] = useState(0);
   const [savingsGoals, setSavingsGoals] = useState<SavingsGoal[]>([]);
-  const [addMoneyAmount, setAddMoneyAmount] = useState("");
+    const [addMoneyAmount, setAddMoneyAmount] = useState("");
   const [isAddMoneyOpen, setIsAddMoneyOpen] = useState(false);
+  const [tagFilter, setTagFilter] = useState<string[]>([]);
+  const [availableTags, setAvailableTags] = useState<string[]>([]);
+  const [filteredProperties, setFilteredProperties] = useState<Property[]>([]);
 
   useEffect(() => {
     const savedLiked = localStorage.getItem('likedProperties');
     const savedSavings = localStorage.getItem('totalSavings');
-    const savedGoals = localStorage.getItem('savingsGoals');
+        const savedGoals = localStorage.getItem('savingsGoals');
+    const savedTags = localStorage.getItem('availableTags');
     
     if (savedLiked) {
       try {
@@ -55,14 +59,34 @@ export default function Cofrinho() {
       setTotalSavings(parseFloat(savedSavings));
     }
     
-    if (savedGoals) {
+        if (savedGoals) {
       try {
         setSavingsGoals(JSON.parse(savedGoals));
       } catch (error) {
         console.error('Error loading savings goals:', error);
       }
     }
+
+    if (savedTags) {
+      try {
+        setAvailableTags(JSON.parse(savedTags));
+      } catch (error) {
+        console.error('Error loading available tags:', error);
+      }
+    }
   }, []);
+
+  // Filter properties based on selected tags
+  useEffect(() => {
+    if (tagFilter.length === 0) {
+      setFilteredProperties(likedProperties);
+    } else {
+      const filtered = likedProperties.filter(property =>
+        property.tags && tagFilter.some(tag => property.tags!.includes(tag))
+      );
+      setFilteredProperties(filtered);
+    }
+  }, [likedProperties, tagFilter]);
 
   const parseNumericValue = (valueStr: string): number => {
     return parseInt(valueStr.replace(/[^\d]/g, '')) || 0;
@@ -115,40 +139,48 @@ export default function Cofrinho() {
     return remaining / monthsRemaining;
   };
 
-  const getProgressPercentage = (valor: string): number => {
+    const getProgressPercentage = (valor: string): number => {
     const downPayment = calculateDownPayment(valor);
     return Math.min(100, (totalSavings / downPayment) * 100);
+  };
+
+  const removeFromLiked = (propertyId: string) => {
+    const updatedLiked = likedProperties.filter(p => p.id !== propertyId);
+    setLikedProperties(updatedLiked);
+    localStorage.setItem('likedProperties', JSON.stringify(updatedLiked));
+    toast.success("Casa removida das curtidas!");
   };
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-green-50 via-white to-blue-50">
       {/* Header */}
       <header className="bg-white/80 backdrop-blur-sm border-b border-gray-200 sticky top-0 z-50">
-        <div className="container mx-auto px-4 sm:px-6 py-4">
-          <div className="flex items-center justify-between">
-            <div className="flex items-center gap-3">
+        <div className="container mx-auto px-3 sm:px-6 py-3 sm:py-4">
+          <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3 sm:gap-0">
+            <div className="flex items-center gap-2 sm:gap-3 w-full sm:w-auto">
               <Link to="/">
-                <Button variant="outline" size="sm" className="gap-2">
-                  <ArrowLeft className="h-4 w-4" />
-                  Voltar
+                <Button variant="outline" size="sm" className="gap-1 sm:gap-2 text-xs sm:text-sm">
+                  <ArrowLeft className="h-3 w-3 sm:h-4 sm:w-4" />
+                  <span className="hidden xs:inline">Voltar</span>
                 </Button>
               </Link>
-              <div className="flex items-center gap-3">
-                <div className="p-2 bg-green-600 rounded-lg">
-                  <PiggyBank className="h-6 w-6 text-white" />
+              <div className="flex items-center gap-2 sm:gap-3">
+                <div className="p-1.5 sm:p-2 bg-green-600 rounded-lg">
+                  <PiggyBank className="h-5 w-5 sm:h-6 sm:w-6 text-white" />
                 </div>
                 <div>
-                  <h1 className="text-xl sm:text-2xl font-bold text-gray-900">Cofrinho</h1>
-                  <p className="text-sm text-gray-600">Suas economias para o lar dos sonhos</p>
+                  <h1 className="text-lg sm:text-xl md:text-2xl font-bold text-gray-900">Cofrinho</h1>
+                  <p className="text-xs sm:text-sm text-gray-600 hidden xs:block">Suas economias para o lar dos sonhos</p>
                 </div>
               </div>
             </div>
             
             <Dialog open={isAddMoneyOpen} onOpenChange={setIsAddMoneyOpen}>
               <DialogTrigger asChild>
-                <Button className="gap-2 bg-green-600 hover:bg-green-700">
-                  <Plus className="h-4 w-4" />
-                  Adicionar Dinheiro
+                <Button className="gap-1 sm:gap-2 bg-green-600 hover:bg-green-700 text-xs sm:text-sm px-3 sm:px-4">
+                  <Plus className="h-3 w-3 sm:h-4 sm:w-4" />
+                  <span className="hidden sm:inline">Adicionar Dinheiro</span>
+                  <span className="sm:hidden">+ Dinheiro</span>
                 </Button>
               </DialogTrigger>
               <DialogContent className="sm:max-w-md">
@@ -180,9 +212,54 @@ export default function Cofrinho() {
         </div>
       </header>
 
-      <div className="container mx-auto px-4 sm:px-6 py-6 sm:py-8">
+      <div className="container mx-auto px-3 sm:px-6 py-4 sm:py-6 md:py-8">
+        {/* Tag Filter */}
+        {availableTags.length > 0 && (
+          <Card className="mb-6 sm:mb-8 bg-white/60 backdrop-blur-sm">
+            <CardHeader className="pb-3 sm:pb-6">
+              <CardTitle className="text-base sm:text-lg flex items-center gap-2">
+                <Filter className="h-4 w-4 sm:h-5 sm:w-5" />
+                <span className="hidden sm:inline">Filtrar por Tags</span>
+                <span className="sm:hidden">Tags</span>
+              </CardTitle>
+            </CardHeader>
+            <CardContent className="px-3 sm:px-6">
+              <div className="space-y-3">
+                <div className="flex flex-wrap gap-1 min-h-[2rem] p-2 border rounded-md bg-white">
+                  {tagFilter.length === 0 ? (
+                    <span className="text-sm text-gray-400">Selecione tags para filtrar suas casas curtidas</span>
+                  ) : (
+                    tagFilter.map(tag => (
+                      <Badge
+                        key={tag}
+                        variant="secondary"
+                        className="cursor-pointer hover:bg-red-100"
+                        onClick={() => setTagFilter(prev => prev.filter(t => t !== tag))}
+                      >
+                        {tag} <X className="h-3 w-3 ml-1" />
+                      </Badge>
+                    ))
+                  )}
+                </div>
+                <div className="flex flex-wrap gap-1">
+                  {availableTags.filter(tag => !tagFilter.includes(tag)).map(tag => (
+                    <Badge
+                      key={tag}
+                      variant="outline"
+                      className="cursor-pointer hover:bg-blue-50"
+                      onClick={() => setTagFilter(prev => [...prev, tag])}
+                    >
+                      <Plus className="h-3 w-3 mr-1" /> {tag}
+                    </Badge>
+                  ))}
+                </div>
+              </div>
+            </CardContent>
+          </Card>
+        )}
+
         {/* Savings Summary */}
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 sm:gap-6 mb-6 sm:mb-8">
           <Card className="bg-white/60 backdrop-blur-sm">
             <CardContent className="p-6">
               <div className="flex items-center justify-between">
@@ -200,9 +277,14 @@ export default function Cofrinho() {
           <Card className="bg-white/60 backdrop-blur-sm">
             <CardContent className="p-6">
               <div className="flex items-center justify-between">
-                <div>
+                                <div>
                   <p className="text-sm font-medium text-gray-600">Casas Curtidas</p>
-                  <p className="text-3xl font-bold text-blue-600">{likedProperties.length}</p>
+                  <p className="text-3xl font-bold text-blue-600">
+                    {filteredProperties.length}
+                    {tagFilter.length > 0 && filteredProperties.length !== likedProperties.length && (
+                      <span className="text-lg text-gray-500">/{likedProperties.length}</span>
+                    )}
+                  </p>
                 </div>
                 <Home className="h-8 w-8 text-blue-600" />
               </div>
@@ -222,9 +304,9 @@ export default function Cofrinho() {
           </Card>
         </div>
 
-        {/* Properties Grid */}
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-          {likedProperties.map((property) => {
+                {/* Properties Grid */}
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 sm:gap-6">
+          {filteredProperties.map((property) => {
             const downPayment = calculateDownPayment(property.valor);
             const progress = getProgressPercentage(property.valor);
             const monthlyNeeded = calculateMonthlyNeeded(property.id, property.valor);
@@ -285,7 +367,7 @@ export default function Cofrinho() {
                     </div>
                   </div>
                   
-                  <div className="flex flex-wrap gap-2 mb-4">
+                                    <div className="flex flex-wrap gap-2 mb-4">
                     <Badge variant="secondary" className="gap-1">
                       <Maximize2 className="h-3 w-3" />
                       {property.m2}
@@ -299,6 +381,18 @@ export default function Cofrinho() {
                       {property.garagem} vagas
                     </Badge>
                   </div>
+
+                  {/* Tags */}
+                  {property.tags && property.tags.length > 0 && (
+                    <div className="flex flex-wrap gap-1 mb-4">
+                      {property.tags.map(tag => (
+                        <Badge key={tag} variant="default" className="text-xs bg-purple-100 text-purple-800">
+                          <Tag className="h-3 w-3 mr-1" />
+                          {tag}
+                        </Badge>
+                      ))}
+                    </div>
+                  )}
 
                   {/* Target Date and Monthly Calculation */}
                   <div className="space-y-3">
@@ -327,12 +421,23 @@ export default function Cofrinho() {
                       </div>
                     )}
                     
-                    <Button
-                      className="w-full"
-                      onClick={() => window.open(property.link, '_blank')}
-                    >
-                      Ver Detalhes
-                    </Button>
+                                        <div className="flex gap-2">
+                      <Button
+                        size="sm"
+                        variant="destructive"
+                        onClick={() => removeFromLiked(property.id)}
+                        className="gap-2"
+                      >
+                        <Trash2 className="h-4 w-4" />
+                        Remover
+                      </Button>
+                      <Button
+                        className="flex-1"
+                        onClick={() => window.open(property.link, '_blank')}
+                      >
+                        Ver Detalhes
+                      </Button>
+                    </div>
                   </div>
                 </CardContent>
               </Card>
@@ -340,7 +445,7 @@ export default function Cofrinho() {
           })}
         </div>
 
-        {likedProperties.length === 0 && (
+                {filteredProperties.length === 0 && likedProperties.length === 0 && (
           <Card className="bg-white/60 backdrop-blur-sm">
             <CardContent className="p-12 text-center">
               <PiggyBank className="h-16 w-16 text-gray-400 mx-auto mb-4" />
@@ -356,6 +461,23 @@ export default function Cofrinho() {
                   Voltar para a busca
                 </Button>
               </Link>
+            </CardContent>
+          </Card>
+        )}
+
+        {filteredProperties.length === 0 && likedProperties.length > 0 && (
+          <Card className="bg-white/60 backdrop-blur-sm">
+            <CardContent className="p-12 text-center">
+              <Search className="h-16 w-16 text-gray-400 mx-auto mb-4" />
+              <h3 className="text-xl font-semibold text-gray-900 mb-2">
+                Nenhuma casa encontrada com essas tags
+              </h3>
+              <p className="text-gray-600 mb-6">
+                Tente ajustar os filtros. Você tem {likedProperties.length} casas curtidas.
+              </p>
+              <Button variant="outline" onClick={() => setTagFilter([])}>
+                Limpar Filtros
+              </Button>
             </CardContent>
           </Card>
         )}

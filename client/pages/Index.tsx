@@ -3,11 +3,11 @@ import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Input } from "@/components/ui/input";
-import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
+import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
 import { Label } from "@/components/ui/label";
 import { Slider } from "@/components/ui/slider";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
-import { Play, Square, Upload, Download, Home, MapPin, Car, Maximize2, Settings, Filter, Heart, ThumbsDown, ArrowUpDown } from "lucide-react";
+import { Play, Square, Upload, Download, Home, MapPin, Car, Maximize2, Settings, Filter, Heart, ThumbsDown, ArrowUpDown, Target, Tag, Plus, X, Search, ArrowLeft, ArrowRight, Zap, PiggyBank, Bath } from "lucide-react";
 import { Link } from "react-router-dom";
 import { toast } from "sonner";
 import * as XLSX from 'xlsx';
@@ -22,12 +22,22 @@ interface Property {
   link: string;
   quartos: string;
   garagem: string;
+  banheiros?: string;
+  site?: string;
+  // Novos campos para diferentes sites
+  vantagens?: string;
+  condominio?: string;
+  rua?: string;
+  bairro?: string;
+  palavrasChaves?: string;
+  imagem2?: string; // Segunda imagem
   latitude?: number;
   longitude?: number;
   valorNumerico?: number;
   m2Numerico?: number;
   quartosNumerico?: number;
   garagemNumerico?: number;
+  banheirosNumerico?: number;
   distancia?: number;
   tags?: string[];
 }
@@ -45,7 +55,9 @@ interface Filters {
   m2Max: number;
   quartos: string;
   vagas: string;
+  banheiros: string;
   distanciaMax: number;
+  tags: string[];
 }
 
 interface SortOption {
@@ -67,26 +79,59 @@ export default function Index() {
   const [userLocation, setUserLocation] = useState<UserLocation | null>(null);
     const [isSettingsOpen, setIsSettingsOpen] = useState(false);
   const [isLikedModalOpen, setIsLikedModalOpen] = useState(false);
-  const [isMatchModeOpen, setIsMatchModeOpen] = useState(false);
+      const [isMatchModeOpen, setIsMatchModeOpen] = useState(false);
   const [currentMatchIndex, setCurrentMatchIndex] = useState(0);
+  const [matchModeProperties, setMatchModeProperties] = useState<Property[]>([]);
+  const [matchModeTagInput, setMatchModeTagInput] = useState("");
+  const [isMatchModeTagModalOpen, setIsMatchModeTagModalOpen] = useState(false);
+  const [swipeDirection, setSwipeDirection] = useState<'left' | 'right' | null>(null);
+  const [isSwipeAnimating, setIsSwipeAnimating] = useState(false);
   const [isTagModalOpen, setIsTagModalOpen] = useState(false);
   const [selectedPropertyForTag, setSelectedPropertyForTag] = useState<Property | null>(null);
   const [newTagInput, setNewTagInput] = useState("");
   const [availableTags, setAvailableTags] = useState<string[]>([]);
   const [tagSearchInput, setTagSearchInput] = useState("");
+  const [selectedTagsFilter, setSelectedTagsFilter] = useState<string[]>([]);
+  const [showAllProperties, setShowAllProperties] = useState(false);
   const [locationInput, setLocationInput] = useState("");
   const [sortOption, setSortOption] = useState<SortOption>({ field: 'valor', direction: 'desc' });
   const [touchStart, setTouchStart] = useState<TouchPosition | null>(null);
+  const [showHeader, setShowHeader] = useState(true);
+  const [lastScrollY, setLastScrollY] = useState(0);
+  const [scrapingStatus, setScrapingStatus] = useState<{
+    isRunning: boolean;
+    progress: string;
+    completed: boolean;
+    totalProperties?: number;
+  }>({ isRunning: false, progress: 'Pausado', completed: false });
+  const [tempFilters, setTempFilters] = useState<Filters>({
+    valorMin: "",
+    valorMax: "",
+    m2Min: 0,
+    m2Max: 2000,
+    quartos: "all",
+    vagas: "all",
+    banheiros: "all",
+    distanciaMax: 100,
+    tags: []
+  });
+  const [filtersApplied, setFiltersApplied] = useState(false);
+  const [isSelectSiteOpen, setIsSelectSiteOpen] = useState(false);
+  const [selectedSite, setSelectedSite] = useState<string>('');
+  const [pendingFile, setPendingFile] = useState<File | null>(null);
+  const [currentImageIndex, setCurrentImageIndex] = useState<{[key: string]: number}>({});
   const [touchEnd, setTouchEnd] = useState<TouchPosition | null>(null);
   const [swipedCard, setSwipedCard] = useState<string | null>(null);
   const [filters, setFilters] = useState<Filters>({
     valorMin: "",
     valorMax: "",
     m2Min: 0,
-    m2Max: 1000,
+    m2Max: 2000,
     quartos: "all",
     vagas: "all",
-    distanciaMax: 50
+    banheiros: "all",
+    distanciaMax: 100,
+    tags: []
   });
     const fileInputRef = useRef<HTMLInputElement>(null);
 
@@ -122,35 +167,88 @@ export default function Index() {
   };
 
   // Function to parse numeric values from strings
-  const parseNumericValue = (valueStr: string): number => {
-    return parseInt(valueStr.replace(/[^\d]/g, '')) || 0;
-  };
+  const parseNumericValue = (valueStr: string | number | undefined | null): number => {
+    if (valueStr === null || valueStr === undefined) return 0;
 
-      // Function to check if property link already exists
-  const isDuplicateProperty = (newProperty: Property, existingProperties: Property[]): boolean => {
-    return existingProperties.some(existing => existing.link === newProperty.link);
-  };
+    // If it's already a number, return it
+    if (typeof valueStr === 'number') return valueStr;
 
-  // Function to remove duplicates from property array based on link
-  const removeDuplicateProperties = (properties: Property[]): Property[] => {
-    const seen = new Set<string>();
-    return properties.filter(property => {
-      if (seen.has(property.link)) {
-        return false;
+    // Convert to string and handle different formats
+    const str = valueStr.toString().trim();
+    if (!str || str === '' || str === '-' || str === 'N/A') return 0;
+
+    // Extract only digits, dots and commas
+    const cleaned = str.replace(/[^\d.,]/g, '');
+    if (!cleaned) return 0;
+
+    // Handle Brazilian number format
+    // Examples: 1.200.000 = 1200000, 1.200.000,50 = 1200000.5, 1200000 = 1200000
+    let normalizedStr = cleaned;
+
+    // Check if it's Brazilian format with dots as thousand separators
+    const dotCount = (cleaned.match(/\./g) || []).length;
+    const commaCount = (cleaned.match(/,/g) || []).length;
+
+    if (dotCount > 1 || (dotCount === 1 && commaCount === 1)) {
+      // Brazilian format: 1.200.000 or 1.200.000,50
+      // Remove dots (thousand separators) and replace comma with dot (decimal)
+      normalizedStr = cleaned.replace(/\./g, '').replace(',', '.');
+    } else if (dotCount === 1 && commaCount === 0) {
+      // Could be: 1200000.50 (English) or 1.200 (Brazilian thousands)
+      // Check if dot is followed by 1-2 digits (likely decimal) or 3+ digits (likely thousands)
+      const parts = cleaned.split('.');
+      if (parts.length === 2 && parts[1].length <= 2) {
+        // Likely decimal: 1200000.50
+        normalizedStr = cleaned;
+      } else {
+        // Likely thousands: 1.200 -> 1200
+        normalizedStr = cleaned.replace(/\./g, '');
       }
-      seen.add(property.link);
-      return true;
-    });
+    } else if (dotCount === 0 && commaCount === 1) {
+      // Brazilian decimal: 1200000,50 -> 1200000.50
+      normalizedStr = cleaned.replace(',', '.');
+    } else {
+      // Only digits or multiple separators - remove all separators except last
+      normalizedStr = cleaned.replace(/[.,]/g, '');
+    }
+
+    const parsed = parseFloat(normalizedStr);
+    const result = isNaN(parsed) ? 0 : Math.floor(parsed);
+
+    // Debug log para verificar conversões
+    if (str !== cleaned && result > 0) {
+      console.log(`Converted: "${str}" -> "${cleaned}" -> "${normalizedStr}" -> ${result}`);
+    }
+
+    return result;
+  };
+
+        // Function to check if property already exists - DISABLED: always returns false
+  const isDuplicateProperty = (newProperty: Property, existingProperties: Property[]): boolean => {
+    // Duplicate detection disabled - always return false to accept all properties
+    return false;
+  };
+
+  // Function to check if property already exists in liked or disliked
+  const isPropertyAlreadyProcessed = (newProperty: Property): boolean => {
+    return isDuplicateProperty(newProperty, likedProperties) || isDuplicateProperty(newProperty, dislikedProperties);
+  };
+
+  // Function to remove duplicates from property array - DISABLED: returns all properties
+  const removeDuplicateProperties = (properties: Property[]): Property[] => {
+    // Duplicate removal disabled - return all properties as requested
+    return properties;
   };
 
   // Function to enhance property with numeric values and distance
   const enhanceProperty = (property: Property): Property => {
     const enhanced = {
       ...property,
-      valorNumerico: parseNumericValue(property.valor),
-      m2Numerico: parseNumericValue(property.m2),
-      quartosNumerico: parseNumericValue(property.quartos),
-      garagemNumerico: parseNumericValue(property.garagem)
+      valorNumerico: parseNumericValue(property.valor || ""),
+      m2Numerico: parseNumericValue(property.m2 || ""),
+      quartosNumerico: parseNumericValue(property.quartos || ""),
+      garagemNumerico: parseNumericValue(property.garagem || ""),
+      banheirosNumerico: parseNumericValue(property.banheiros || "")
     };
 
     // Add mock coordinates for demonstration (in real app, these would come from geocoding)
@@ -181,42 +279,155 @@ export default function Index() {
 
     // Filter properties based on current filters
   const applyFilters = (propertiesToFilter: Property[]) => {
-    return propertiesToFilter.filter(property => {
-      const enhanced = enhanceProperty(property);
+    console.log('=== APLICANDO FILTROS ===');
+    console.log('Total propriedades para filtrar:', propertiesToFilter.length);
+    console.log('Filtros ativos:', filters);
 
-      // Price filter
-      const valorMin = filters.valorMin ? parseInt(filters.valorMin.replace(/[^\d]/g, '')) : 0;
-      const valorMax = filters.valorMax ? parseInt(filters.valorMax.replace(/[^\d]/g, '')) : Infinity;
-      if (enhanced.valorNumerico < valorMin || enhanced.valorNumerico > valorMax) {
-        return false;
+    const filtered = propertiesToFilter.filter((property, index) => {
+      try {
+        // Use existing enhanced values or enhance if not already done
+        const enhanced = property.valorNumerico ? property : enhanceProperty(property);
+
+        // Price filter - only apply if values are set and valid
+        if (filters.valorMin && filters.valorMin.trim()) {
+          const valorMin = parseInt(filters.valorMin.replace(/[^\d]/g, ''));
+          if (Math.random() < 0.02) { // Debug 2% das vezes
+            console.log(`DEBUG valorMin: input="${filters.valorMin}" -> parsed=${valorMin}, property=${enhanced.valorNumerico} (${property.nome})`);
+          }
+          if (valorMin > 0 && enhanced.valorNumerico && enhanced.valorNumerico < valorMin) {
+            return false;
+          }
+        }
+        if (filters.valorMax && filters.valorMax.trim()) {
+          const valorMax = parseInt(filters.valorMax.replace(/[^\d]/g, ''));
+          if (Math.random() < 0.02) { // Debug 2% das vezes
+            console.log(`DEBUG valorMax: input="${filters.valorMax}" -> parsed=${valorMax}, property=${enhanced.valorNumerico} (${property.nome})`);
+          }
+          if (valorMax > 0 && enhanced.valorNumerico && enhanced.valorNumerico > valorMax) {
+            return false;
+          }
+        }
+
+        // Size filter - only exclude if property has size data and it's outside range
+        const m2Value = enhanced.m2Numerico || 0;
+        if (m2Value > 0) {
+          if (m2Value < filters.m2Min || m2Value > filters.m2Max) {
+            return false;
+          }
+        }
+
+        // Rooms filter - only apply if not "all" and property has room data
+        if (filters.quartos !== "all" && enhanced.quartosNumerico !== undefined) {
+          const requiredRooms = parseInt(filters.quartos);
+          if (!isNaN(requiredRooms) && enhanced.quartosNumerico !== requiredRooms) {
+            return false;
+          }
+        }
+
+        // Parking filter - only apply if not "all" and property has parking data
+        if (filters.vagas !== "all" && enhanced.garagemNumerico !== undefined) {
+          const requiredVagas = parseInt(filters.vagas);
+          if (!isNaN(requiredVagas) && enhanced.garagemNumerico !== requiredVagas) {
+            return false;
+          }
+        }
+
+        // Bathrooms filter - only apply if not "all" and property has bathroom data
+        if (filters.banheiros !== "all" && enhanced.banheirosNumerico !== undefined) {
+          const requiredBanheiros = parseInt(filters.banheiros);
+          if (!isNaN(requiredBanheiros) && enhanced.banheirosNumerico !== requiredBanheiros) {
+            return false;
+          }
+        }
+
+        // Distance filter - only apply if user location is set AND property has location
+        if (userLocation && enhanced.distancia !== undefined && enhanced.distancia > filters.distanciaMax) {
+          return false;
+        }
+
+        // Tags filter - only apply if tags are selected
+        if (filters.tags.length > 0) {
+          if (!property.tags || !filters.tags.some(tag => property.tags!.includes(tag))) {
+            return false;
+          }
+        }
+
+        return true;
+      } catch (error) {
+        console.error(`Error filtering property ${index}:`, error, property);
+        // If there's an error, include the property rather than exclude it
+        return true;
       }
-
-      // Size filter
-      if (enhanced.m2Numerico < filters.m2Min || enhanced.m2Numerico > filters.m2Max) {
-        return false;
-      }
-
-      // Rooms filter
-      if (filters.quartos !== "all" && enhanced.quartosNumerico !== parseInt(filters.quartos)) {
-        return false;
-      }
-
-      // Parking filter
-      if (filters.vagas !== "all" && enhanced.garagemNumerico !== parseInt(filters.vagas)) {
-        return false;
-      }
-
-      // Distance filter
-      if (userLocation && enhanced.distancia && enhanced.distancia > filters.distanciaMax) {
-        return false;
-      }
-
-      return true;
     });
+
+    console.log(`Filtros aplicados: ${propertiesToFilter.length} -> ${filtered.length} propriedades`);
+    return filtered;
+  };
+
+  const applyFiltersNow = () => {
+    console.log('=== BOTÃO APLICAR FILTROS CLICADO ===');
+    console.log('tempFilters (novos):', tempFilters);
+    console.log('filters (atuais):', filters);
+    console.log('Alterando filters para:', tempFilters);
+
+    setFilters(tempFilters);
+    setFiltersApplied(true);
+    setShowAllProperties(false); // Ensure filters are actually applied
+    toast.info("Filtros aplicados!");
+  };
+
+  // Function to check if filters have changed
+  const hasFiltersChanged = () => {
+    const changed = (
+      tempFilters.valorMin !== filters.valorMin ||
+      tempFilters.valorMax !== filters.valorMax ||
+      tempFilters.m2Min !== filters.m2Min ||
+      tempFilters.m2Max !== filters.m2Max ||
+      tempFilters.quartos !== filters.quartos ||
+      tempFilters.vagas !== filters.vagas ||
+      tempFilters.banheiros !== filters.banheiros ||
+      tempFilters.distanciaMax !== filters.distanciaMax ||
+      JSON.stringify(tempFilters.tags) !== JSON.stringify(filters.tags)
+    );
+
+    // Debug para identificar o problema
+    if (Math.random() < 0.1) {
+      console.log('=== FILTROS COMPARAÇÃO ===');
+      console.log('tempFilters:', tempFilters);
+      console.log('filters:', filters);
+      console.log('hasChanged:', changed);
+      console.log('Button should be enabled:', changed);
+    }
+
+    return changed;
+  };
+
+  const resetFilters = () => {
+    const resetValues = {
+      valorMin: "",
+      valorMax: "",
+      m2Min: 0,
+      m2Max: 2000,
+      quartos: "all",
+      vagas: "all",
+      banheiros: "all",
+      distanciaMax: 100,
+      tags: []
+    };
+    setTempFilters(resetValues);
+    setFilters(resetValues);
+    setFiltersApplied(false);
+    setShowAllProperties(false);
+    toast.info("Filtros resetados!");
   };
 
       // Update filtered properties when properties or filters change
   useEffect(() => {
+    console.log('=== useEffect FILTROS EXECUTANDO ===');
+    console.log('properties.length:', properties.length);
+    console.log('filters:', filters);
+    console.log('showAllProperties:', showAllProperties);
+
     // First deduplicate the properties
     const deduplicatedProperties = removeDuplicateProperties(properties);
 
@@ -226,11 +437,42 @@ export default function Index() {
       return; // Exit early, will trigger this useEffect again with deduplicated data
     }
 
-    const enhanced = properties.map(enhanceProperty);
-    const filtered = applyFilters(enhanced);
-    const sorted = sortProperties(filtered);
+    // Enhance properties that don't have numeric values yet
+    const enhanced = properties.map(property =>
+      property.valorNumerico ? property : enhanceProperty(property)
+    );
+
+    // If showAllProperties is true, bypass filtering completely
+    const result = showAllProperties ? enhanced : applyFilters(enhanced);
+    const sorted = sortProperties(result);
+
+    // Debug log para verificar filtros
+    if (Math.random() < 0.1) {
+      console.log('=== FILTROS DEBUG ===');
+      console.log('Filtros ativos:', filters);
+      console.log(`Propriedades: ${properties.length} -> Filtradas: ${result.length}`);
+      console.log('showAllProperties:', showAllProperties);
+    }
+
+    // Show helpful message if no properties match filters
+    if (properties.length > 0 && result.length === 0 && !showAllProperties) {
+      console.log('Debug filtering:', {
+        totalProperties: properties.length,
+        enhancedCount: enhanced.length,
+        filteredCount: result.length,
+        currentFilters: filters,
+        sampleEnhanced: enhanced[0],
+        sampleOriginal: properties[0]
+      });
+    }
+
     setFilteredProperties(sorted);
-  }, [properties, filters, userLocation, sortOption]);
+  }, [properties, filters, userLocation, sortOption, showAllProperties]);
+
+  // Initialize and sync tempFilters with current filters
+  useEffect(() => {
+    setTempFilters(filters);
+  }, [filters]);
 
   const handleSaveLocation = async () => {
     if (!locationInput.trim()) {
@@ -256,6 +498,162 @@ export default function Index() {
     }
   };
 
+  // Server communication functions
+  const startScraping = async () => {
+    try {
+      setScrapingStatus({ isRunning: true, progress: 'Iniciando scraping...', completed: false });
+
+      const response = await fetch('/api/scraper/start', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' }
+      });
+
+      if (!response.ok) {
+        throw new Error('Erro ao iniciar scraping');
+      }
+
+      const data = await response.json();
+      setScrapingStatus(data.status);
+      toast.success('Scraping iniciado! Aguarde a conclusão...');
+
+      // Poll for status updates
+      pollScrapingStatus();
+    } catch (error) {
+      console.error('Error starting scraping:', error);
+      toast.error('Erro ao iniciar scraping');
+      setScrapingStatus({ isRunning: false, progress: 'Erro ao iniciar', completed: false });
+    }
+  };
+
+  const stopScraping = async () => {
+    try {
+      const response = await fetch('/api/scraper/stop', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' }
+      });
+
+      if (!response.ok) {
+        throw new Error('Erro ao parar scraping');
+      }
+
+      const data = await response.json();
+      setScrapingStatus(data.status);
+      toast.info('Scraping interrompido');
+    } catch (error) {
+      console.error('Error stopping scraping:', error);
+      toast.error('Erro ao parar scraping');
+    }
+  };
+
+  const pollScrapingStatus = async () => {
+    try {
+      const response = await fetch('/api/scraper/status');
+      const status = await response.json();
+      setScrapingStatus(status);
+
+      if (status.completed && !status.isRunning) {
+        toast.success(`Scraping concluído! ${status.totalProperties || 0} imóveis coletados`);
+        // Auto-import the scraped data
+        await importScrapedData();
+      } else if (status.isRunning) {
+        // Continue polling
+        setTimeout(pollScrapingStatus, 2000);
+      }
+    } catch (error) {
+      console.error('Error polling scraping status:', error);
+    }
+  };
+
+  const importScrapedData = async () => {
+    try {
+      const response = await fetch('/api/scraper/import', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' }
+      });
+
+      if (!response.ok) {
+        throw new Error('Erro ao importar dados');
+      }
+
+      const data = await response.json();
+
+      // Add scraped properties to existing properties
+      setProperties(prev => {
+        const enhanced = data.properties.map((property: any) => enhanceProperty(property));
+        initializeImageIndex(enhanced);
+        return [...prev, ...enhanced];
+      });
+
+      // Reset filters and show all properties
+      setTimeout(() => {
+        resetFilters();
+        setShowAllProperties(true);
+      }, 100);
+
+      toast.success(data.message);
+    } catch (error) {
+      console.error('Error importing scraped data:', error);
+      toast.error('Erro ao importar dados do scraping');
+    }
+  };
+
+  // Server data persistence functions
+  const saveToServer = async (type: 'liked' | 'disliked' | 'cofrinho', property: Property) => {
+    try {
+      const userId = 'default'; // You can implement user identification later
+      const response = await fetch(`/api/user/${userId}/${type}`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ property })
+      });
+
+      if (!response.ok) {
+        throw new Error(`Erro ao salvar ${type}`);
+      }
+    } catch (error) {
+      console.error(`Error saving ${type}:`, error);
+      // Fallback to localStorage if server fails
+    }
+  };
+
+  const loadFromServer = async () => {
+    try {
+      const userId = 'default';
+      const response = await fetch(`/api/user/${userId}/data`);
+
+      if (response.ok) {
+        const data = await response.json();
+        setLikedProperties(data.likedProperties || []);
+        setDislikedProperties(data.dislikedProperties || []);
+        // Load cofrinho data if needed
+        return true;
+      }
+    } catch (error) {
+      console.error('Error loading from server:', error);
+    }
+    return false;
+  };
+
+  // Control header visibility on scroll (mobile)
+  useEffect(() => {
+    const controlHeader = () => {
+      const currentScrollY = window.scrollY;
+
+      if (currentScrollY < lastScrollY || currentScrollY < 10) {
+        // Scrolling up or at top - show header
+        setShowHeader(true);
+      } else {
+        // Scrolling down - hide header
+        setShowHeader(false);
+      }
+
+      setLastScrollY(currentScrollY);
+    };
+
+    window.addEventListener('scroll', controlHeader);
+    return () => window.removeEventListener('scroll', controlHeader);
+  }, [lastScrollY]);
+
     // Swipe handling functions
   const handleTouchStart = (e: React.TouchEvent, propertyId: string) => {
     setTouchStart({
@@ -271,7 +669,7 @@ export default function Index() {
     });
   };
 
-  const handleTouchEnd = (propertyId: string) => {
+    const handleTouchEnd = (propertyId: string) => {
     if (!touchStart || !touchEnd) return;
 
     const distanceX = touchStart.x - touchEnd.x;
@@ -292,6 +690,154 @@ export default function Index() {
     setTouchEnd(null);
   };
 
+  // Tag management functions
+  const addTagToProperty = (propertyId: string, tag: string) => {
+    setProperties(prev => prev.map(property => {
+      if (property.id === propertyId) {
+        const currentTags = property.tags || [];
+        if (!currentTags.includes(tag)) {
+          return { ...property, tags: [...currentTags, tag] };
+        }
+      }
+      return property;
+    }));
+
+    // Also update liked properties if this property is liked
+    setLikedProperties(prev => prev.map(property => {
+      if (property.id === propertyId) {
+        const currentTags = property.tags || [];
+        if (!currentTags.includes(tag)) {
+          const updated = [...prev.filter(p => p.id !== propertyId), { ...property, tags: [...currentTags, tag] }];
+          localStorage.setItem('likedProperties', JSON.stringify(updated));
+          return { ...property, tags: [...currentTags, tag] };
+        }
+      }
+      return property;
+    }));
+
+    // Update available tags
+    if (!availableTags.includes(tag)) {
+      const newTags = [...availableTags, tag];
+      setAvailableTags(newTags);
+      localStorage.setItem('availableTags', JSON.stringify(newTags));
+    }
+  };
+
+  const addNewTag = () => {
+    if (newTagInput.trim() && selectedPropertyForTag) {
+      addTagToProperty(selectedPropertyForTag.id, newTagInput.trim());
+      setNewTagInput("");
+      setIsTagModalOpen(false);
+      setSelectedPropertyForTag(null);
+      toast.success(`Tag "${newTagInput.trim()}" adicionada!`);
+    }
+  };
+
+  const openTagModal = (property: Property) => {
+    setSelectedPropertyForTag(property);
+    setIsTagModalOpen(true);
+  };
+
+  // Match Mode functions
+  const startMatchMode = () => {
+    if (filteredProperties.length === 0) {
+      toast.error("Nenhuma propriedade dispon��vel para o modo match");
+      return;
+    }
+    setMatchModeProperties([...filteredProperties]);
+    setCurrentMatchIndex(0);
+    setIsMatchModeOpen(true);
+  };
+
+  const handleMatchModeAction = (action: 'like' | 'dislike') => {
+    if (currentMatchIndex >= matchModeProperties.length) return;
+
+    const currentProperty = matchModeProperties[currentMatchIndex];
+
+    if (action === 'like') {
+      handleLike(currentProperty.id);
+    } else {
+      handleDislike(currentProperty.id);
+    }
+
+    // Remove the property from match mode list
+    const updatedMatchProperties = matchModeProperties.filter(p => p.id !== currentProperty.id);
+    setMatchModeProperties(updatedMatchProperties);
+
+    // If no more properties, close match mode
+    if (updatedMatchProperties.length === 0) {
+      setIsMatchModeOpen(false);
+      toast.info("Todas as propriedades foram avaliadas!");
+      return;
+    }
+
+    // Adjust index if necessary and reset position states
+    if (currentMatchIndex >= updatedMatchProperties.length) {
+      setCurrentMatchIndex(0);
+    }
+
+    // Reset touch and animation states to ensure next card appears correctly
+    setTouchStart(null);
+    setTouchEnd(null);
+    setIsSwipeAnimating(false);
+    setSwipeDirection(null);
+  };
+
+    // Match Mode tag functions
+  const addTagInMatchMode = (tag: string) => {
+    if (currentMatchIndex >= matchModeProperties.length) return;
+
+    const currentProperty = matchModeProperties[currentMatchIndex];
+    addTagToProperty(currentProperty.id, tag);
+
+    // Update the match mode properties array
+    setMatchModeProperties(prev => prev.map(prop =>
+      prop.id === currentProperty.id
+        ? { ...prop, tags: [...(prop.tags || []), tag] }
+        : prop
+    ));
+  };
+
+  const addNewTagInMatchMode = () => {
+    if (matchModeTagInput.trim()) {
+      addTagInMatchMode(matchModeTagInput.trim());
+      setMatchModeTagInput("");
+      setIsMatchModeTagModalOpen(false);
+      toast.success(`Tag "${matchModeTagInput.trim()}" adicionada!`);
+    }
+  };
+
+  // Keyboard controls for match mode
+  useEffect(() => {
+    const handleKeyDown = (event: KeyboardEvent) => {
+      if (!isMatchModeOpen || isMatchModeTagModalOpen) return;
+
+      if (event.key === 'ArrowLeft') {
+        event.preventDefault();
+        handleMatchModeAction('dislike');
+      } else if (event.key === 'ArrowRight') {
+        event.preventDefault();
+        handleMatchModeAction('like');
+      } else if (event.key === 'Escape') {
+        setIsMatchModeOpen(false);
+      } else if (event.key === 't' || event.key === 'T') {
+        event.preventDefault();
+        setIsMatchModeTagModalOpen(true);
+      }
+    };
+
+    window.addEventListener('keydown', handleKeyDown);
+    return () => window.removeEventListener('keydown', handleKeyDown);
+  }, [isMatchModeOpen, isMatchModeTagModalOpen, currentMatchIndex, matchModeProperties]);
+
+  // Reset animation states when card index changes
+  useEffect(() => {
+    setIsSwipeAnimating(false);
+    setSwipeDirection(null);
+    setTouchStart(null);
+    setTouchEnd(null);
+  }, [currentMatchIndex]);
+
     const handleLike = (propertyId: string) => {
     const property = properties.find(p => p.id === propertyId);
     if (!property) return;
@@ -304,6 +850,8 @@ export default function Index() {
         if (!isDuplicateProperty(property, prev)) {
           const updated = [...prev, property];
           localStorage.setItem('likedProperties', JSON.stringify(updated));
+          // Save to server
+          saveToServer('liked', property);
           return updated;
         }
         return prev;
@@ -324,6 +872,8 @@ export default function Index() {
         if (!isDuplicateProperty(property, prev)) {
           const updated = [...prev, property];
           localStorage.setItem('dislikedProperties', JSON.stringify(updated));
+          // Save to server
+          saveToServer('disliked', property);
           return updated;
         }
         return prev;
@@ -334,6 +884,8 @@ export default function Index() {
 
   // Sorting function
   const sortProperties = (propertiesToSort: Property[]): Property[] => {
+    if (!propertiesToSort || propertiesToSort.length === 0) return [];
+
     return [...propertiesToSort].sort((a, b) => {
       let aValue: number, bValue: number;
 
@@ -354,15 +906,28 @@ export default function Index() {
           return 0;
       }
 
-      return sortOption.direction === 'asc' ? aValue - bValue : bValue - aValue;
+      const result = sortOption.direction === 'asc' ? aValue - bValue : bValue - aValue;
+
+      // Debug ordenação
+      if (sortOption.field === 'valor' && Math.random() < 0.1) {
+        console.log(`Sorting: ${a.nome}(${aValue}) vs ${b.nome}(${bValue}) = ${result} (${sortOption.direction})`);
+      }
+
+      return result;
     });
+
+    // Log final para debug
+    console.log(`Ordenação ${sortOption.field} ${sortOption.direction} aplicada. Total: ${sorted.length} propriedades`);
+
+    return sorted;
   };
 
-    // Load user location and liked/disliked properties from localStorage on component mount
+      // Load user location and liked/disliked properties from localStorage on component mount
   useEffect(() => {
     const savedLocation = localStorage.getItem('userLocation');
     const savedLiked = localStorage.getItem('likedProperties');
     const savedDisliked = localStorage.getItem('dislikedProperties');
+    const savedTags = localStorage.getItem('availableTags');
 
     if (savedLocation) {
       try {
@@ -403,6 +968,14 @@ export default function Index() {
         console.error('Error loading disliked properties:', error);
       }
     }
+
+    if (savedTags) {
+      try {
+        setAvailableTags(JSON.parse(savedTags));
+      } catch (error) {
+        console.error('Error loading available tags:', error);
+      }
+    }
   }, []);
 
   const handleStartScraping = () => {
@@ -423,12 +996,26 @@ export default function Index() {
         garagem: "2"
       };
 
-      setProperties(prev => {
-        if (!isDuplicateProperty(newProperty1, prev)) {
+            setProperties(prev => {
+        if (!isDuplicateProperty(newProperty1, prev) && !isPropertyAlreadyProcessed(newProperty1)) {
           toast.info("Encontrada nova propriedade!");
+          // Reset filters when adding new properties to ensure they are visible
+          setTimeout(() => {
+            setFilters({
+              valorMin: "",
+              valorMax: "",
+              m2Min: 0,
+              m2Max: 2000,
+              quartos: "all",
+              vagas: "all",
+              banheiros: "all",
+              distanciaMax: 100,
+              tags: []
+            });
+          }, 100);
           return [...prev, newProperty1];
         } else {
-          toast.info("Propriedade já existe, pulando duplicata");
+          toast.info("Propriedade já existe ou foi processada, pulando duplicata");
           return prev;
         }
       });
@@ -448,12 +1035,12 @@ export default function Index() {
         garagem: "3"
       };
 
-      setProperties(prev => {
-        if (!isDuplicateProperty(newProperty2, prev)) {
+            setProperties(prev => {
+        if (!isDuplicateProperty(newProperty2, prev) && !isPropertyAlreadyProcessed(newProperty2)) {
           toast.info("Encontrada nova propriedade!");
           return [...prev, newProperty2];
         } else {
-          toast.info("Propriedade já existe, pulando duplicata");
+          toast.info("Propriedade já existe ou foi processada, pulando duplicata");
           return prev;
         }
       });
@@ -465,61 +1052,374 @@ export default function Index() {
     toast.info("Scraping pausado.");
   };
 
+  // Site mappings for different XLSX structures
+  const siteColumnMappings = {
+    geral: {
+      nome: ['título', 'titulo', 'Título', 'nome', 'Nome'],
+      imagem: ['imagem', 'Imagem', 'foto', 'Foto'],
+      imagem2: ['imagem2', 'Imagem2', 'foto2', 'Foto2'],
+      valor: ['valor', 'Valor', 'preço', 'preco', 'Preço'],
+      condominio: ['condominio', 'condomínio', 'Condominio', 'Condomínio'],
+      m2: ['m2', 'M2', 'm²', 'M²', 'area', 'Area', 'Área'],
+      rua: ['rua', 'Rua', 'endereço', 'endereco', 'Endereço'],
+      bairro: ['bairro', 'Bairro'],
+      localizacao: ['localização', 'localizacao', 'Localização'],
+      link: ['link', 'Link', 'url', 'URL'],
+      quartos: ['quartos', 'Quartos'],
+      garagem: ['garagem', 'Garagem', 'vagas', 'Vagas'],
+      banheiros: ['banheiros', 'Banheiros', 'banheiro', 'Banheiro'],
+      vantagens: ['vantagens', 'Vantagens'],
+      palavrasChaves: ['palavras-chave', 'palavraschave', 'PalavrasChave'],
+      site: ['fonte', 'Fonte', 'site', 'Site']
+    },
+    quintoandar: {
+      nome: ['Nome', 'nome', 'Título', 'titulo'],
+      imagem: ['Imagem', 'imagem', 'Foto', 'foto'],
+      valor: ['Valor', 'valor', 'Preço', 'preco'],
+      m2: ['M²', 'm2', 'Area', 'area'],
+      localizacao: ['Localização', 'localizacao', 'Endereço', 'endereco'],
+      link: ['Link', 'link', 'URL', 'url'],
+      quartos: ['Quartos', 'quartos'],
+      garagem: ['Garagem', 'garagem', 'Vagas', 'vagas'],
+      site: ['Site', 'site']
+    },
+    imovelnaweb: {
+      nome: ['Titulo', 'titulo', 'Título', 'Nome', 'nome'],
+      imagem: ['Imagem1', 'imagem1', 'Imagem', 'imagem'],
+      imagem2: ['Imagem2', 'imagem2'],
+      valor: ['Preço', 'Preco', 'preco', 'Valor', 'valor'],
+      condominio: ['Condominio', 'condominio', 'Condomínio'],
+      m2: ['Area', 'area', 'Área', 'área', 'M²', 'm2'],
+      rua: ['Rua', 'rua', 'Endereço', 'endereco'],
+      bairro: ['Bairro', 'bairro'],
+      localizacao: ['Localização', 'localizacao', 'Endereço', 'endereco'],
+      link: ['Link', 'link', 'URL', 'url'],
+      quartos: ['Quartos', 'quartos'],
+      garagem: ['Garagem', 'garagem', 'Vagas', 'vagas'],
+      vantagens: ['Vantagens', 'vantagens'],
+      palavrasChaves: ['PalavrasChaves', 'palavraschaves', 'Palavras-chave', 'Keywords'],
+      site: ['Site', 'site']
+    },
+    olx: {
+      nome: ['Título', 'titulo', 'Nome', 'nome'],
+      imagem: ['Imagem', 'imagem', 'Foto', 'foto'],
+      valor: ['Preço', 'preco', 'Valor', 'valor'],
+      m2: ['Tamanho', 'tamanho', 'M²', 'm2'],
+      localizacao: ['Localização', 'localizacao', 'Cidade', 'cidade'],
+      link: ['Link', 'link', 'URL', 'url'],
+      quartos: ['Quartos', 'quartos'],
+      garagem: ['Garagem', 'garagem'],
+      site: ['Site', 'site']
+    },
+    zapimoveis: {
+      nome: ['Título', 'titulo', 'Nome', 'nome'],
+      imagem: ['Imagem', 'imagem'],
+      valor: ['Valor', 'valor', 'Preço', 'preco'],
+      m2: ['Área', 'area', 'M²', 'm2'],
+      localizacao: ['Endereço', 'endereco', 'Localização', 'localizacao'],
+      link: ['Link', 'link'],
+      quartos: ['Quartos', 'quartos'],
+      garagem: ['Vagas', 'vagas', 'Garagem', 'garagem'],
+      site: ['Site', 'site']
+    },
+    vivareal: {
+      nome: ['Título', 'titulo', 'Nome', 'nome'],
+      imagem: ['Foto', 'foto', 'Imagem', 'imagem'],
+      valor: ['Preço', 'preco', 'Valor', 'valor'],
+      m2: ['Área ��til', 'area', 'M²', 'm2'],
+      localizacao: ['Endereço', 'endereco', 'Localização', 'localizacao'],
+      link: ['Link', 'link'],
+      quartos: ['Quartos', 'quartos'],
+      garagem: ['Vagas', 'vagas'],
+      site: ['Site', 'site']
+    },
+    netimoveis: {
+      nome: ['T��tulo', 'titulo', 'Nome', 'nome'],
+      imagem: ['Imagem', 'imagem', 'Foto', 'foto'],
+      valor: ['Valor', 'valor', 'Pre��o', 'preco'],
+      m2: ['Área', 'area', 'M²', 'm2'],
+      localizacao: ['Endereço', 'endereco', 'Localiza��ão', 'localizacao'],
+      link: ['Link', 'link', 'URL', 'url'],
+      quartos: ['Quartos', 'quartos'],
+      garagem: ['Garagem', 'garagem', 'Vagas', 'vagas'],
+      site: ['Site', 'site']
+    },
+    loft: {
+      nome: ['Título', 'titulo', 'Nome', 'nome'],
+      imagem: ['Imagem', 'imagem'],
+      valor: ['Preço', 'preco', 'Valor', 'valor'],
+      m2: ['Área', 'area', 'M²', 'm2'],
+      localizacao: ['Endereço', 'endereco'],
+      link: ['Link', 'link'],
+      quartos: ['Quartos', 'quartos'],
+      garagem: ['Vagas', 'vagas'],
+      site: ['Site', 'site']
+    },
+    chavesnamao: {
+      nome: ['Título', 'titulo', 'Descrição', 'descricao'],
+      imagem: ['Foto', 'foto', 'Imagem', 'imagem'],
+      valor: ['Valor', 'valor', 'Preço', 'preco'],
+      m2: ['Área', 'area', 'Tamanho', 'tamanho'],
+      localizacao: ['Localização', 'localizacao', 'Endereço', 'endereco'],
+      link: ['Link', 'link'],
+      quartos: ['Quartos', 'quartos'],
+      garagem: ['Garagem', 'garagem'],
+      site: ['Site', 'site']
+    },
+    casamineira: {
+      nome: ['nome da casa', 'Título', 'titulo', 'Nome', 'nome'],
+      imagem: ['Imagem', 'imagem', 'Foto', 'foto'],
+      valor: ['Preço', 'preco', 'Valor', 'valor'],
+      m2: ['Área', 'area', 'M²', 'm2'],
+      rua: ['Rua', 'rua', 'Endereço', 'endereco'],
+      bairro: ['Bairro', 'bairro'],
+      localizacao: ['Localização', 'localizacao'],
+      link: ['Link', 'link'],
+      quartos: ['Quartos', 'quartos'],
+      garagem: ['Garagem', 'garagem', 'Vagas', 'vagas'],
+      banheiros: ['Banheiros', 'banheiros', 'Banheiro', 'banheiro'],
+      site: ['Site', 'site']
+    }
+  };
+
+  const getColumnValue = (row: any, mapping: string[], fieldName = ''): string => {
+    if (!mapping || mapping.length === 0) return '';
+
+    // Debug: log available columns for first property (reduced frequency)
+    if (fieldName === 'nome' && Math.random() < 0.02) {
+      console.log(`=== DEBUG ${fieldName} ===`);
+      console.log('Available columns:', Object.keys(row));
+      console.log('Looking for:', mapping);
+    }
+
+    for (const column of mapping) {
+      if (row[column] !== undefined && row[column] !== null && row[column] !== '') {
+        let value = row[column].toString().trim();
+        if (value && value !== 'N/A' && value !== '-') {
+
+          // Special processing for nome field
+          if (fieldName === 'nome') {
+            // Remove HTML tags and entities
+            value = value.replace(/<[^>]*>/g, '');
+            value = value.replace(/&amp;lt;/g, '<').replace(/&amp;gt;/g, '>');
+            value = value.replace(/&lt;/g, '<').replace(/&gt;/g, '>');
+            value = value.replace(/&nbsp;/g, ' ');
+            value = value.replace(/&quot;/g, '"');
+            value = value.replace(/&amp;/g, '&');
+
+            // Remove extra whitespace
+            value = value.replace(/\s+/g, ' ').trim();
+
+            // Extract meaningful title - look for patterns
+            // Try to find the actual property title before description
+            const patterns = [
+              /^([^–-]+)[–-]/, // Title before dash
+              /^([^.!?]+)[.!?]/, // First sentence
+              /^(.{1,100})\s+(Características|Detalhes|Localização|Com\s+\d+)/, // Before common description words
+            ];
+
+            for (const pattern of patterns) {
+              const match = value.match(pattern);
+              if (match && match[1] && match[1].trim().length > 10) {
+                value = match[1].trim();
+                break;
+              }
+            }
+
+            // Limit to 120 characters for better display
+            if (value.length > 120) {
+              value = value.substring(0, 117) + '...';
+            }
+          }
+
+          // Only log first few items to avoid spam
+          if ((fieldName === 'nome' || fieldName === 'valor' || fieldName === 'imagem') && Math.random() < 0.02) {
+            console.log(`Found ${fieldName}: "${value.substring(0, 50)}..." in column "${column}"`);
+          }
+          return value;
+        }
+      }
+    }
+
+    // Only log missing critical fields
+    if ((fieldName === 'nome' || fieldName === 'valor') && Math.random() < 0.2) {
+      console.log(`No ${fieldName} found in columns:`, mapping);
+    }
+    return '';
+  };
+
+  // Initialize image index for new properties
+  const initializeImageIndex = (properties: Property[]) => {
+    const newIndexes: {[key: string]: number} = {};
+    properties.forEach(prop => {
+      if (!currentImageIndex[prop.id]) {
+        newIndexes[prop.id] = 0;
+      }
+    });
+    if (Object.keys(newIndexes).length > 0) {
+      setCurrentImageIndex(prev => ({ ...prev, ...newIndexes }));
+    }
+  };
+
   const handleFileUpload = (event: React.ChangeEvent<HTMLInputElement>) => {
     const file = event.target.files?.[0];
     if (file && (file.name.endsWith('.xlsx') || file.name.endsWith('.xls'))) {
-      const reader = new FileReader();
-      reader.onload = (e) => {
-        try {
-          const data = new Uint8Array(e.target?.result as ArrayBuffer);
-          const workbook = XLSX.read(data, { type: 'array' });
-          const sheetName = workbook.SheetNames[0];
-          const worksheet = workbook.Sheets[sheetName];
-          const jsonData = XLSX.utils.sheet_to_json(worksheet) as any[];
-          
-          // Convert Excel data to our Property interface
-          const importedProperties: Property[] = jsonData.map((row, index) => ({
-            id: `imported-${Date.now()}-${index}`,
-            nome: row.Nome || row.nome || `Imóvel Importado ${index + 1}`,
-            imagem: row.Imagem || row.imagem || "https://cdn.builder.io/api/v1/image/assets%2FTEMP%2Fdefault-house",
-            valor: row.Valor || row.valor || "R$ 0",
-            m2: row["M²"] || row.m2 || "0 m²",
-            localizacao: row["Localização"] || row.localizacao || "Localização não informada",
-            link: row.Link || row.link || "#",
-            quartos: row.Quartos || row.quartos || "0 quartos",
-            garagem: row.Garagem || row.garagem || "0"
-          }));
-          
-                    // Filter out duplicates based on link
-          setProperties(prev => {
-            const newProperties = importedProperties.filter(newProp =>
-              !isDuplicateProperty(newProp, prev)
-            );
-
-            const duplicatesCount = importedProperties.length - newProperties.length;
-
-            if (duplicatesCount > 0) {
-              toast.info(`${newProperties.length} novos imóveis importados, ${duplicatesCount} duplicatas ignoradas`);
-            } else {
-              toast.success(`${newProperties.length} imóveis importados do arquivo ${file.name}!`);
-            }
-
-            return [...prev, ...newProperties];
-          });
-        } catch (error) {
-          toast.error("Erro ao processar o arquivo Excel. Verifique o formato.");
-          console.error("Error parsing Excel file:", error);
-        }
-      };
-      reader.readAsArrayBuffer(file);
+      setPendingFile(file);
+      setIsSelectSiteOpen(true);
     } else {
       toast.error("Por favor, selecione um arquivo Excel (.xlsx ou .xls)");
     }
-    
+
     // Reset input value
     if (event.target) {
       event.target.value = '';
     }
+  };
+
+  const processSelectedFile = () => {
+    if (!pendingFile || !selectedSite) return;
+
+    const mapping = siteColumnMappings[selectedSite as keyof typeof siteColumnMappings];
+    if (!mapping) {
+      toast.error("Site não suportado");
+      return;
+    }
+
+    const reader = new FileReader();
+    reader.onload = (e) => {
+      try {
+        const data = new Uint8Array(e.target?.result as ArrayBuffer);
+        const workbook = XLSX.read(data, { type: 'array' });
+        const sheetName = workbook.SheetNames[0];
+        const worksheet = workbook.Sheets[sheetName];
+        const jsonData = XLSX.utils.sheet_to_json(worksheet) as any[];
+
+        // Convert Excel data using site-specific mapping
+        const importedProperties: Property[] = jsonData.map((row, index) => {
+          // Special handling for Casa Mineira
+          const isExtraLinha = selectedSite === 'casamineira';
+
+          // Auto-detect site from 'fonte' column when 'geral' is selected
+          let detectedSite = selectedSite;
+          if (selectedSite === 'geral') {
+            const fonteValue = getColumnValue(row, mapping.site, 'site');
+            detectedSite = fonteValue ? fonteValue.toLowerCase() : 'geral';
+          }
+
+          // Debug first few rows (removed for cleaner output)
+
+          return {
+            id: `imported-${Date.now()}-${index}`,
+            nome: getColumnValue(row, mapping.nome, 'nome') || (isExtraLinha ? `Casa ${index + 1}` : `Imóvel Importado ${index + 1}`),
+            imagem: getColumnValue(row, mapping.imagem, 'imagem') ||
+                    getColumnValue(row, ['Imagem', 'imagem', 'Foto', 'foto', 'Image', 'image'], 'imagem-fallback') ||
+                    "https://cdn.builder.io/api/v1/image/assets%2FTEMP%2Fdefault-house",
+            imagem2: getColumnValue(row, mapping.imagem2 || [], 'imagem2'),
+            valor: getColumnValue(row, mapping.valor, 'valor') || "R$ 0",
+            condominio: getColumnValue(row, mapping.condominio || [], 'condominio'),
+            m2: getColumnValue(row, mapping.m2, 'm2') || "0 m²",
+            rua: getColumnValue(row, mapping.rua || [], 'rua'),
+            bairro: getColumnValue(row, mapping.bairro || [], 'bairro'),
+            localizacao: getColumnValue(row, mapping.localizacao, 'localizacao') ||
+                        `${getColumnValue(row, mapping.rua || [], 'rua')} ${getColumnValue(row, mapping.bairro || [], 'bairro')}`.trim() ||
+                        "Localização não informada",
+            link: getColumnValue(row, mapping.link, 'link') || "#",
+            quartos: getColumnValue(row, mapping.quartos, 'quartos') || "0 quartos",
+            garagem: isExtraLinha ? "Consultar no site" : (getColumnValue(row, mapping.garagem, 'garagem') || "0"),
+            banheiros: getColumnValue(row, mapping.banheiros || [], 'banheiros'),
+            vantagens: getColumnValue(row, mapping.vantagens || [], 'vantagens'),
+            palavrasChaves: getColumnValue(row, mapping.palavrasChaves || [], 'palavrasChaves'),
+            site: detectedSite
+          };
+        });
+
+        // Filter out duplicates and already processed properties
+        setProperties(prev => {
+          console.log('=== IMPORT DEBUG ===');
+          console.log('Total properties in XLSX:', importedProperties.length);
+          console.log('Existing properties:', prev.length);
+          console.log('Liked properties:', likedProperties.length);
+          console.log('Disliked properties:', dislikedProperties.length);
+
+          let duplicateCount = 0;
+          let processedCount = 0;
+          let acceptedCount = 0;
+
+          // Debug each property filtering
+          const newProperties = importedProperties.filter((newProp, index) => {
+            const isDuplicate = isDuplicateProperty(newProp, prev);
+            const isProcessed = isPropertyAlreadyProcessed(newProp);
+
+            if (isDuplicate) {
+              duplicateCount++;
+              console.log(`Property ${index + 1} is duplicate:`, {
+                name: newProp.nome,
+                localizacao: newProp.localizacao,
+                valor: newProp.valor,
+                m2: newProp.m2,
+                quartos: newProp.quartos
+              });
+            }
+
+            if (isProcessed) {
+              processedCount++;
+              console.log(`Property ${index + 1} already processed (liked/disliked):`, {
+                name: newProp.nome,
+                link: newProp.link
+              });
+            }
+
+            if (!isDuplicate && !isProcessed) {
+              acceptedCount++;
+            }
+
+            // Special check for problematic links
+            if (newProp.link === "#" || newProp.link.includes('cookie') || newProp.link.includes('session')) {
+              console.log(`Property ${index + 1} has problematic link:`, newProp.link);
+            }
+
+            return !isDuplicate && !isProcessed;
+          });
+
+          console.log('=== IMPORT SUMMARY ===');
+          console.log(`Original: ${importedProperties.length}, Duplicates: ${duplicateCount}, Already Processed: ${processedCount}, Accepted: ${acceptedCount}`);
+
+          // Enhance imported properties with numeric values
+          const enhancedNewProperties = newProperties.map(property => enhanceProperty(property));
+
+          // Initialize image indexes for new properties
+          initializeImageIndex(enhancedNewProperties);
+
+          const duplicatesCount = importedProperties.length - newProperties.length;
+
+          if (duplicatesCount > 0) {
+            toast.info(`${newProperties.length} novos imóveis importados do ${selectedSite}, ${duplicatesCount} duplicatas/já processadas ignoradas`);
+          } else {
+            toast.success(`${newProperties.length} imóveis importados do ${selectedSite}!`);
+          }
+
+          // Reset filters and activate show all mode after import
+          if (newProperties.length > 0) {
+            setTimeout(() => {
+              resetFilters();
+              setShowAllProperties(true);
+            }, 100);
+          }
+
+          return [...prev, ...enhancedNewProperties];
+        });
+
+        // Close modal and reset
+        setIsSelectSiteOpen(false);
+        setSelectedSite('');
+        setPendingFile(null);
+
+      } catch (error) {
+        toast.error("Erro ao processar o arquivo Excel. Verifique o formato.");
+        console.error("Error parsing Excel file:", error);
+      }
+    };
+    reader.readAsArrayBuffer(pendingFile);
   };
 
   const handleExportData = () => {
@@ -527,12 +1427,20 @@ export default function Index() {
     const exportData = properties.map(property => ({
       Nome: property.nome,
       Imagem: property.imagem,
+      Imagem2: property.imagem2 || '',
       Valor: property.valor,
+      Condominio: property.condominio || '',
       "M²": property.m2,
+      Rua: property.rua || '',
+      Bairro: property.bairro || '',
       "Localização": property.localizacao,
       Link: property.link,
       Quartos: property.quartos,
-      Garagem: property.garagem
+      Garagem: property.garagem,
+      Banheiros: property.banheiros || '',
+      Vantagens: property.vantagens || '',
+      PalavrasChaves: property.palavrasChaves || '',
+      Site: property.site || 'QuintoAndar'
     }));
     
     const worksheet = XLSX.utils.json_to_sheet(exportData);
@@ -547,31 +1455,80 @@ export default function Index() {
   return (
     <div className="min-h-screen bg-gradient-to-br from-blue-50 via-white to-purple-50">
       {/* Header */}
-      <header className="bg-white/80 backdrop-blur-sm border-b border-gray-200 sticky top-0 z-50">
-        <div className="container mx-auto px-4 sm:px-6 py-4">
-          <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
-            <div className="flex items-center gap-3">
-              <div className="p-2 bg-blue-600 rounded-lg">
-                <Home className="h-6 w-6 text-white" />
-              </div>
-              <div>
-                                <h1 className="text-xl sm:text-2xl font-bold text-gray-900">Melhor Casa</h1>
-                <p className="text-sm text-gray-600 hidden sm:block">Ferramenta elegante para coleta de imóveis</p>
+      <header className={`bg-white/80 backdrop-blur-sm border-b border-gray-200 sticky top-0 z-50 transition-transform duration-300 ${showHeader ? 'translate-y-0' : '-translate-y-full'}`}>
+        <div className="container mx-auto px-3 sm:px-6 py-3 sm:py-4">
+          <div className="space-y-3">
+            {/* Logo and title row */}
+            <div className="flex items-center justify-between">
+              <div className="flex items-center gap-2 sm:gap-3">
+                <div className="p-1.5 sm:p-2 bg-blue-600 rounded-lg">
+                  <Home className="h-5 w-5 sm:h-6 sm:w-6 text-white" />
+                </div>
+                <div>
+                  <h1 className="text-lg sm:text-xl md:text-2xl font-bold text-gray-900">Melhor Casa</h1>
+                  <p className="text-xs sm:text-sm text-gray-600 hidden xs:block">Ferramenta elegante para coleta de imóveis</p>
+                </div>
               </div>
             </div>
-            
-                                    <div className="flex items-center gap-2 sm:gap-3 w-full sm:w-auto">
-              <Link to="/dislikes">
+
+            {/* Navigation buttons - optimized for mobile */}
+            <div className="grid grid-cols-2 sm:grid-cols-3 lg:flex gap-1.5 sm:gap-2">
+              {/* Row 1: Primary actions */}
+              <div className="col-span-2 sm:col-span-1 lg:contents">
+                <Button
+                  onClick={startMatchMode}
+                  variant="default"
+                  size="sm"
+                  className="gap-1 sm:gap-2 bg-gradient-to-r from-pink-500 to-purple-600 hover:from-pink-600 hover:to-purple-700 w-full lg:w-auto"
+                  disabled={filteredProperties.length === 0}
+                >
+                  <Zap className="h-3 w-3 sm:h-4 sm:w-4" />
+                  <span className="text-xs sm:text-sm">Match</span>
+                </Button>
+              </div>
+
+              <Link to="/casas-com-tags" className="w-full lg:w-auto">
                 <Button
                   variant="outline"
                   size="sm"
-                  className="gap-2 flex-1 sm:flex-none"
+                  className="gap-1 sm:gap-2 w-full lg:w-auto justify-start lg:justify-center text-xs sm:text-sm"
                 >
-                  <ThumbsDown className="h-4 w-4" />
-                  <span className="hidden sm:inline">Rejeitadas</span>
-                  <span className="sm:hidden">👎</span>
+                  <Tag className="h-3 w-3 sm:h-4 sm:w-4" />
+                  <span className="truncate">Tags</span>
+                  {(likedProperties.length + dislikedProperties.length) > 0 && (
+                    <Badge variant="secondary" className="ml-auto lg:ml-1 text-xs">
+                      {likedProperties.length + dislikedProperties.length}
+                    </Badge>
+                  )}
+                </Button>
+              </Link>
+
+              <Link to="/cofrinho" className="w-full lg:w-auto">
+                <Button
+                  variant="outline"
+                  size="sm"
+                  className="gap-1 sm:gap-2 w-full lg:w-auto justify-start lg:justify-center text-xs sm:text-sm"
+                >
+                  <PiggyBank className="h-3 w-3 sm:h-4 sm:w-4" />
+                  <span className="truncate">Cofrinho</span>
+                  {likedProperties.length > 0 && (
+                    <Badge variant="secondary" className="ml-auto lg:ml-1 text-xs">
+                      {likedProperties.length}
+                    </Badge>
+                  )}
+                </Button>
+              </Link>
+
+              <Link to="/dislikes" className="w-full lg:w-auto">
+                <Button
+                  variant="outline"
+                  size="sm"
+                  className="gap-1 sm:gap-2 w-full lg:w-auto justify-start lg:justify-center text-xs sm:text-sm"
+                >
+                  <ThumbsDown className="h-3 w-3 sm:h-4 sm:w-4" />
+                  <span className="truncate">Rejeitadas</span>
                   {dislikedProperties.length > 0 && (
-                    <Badge variant="destructive" className="ml-1 text-xs">
+                    <Badge variant="destructive" className="ml-auto lg:ml-1 text-xs">
                       {dislikedProperties.length}
                     </Badge>
                   )}
@@ -587,7 +1544,7 @@ export default function Index() {
                   >
                     <Heart className="h-4 w-4" />
                     <span className="hidden sm:inline">Curtidas</span>
-                    <span className="sm:hidden">❤️</span>
+                    <span className="sm:hidden">Curtidas</span>
                     {likedProperties.length > 0 && (
                       <Badge variant="secondary" className="ml-1 text-xs">
                         {likedProperties.length}
@@ -597,7 +1554,7 @@ export default function Index() {
                 </DialogTrigger>
                 <DialogContent className="sm:max-w-4xl max-h-[80vh] overflow-hidden">
                   <DialogHeader>
-                    <DialogTitle>Casas Curtidas ❤️</DialogTitle>
+                    <DialogTitle>Casas Curtidas ❤��</DialogTitle>
                   </DialogHeader>
                   <div className="overflow-y-auto max-h-[60vh] space-y-4">
                     {likedProperties.length === 0 ? (
@@ -626,6 +1583,9 @@ export default function Index() {
                                 <Badge variant="secondary" className="text-xs">{property.m2}</Badge>
                                 <Badge variant="secondary" className="text-xs">{property.quartos}</Badge>
                                 <Badge variant="secondary" className="text-xs">{property.garagem} vagas</Badge>
+                                {property.banheiros && (
+                                  <Badge variant="secondary" className="text-xs">{property.banheiros} banheiros</Badge>
+                                )}
                               </div>
                               <Button
                                 size="sm"
@@ -658,6 +1618,9 @@ export default function Index() {
                 <DialogContent className="sm:max-w-md">
                   <DialogHeader>
                     <DialogTitle>Configurações de Localização</DialogTitle>
+                    <DialogDescription>
+                      Configure sua localização para calcular distâncias dos imóveis
+                    </DialogDescription>
                   </DialogHeader>
                   <div className="space-y-4">
                     <div className="space-y-2">
@@ -749,18 +1712,19 @@ export default function Index() {
                 </Card>
 
                 {/* Filters */}
-        <Card className="mb-8 bg-white/60 backdrop-blur-sm">
-          <CardHeader>
-            <CardTitle className="text-xl flex items-center justify-between">
+        <Card className="mb-6 sm:mb-8 bg-white/60 backdrop-blur-sm">
+          <CardHeader className="pb-3 sm:pb-6">
+            <CardTitle className="text-lg sm:text-xl flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3 sm:gap-0">
               <div className="flex items-center gap-2">
-                <Filter className="h-5 w-5" />
-                Filtros e Ordenação
+                <Filter className="h-4 w-4 sm:h-5 sm:w-5" />
+                <span className="hidden sm:inline">Filtros e Ordenação</span>
+                <span className="sm:hidden">Filtros</span>
               </div>
               <Select value={`${sortOption.field}-${sortOption.direction}`} onValueChange={(value) => {
                 const [field, direction] = value.split('-') as [SortOption['field'], SortOption['direction']];
                 setSortOption({ field, direction });
               }}>
-                <SelectTrigger className="w-48">
+                <SelectTrigger className="w-full sm:w-48">
                   <SelectValue />
                 </SelectTrigger>
                 <SelectContent>
@@ -808,28 +1772,28 @@ export default function Index() {
               </Select>
             </CardTitle>
           </CardHeader>
-          <CardContent>
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+          <CardContent className="px-3 sm:px-6">
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 sm:gap-6">
               {/* Price Filter */}
-              <div className="space-y-3">
+              <div className="space-y-2 sm:space-y-3">
                 <Label className="text-sm font-medium">Valor (R$)</Label>
                 <div className="space-y-2">
-                  <div className="flex gap-2">
+                  <div className="flex flex-col sm:flex-row gap-2">
                     <Input
-                      placeholder="Valor mínimo"
-                      value={filters.valorMin}
-                      onChange={(e) => setFilters(prev => ({ ...prev, valorMin: e.target.value }))}
-                      className="flex-1"
+                      placeholder="Mínimo"
+                      value={tempFilters.valorMin}
+                      onChange={(e) => setTempFilters(prev => ({ ...prev, valorMin: e.target.value }))}
+                      className="flex-1 text-sm"
                     />
                     <Input
-                      placeholder="Valor máximo"
-                      value={filters.valorMax}
-                      onChange={(e) => setFilters(prev => ({ ...prev, valorMax: e.target.value }))}
-                      className="flex-1"
+                      placeholder="Máximo"
+                      value={tempFilters.valorMax}
+                      onChange={(e) => setTempFilters(prev => ({ ...prev, valorMax: e.target.value }))}
+                      className="flex-1 text-sm"
                     />
                   </div>
                   <div className="text-xs text-gray-600 text-center">
-                    Digite valores como: 500000 ou 1500000
+                    Ex: 500000
                   </div>
                 </div>
               </div>
@@ -839,18 +1803,18 @@ export default function Index() {
                 <Label className="text-sm font-medium">Tamanho (m²)</Label>
                 <div className="space-y-2">
                   <Slider
-                    value={[filters.m2Min, filters.m2Max]}
+                    value={[tempFilters.m2Min, tempFilters.m2Max]}
                     onValueChange={([min, max]) =>
-                      setFilters(prev => ({ ...prev, m2Min: min, m2Max: max }))
+                      setTempFilters(prev => ({ ...prev, m2Min: min, m2Max: max }))
                     }
-                    max={1000}
+                    max={2000}
                     min={0}
                     step={10}
                     className="w-full"
                   />
                   <div className="flex justify-between text-xs text-gray-600">
-                    <span>{filters.m2Min} m²</span>
-                    <span>{filters.m2Max} m²</span>
+                    <span>{tempFilters.m2Min} m²</span>
+                    <span>{tempFilters.m2Max} m²</span>
                   </div>
                 </div>
               </div>
@@ -861,17 +1825,17 @@ export default function Index() {
                   <Label className="text-sm font-medium">Distância máxima (km)</Label>
                   <div className="space-y-2">
                     <Slider
-                      value={[filters.distanciaMax]}
+                      value={[tempFilters.distanciaMax]}
                       onValueChange={([max]) =>
-                        setFilters(prev => ({ ...prev, distanciaMax: max }))
+                        setTempFilters(prev => ({ ...prev, distanciaMax: max }))
                       }
-                      max={100}
+                      max={200}
                       min={1}
                       step={1}
                       className="w-full"
                     />
                     <div className="text-xs text-gray-600 text-center">
-                      Até {filters.distanciaMax} km da sua localização
+                      Até {tempFilters.distanciaMax} km da sua localização
                     </div>
                   </div>
                 </div>
@@ -880,8 +1844,8 @@ export default function Index() {
               {/* Rooms Filter */}
               <div className="space-y-3">
                 <Label className="text-sm font-medium">Quartos</Label>
-                <Select value={filters.quartos} onValueChange={(value) =>
-                  setFilters(prev => ({ ...prev, quartos: value }))
+                <Select value={tempFilters.quartos} onValueChange={(value) =>
+                  setTempFilters(prev => ({ ...prev, quartos: value }))
                 }>
                   <SelectTrigger>
                     <SelectValue placeholder="Selecione" />
@@ -900,8 +1864,8 @@ export default function Index() {
               {/* Parking Filter */}
               <div className="space-y-3">
                 <Label className="text-sm font-medium">Vagas de Garagem</Label>
-                <Select value={filters.vagas} onValueChange={(value) =>
-                  setFilters(prev => ({ ...prev, vagas: value }))
+                <Select value={tempFilters.vagas} onValueChange={(value) =>
+                  setTempFilters(prev => ({ ...prev, vagas: value }))
                 }>
                   <SelectTrigger>
                     <SelectValue placeholder="Selecione" />
@@ -917,23 +1881,80 @@ export default function Index() {
                 </Select>
               </div>
 
-                            {/* Clear Filters */}
-              <div className="space-y-3 flex items-end">
-                <Button
-                  variant="outline"
-                  onClick={() => setFilters({
-                    valorMin: "",
-                    valorMax: "",
-                    m2Min: 0,
-                    m2Max: 1000,
-                    quartos: "all",
-                    vagas: "all",
-                    distanciaMax: 50
-                  })}
-                  className="w-full"
-                >
-                  Limpar Filtros
-                </Button>
+              {/* Bathrooms Filter */}
+              <div className="space-y-3">
+                <Label className="text-sm font-medium">Banheiros</Label>
+                <Select value={tempFilters.banheiros} onValueChange={(value) =>
+                  setTempFilters(prev => ({ ...prev, banheiros: value }))
+                }>
+                  <SelectTrigger>
+                    <SelectValue placeholder="Selecione" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="all">Todos</SelectItem>
+                    <SelectItem value="1">1 banheiro</SelectItem>
+                    <SelectItem value="2">2 banheiros</SelectItem>
+                    <SelectItem value="3">3 banheiros</SelectItem>
+                    <SelectItem value="4">4+ banheiros</SelectItem>
+                  </SelectContent>
+                </Select>
+              </div>
+
+                                          {/* Tags Filter */}
+              <div className="space-y-3 md:col-span-2">
+                <Label className="text-sm font-medium">Filtrar por Tags</Label>
+                <div className="space-y-2">
+                  <div className="flex flex-wrap gap-1 min-h-[2rem] p-2 border rounded-md bg-white">
+                    {tempFilters.tags.length === 0 ? (
+                      <span className="text-sm text-gray-400">Selecione tags para filtrar</span>
+                    ) : (
+                      tempFilters.tags.map(tag => (
+                        <Badge
+                          key={tag}
+                          variant="secondary"
+                          className="cursor-pointer hover:bg-red-100"
+                          onClick={() => setTempFilters(prev => ({ ...prev, tags: prev.tags.filter(t => t !== tag) }))}
+                        >
+                          {tag} <X className="h-3 w-3 ml-1" />
+                        </Badge>
+                      ))
+                    )}
+                  </div>
+                  {availableTags.length > 0 && (
+                    <div className="flex flex-wrap gap-1">
+                      {availableTags.filter(tag => !tempFilters.tags.includes(tag)).map(tag => (
+                        <Badge
+                          key={tag}
+                          variant="outline"
+                          className="cursor-pointer hover:bg-blue-50"
+                          onClick={() => setTempFilters(prev => ({ ...prev, tags: [...prev.tags, tag] }))}
+                        >
+                          <Plus className="h-3 w-3 mr-1" /> {tag}
+                        </Badge>
+                      ))}
+                    </div>
+                  )}
+                </div>
+              </div>
+
+                            {/* Filter Action Buttons */}
+              <div className="space-y-3 flex flex-col items-end md:col-span-full lg:col-span-1">
+                <div className="flex flex-col gap-2 w-full">
+                  <Button
+                    onClick={applyFiltersNow}
+                    className="w-full bg-blue-600 hover:bg-blue-700"
+                    disabled={!hasFiltersChanged()}
+                  >
+                    Aplicar Filtros
+                  </Button>
+                  <Button
+                    variant="outline"
+                    onClick={resetFilters}
+                    className="w-full"
+                  >
+                    Resetar Filtros
+                  </Button>
+                </div>
               </div>
             </div>
           </CardContent>
@@ -945,13 +1966,38 @@ export default function Index() {
             <CardContent className="p-6">
               <div className="flex items-center justify-between">
                 <div>
-                  <p className="text-sm font-medium text-gray-600">Total de Imóveis</p>
+                  <p className="text-sm font-medium text-gray-600">Total de Im��veis</p>
                                     <p className="text-3xl font-bold text-blue-600">
                     {filteredProperties.length}
                     {filteredProperties.length !== properties.length &&
                       <span className="text-lg text-gray-500">/{properties.length}</span>
                     }
                   </p>
+                  {filteredProperties.length === 0 && properties.length > 0 && (
+                    <div className="mt-2 space-y-1">
+                      <Button
+                        size="sm"
+                        variant="outline"
+                        onClick={() => {
+                          resetFilters();
+                        }}
+                        className="text-xs w-full"
+                      >
+                        Resetar Filtros
+                      </Button>
+                      <Button
+                        size="sm"
+                        variant={showAllProperties ? "default" : "outline"}
+                        onClick={() => {
+                          setShowAllProperties(!showAllProperties);
+                          toast.info(showAllProperties ? "Filtros ativados" : "Mostrando todas as propriedades");
+                        }}
+                        className="text-xs w-full"
+                      >
+                        {showAllProperties ? "Ativar Filtros" : "Mostrar Todas"}
+                      </Button>
+                    </div>
+                  )}
                 </div>
                 <Home className="h-8 w-8 text-blue-600" />
               </div>
@@ -962,11 +2008,20 @@ export default function Index() {
             <CardContent className="p-6">
               <div className="flex items-center justify-between">
                 <div>
-                  <p className="text-sm font-medium text-gray-600">Fonte</p>
-                  <p className="text-xl font-bold text-purple-600">QuintoAndar</p>
+                  <p className="text-sm font-medium text-gray-600">Fontes</p>
+                  {(() => {
+                    const uniqueSites = [...new Set(properties.map(p => p.site || 'QuintoAndar'))];
+                    if (uniqueSites.length === 1) {
+                      return <p className="text-xl font-bold text-purple-600">{uniqueSites[0]}</p>;
+                    } else if (uniqueSites.length <= 3) {
+                      return <p className="text-sm font-bold text-purple-600">{uniqueSites.join(', ')}</p>;
+                    } else {
+                      return <p className="text-sm font-bold text-purple-600">{uniqueSites.length} sites diferentes</p>;
+                    }
+                  })()}
                 </div>
                 <div className="w-8 h-8 bg-purple-600 rounded-full flex items-center justify-center">
-                  <span className="text-white font-bold text-sm">Q</span>
+                  <span className="text-white font-bold text-sm">{[...new Set(properties.map(p => p.site || 'QuintoAndar'))].length}</span>
                 </div>
               </div>
             </CardContent>
@@ -988,7 +2043,7 @@ export default function Index() {
         </div>
 
                         {/* Properties Grid */}
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 sm:gap-6">
           {filteredProperties.map((property) => (
             <Card
               key={property.id}
@@ -1001,33 +2056,73 @@ export default function Index() {
             >
               <div className="relative">
                 <img
-                  src={property.imagem}
+                  src={currentImageIndex[property.id] === 1 && property.imagem2 ? property.imagem2 : property.imagem}
                   alt={property.nome}
-                  className="w-full h-48 object-cover"
+                  className="w-full h-48 object-cover cursor-pointer"
+                  onClick={() => {
+                    // Always redirect to property link on image click
+                    window.open(property.link, '_blank');
+                  }}
                   onError={(e) => {
                     (e.target as HTMLImageElement).src = "https://images.unsplash.com/photo-1570129477492-45c003edd2be?w=400&h=300&fit=crop";
                   }}
                 />
                 <Badge className="absolute top-3 right-3 bg-blue-600">
-                  QuintoAndar
+                  {property.site || 'QuintoAndar'}
                 </Badge>
+                {property.imagem2 && (
+                  <div className="absolute bottom-3 right-3 flex gap-1">
+                    <div
+                      className={`w-2 h-2 rounded-full cursor-pointer ${currentImageIndex[property.id] === 0 ? 'bg-white' : 'bg-white/50'}`}
+                      onClick={(e) => {
+                        e.stopPropagation();
+                        setCurrentImageIndex(prev => ({ ...prev, [property.id]: 0 }));
+                      }}
+                    />
+                    <div
+                      className={`w-2 h-2 rounded-full cursor-pointer ${currentImageIndex[property.id] === 1 ? 'bg-white' : 'bg-white/50'}`}
+                      onClick={(e) => {
+                        e.stopPropagation();
+                        setCurrentImageIndex(prev => ({ ...prev, [property.id]: 1 }));
+                      }}
+                    />
+                  </div>
+                )}
               </div>
               
-              <CardContent className="p-6">
-                <h3 className="font-bold text-lg text-gray-900 mb-2 line-clamp-2">
+              <CardContent className="p-3 sm:p-4 md:p-6">
+                <h3 className="font-bold text-base sm:text-lg text-gray-900 mb-2 line-clamp-2">
                   {property.nome}
                 </h3>
-                
-                <div className="flex items-center gap-2 mb-3">
-                  <MapPin className="h-4 w-4 text-gray-500" />
-                  <p className="text-sm text-gray-600 line-clamp-1">{property.localizacao}</p>
+
+                <div className="flex items-start gap-2 mb-3">
+                  <MapPin className="h-3 w-3 sm:h-4 sm:w-4 text-gray-500 mt-0.5 flex-shrink-0" />
+                  <p className="text-xs sm:text-sm text-gray-600 line-clamp-2">{property.localizacao}</p>
                 </div>
-                
-                <div className="text-2xl font-bold text-green-600 mb-4">
+
+                <div className="text-lg sm:text-xl md:text-2xl font-bold text-green-600 mb-2">
                   {property.valor}
                 </div>
+
+                {/* Condomínio */}
+                {property.condominio && (
+                  <div className="text-sm text-gray-600 mb-3">
+                    <span className="font-medium">Condomínio:</span> {property.condominio}
+                  </div>
+                )}
+
+                {/* Endereço detalhado se disponível */}
+                {(property.rua || property.bairro) && (
+                  <div className="flex items-start gap-2 mb-3">
+                    <MapPin className="h-3 w-3 sm:h-4 sm:w-4 text-gray-500 mt-0.5 flex-shrink-0" />
+                    <div className="text-xs sm:text-sm text-gray-600">
+                      {property.rua && <p>{property.rua}</p>}
+                      {property.bairro && <p>{property.bairro}</p>}
+                    </div>
+                  </div>
+                )}
                 
-                                <div className="flex flex-wrap gap-2 mb-4">
+                                                <div className="flex flex-wrap gap-2 mb-4">
                   <Badge variant="secondary" className="gap-1">
                     <Maximize2 className="h-3 w-3" />
                     {property.m2}
@@ -1040,6 +2135,12 @@ export default function Index() {
                     <Car className="h-3 w-3" />
                     {property.garagem} vagas
                   </Badge>
+                  {property.banheiros && (
+                    <Badge variant="secondary" className="gap-1">
+                      <Bath className="h-3 w-3" />
+                      {property.banheiros}
+                    </Badge>
+                  )}
                   {property.distancia && userLocation && (
                     <Badge variant="outline" className="gap-1 border-blue-200 text-blue-700">
                       <MapPin className="h-3 w-3" />
@@ -1047,35 +2148,83 @@ export default function Index() {
                     </Badge>
                   )}
                 </div>
-                
-                                <div className="space-y-2">
-                  <div className="flex gap-2">
-                                        <Button
+
+                {/* Tags */}
+                {property.tags && property.tags.length > 0 && (
+                  <div className="flex flex-wrap gap-1 mb-4">
+                    {property.tags.map(tag => (
+                      <Badge key={tag} variant="default" className="text-xs bg-purple-100 text-purple-800">
+                        <Tag className="h-3 w-3 mr-1" />
+                        {tag}
+                      </Badge>
+                    ))}
+                  </div>
+                )}
+
+                {/* Vantagens */}
+                {property.vantagens && (
+                  <div className="mb-3">
+                    <p className="text-xs font-medium text-gray-700 mb-1">Vantagens:</p>
+                    <p className="text-xs text-gray-600 line-clamp-2">{property.vantagens}</p>
+                  </div>
+                )}
+
+                {/* Palavras-chave */}
+                {property.palavrasChaves && (
+                  <div className="mb-4">
+                    <p className="text-xs font-medium text-gray-700 mb-1">Palavras-chave:</p>
+                    <div className="flex flex-wrap gap-1">
+                      {property.palavrasChaves.split(',').slice(0, 3).map((palavra, index) => (
+                        <Badge key={index} variant="outline" className="text-xs">
+                          {palavra.trim()}
+                        </Badge>
+                      ))}
+                    </div>
+                  </div>
+                )}
+
+                                                <div className="space-y-2">
+                  <div className="grid grid-cols-3 gap-1.5 sm:gap-2">
+                    <Button
                       size="sm"
                       variant="destructive"
                       onClick={() => handleDislike(property.id)}
-                      className="flex-1 gap-2"
+                      className="gap-1 text-xs sm:text-sm"
                     >
-                      <ThumbsDown className="h-4 w-4" />
+                      <ThumbsDown className="h-3 w-3 sm:h-4 sm:w-4" />
+                      <span className="hidden sm:inline">Não</span>
                     </Button>
                     <Button
                       size="sm"
                       onClick={() => window.open(property.link, '_blank')}
                       variant="outline"
-                      className="flex-1"
+                      className="text-xs sm:text-sm"
                     >
-                      Ver Detalhes
+                      <span className="hidden sm:inline">Ver Detalhes</span>
+                      <span className="sm:hidden">Ver</span>
                     </Button>
-                                        <Button
+                    <Button
                       size="sm"
                       onClick={() => handleLike(property.id)}
-                      className="flex-1 gap-2 bg-pink-600 hover:bg-pink-700"
+                      className="gap-1 bg-pink-600 hover:bg-pink-700 text-xs sm:text-sm"
                     >
-                      <Heart className="h-4 w-4" />
+                      <Heart className="h-3 w-3 sm:h-4 sm:w-4" />
+                      <span className="hidden sm:inline">Sim</span>
                     </Button>
                   </div>
+                  <Button
+                    size="sm"
+                    variant="outline"
+                    onClick={() => openTagModal(property)}
+                    className="w-full gap-1 sm:gap-2 text-xs sm:text-sm"
+                  >
+                    <Tag className="h-3 w-3 sm:h-4 sm:w-4" />
+                    <span className="hidden sm:inline">Adicionar Tag</span>
+                    <span className="sm:hidden">Tag</span>
+                  </Button>
                   <div className="text-xs text-center text-gray-500">
-                    ← Arraste para rejeitar | Arraste para curtir →
+                    <span className="hidden sm:inline">�� Arraste para rejeitar | Arraste para curtir →</span>
+                    <span className="sm:hidden">Arraste ←→ ou use botões</span>
                   </div>
                 </div>
               </CardContent>
@@ -1091,7 +2240,7 @@ export default function Index() {
                 Nenhum imóvel encontrado
               </h3>
               <p className="text-gray-600 mb-6">
-                Inicie o scraping para começar a coletar dados reais do QuintoAndar ou importe um arquivo Excel
+                Inicie o scraping para come��ar a coletar dados reais do QuintoAndar ou importe um arquivo Excel
               </p>
               <div className="flex flex-col sm:flex-row gap-3 justify-center">
                 <Button onClick={handleStartScraping} className="gap-2">
@@ -1119,14 +2268,16 @@ export default function Index() {
               </p>
                             <Button
                 variant="outline"
-                onClick={() => setFilters({
+                                onClick={() => setFilters({
                   valorMin: "",
                   valorMax: "",
                   m2Min: 0,
-                  m2Max: 1000,
+                  m2Max: 2000,
                   quartos: "all",
                   vagas: "all",
-                  distanciaMax: 50
+                  banheiros: "all",
+                  distanciaMax: 100,
+                  tags: []
                 })}
               >
                 Limpar Filtros
@@ -1136,7 +2287,7 @@ export default function Index() {
         )}
       </div>
 
-      {/* Hidden file input */}
+            {/* Hidden file input */}
       <input
         ref={fileInputRef}
         type="file"
@@ -1144,6 +2295,568 @@ export default function Index() {
         onChange={handleFileUpload}
         className="hidden"
       />
+
+      {/* Match Mode Modal */}
+      <Dialog open={isMatchModeOpen} onOpenChange={setIsMatchModeOpen}>
+        <DialogContent className="w-[95vw] max-w-2xl h-[95vh] max-h-[95vh] overflow-hidden p-3 sm:p-6">
+          <DialogHeader className="space-y-2 pb-2">
+            <DialogTitle className="flex items-center gap-2 text-lg sm:text-xl">
+              <Zap className="h-4 w-4 sm:h-5 sm:w-5 text-purple-600" />
+              <span className="hidden sm:inline">Modo Match - Tinder de Casas</span>
+              <span className="sm:hidden">Match Mode</span>
+            </DialogTitle>
+            <DialogDescription className="text-xs sm:text-sm text-gray-600">
+              Avalie imóveis de forma rápida e intuitiva
+            </DialogDescription>
+            <div className="text-xs sm:text-sm text-gray-600">
+              <span className="hidden sm:inline">Use as setas: ← rejeitar, → curtir, T para adicionar tag, Esc para sair</span>
+              <span className="sm:hidden">Arraste: ← rejeitar, → curtir | Setas: ←�� | T = tag</span>
+            </div>
+          </DialogHeader>
+
+          {matchModeProperties.length > 0 && currentMatchIndex < matchModeProperties.length && (
+            <div className="overflow-y-auto flex-1 min-h-0">
+              <div className="relative h-full">
+                {(() => {
+                  const property = matchModeProperties[currentMatchIndex];
+                  return (
+                    <Card
+                      className={`overflow-hidden h-full flex flex-col cursor-pointer select-none transition-all duration-300 active:scale-95 ${
+                        isSwipeAnimating ? (
+                          swipeDirection === 'left' ? 'transform -translate-x-full rotate-12 opacity-0' :
+                          swipeDirection === 'right' ? 'transform translate-x-full -rotate-12 opacity-0' : ''
+                        ) : ''
+                      }`}
+                      onTouchStart={(e) => {
+                        handleTouchStart(e, property.id);
+                      }}
+                      onTouchMove={(e) => {
+                        handleTouchMove(e, property.id);
+
+                        // Add visual feedback during swipe
+                        if (touchStart && touchEnd) {
+                          const distanceX = touchStart.x - touchEnd.x;
+                          const card = e.currentTarget as HTMLElement;
+                          const isLeftSwipe = distanceX > 10;
+                          const isRightSwipe = distanceX < -10;
+
+                          if (isLeftSwipe) {
+                            card.style.transform = `translateX(-${Math.min(Math.abs(distanceX), 50)}px) rotate(${Math.min(Math.abs(distanceX) / 10, 5)}deg)`;
+                            card.style.backgroundColor = 'rgba(239, 68, 68, 0.1)';
+                          } else if (isRightSwipe) {
+                            card.style.transform = `translateX(${Math.min(Math.abs(distanceX), 50)}px) rotate(-${Math.min(Math.abs(distanceX) / 10, 5)}deg)`;
+                            card.style.backgroundColor = 'rgba(34, 197, 94, 0.1)';
+                          } else {
+                            card.style.transform = '';
+                            card.style.backgroundColor = '';
+                          }
+                        }
+                      }}
+                      onTouchEnd={(e) => {
+                        const card = e.currentTarget as HTMLElement;
+
+                        if (!touchStart || !touchEnd) {
+                          // Reset card position
+                          card.style.transform = '';
+                          card.style.backgroundColor = '';
+                          return;
+                        }
+
+                        const distanceX = touchStart.x - touchEnd.x;
+                        const distanceY = touchStart.y - touchEnd.y;
+                        const isLeftSwipe = distanceX > 30;
+                        const isRightSwipe = distanceX < -30;
+                        const isVerticalSwipe = Math.abs(distanceY) > Math.abs(distanceX);
+
+                        if (!isVerticalSwipe && (isLeftSwipe || isRightSwipe)) {
+                          // Start animation
+                          setIsSwipeAnimating(true);
+                          setSwipeDirection(isLeftSwipe ? 'left' : 'right');
+
+                          // Execute action after animation
+                          setTimeout(() => {
+                            if (isLeftSwipe) {
+                              handleMatchModeAction('dislike');
+                            } else {
+                              handleMatchModeAction('like');
+                            }
+
+                            // Reset animation state and card position
+                            setIsSwipeAnimating(false);
+                            setSwipeDirection(null);
+
+                            // Ensure card returns to default position
+                            card.style.transform = '';
+                            card.style.backgroundColor = '';
+                          }, 300);
+                        } else {
+                          // Reset card position for incomplete swipes
+                          card.style.transform = '';
+                          card.style.backgroundColor = '';
+                        }
+
+                        setTouchStart(null);
+                        setTouchEnd(null);
+                      }}
+                    >
+                      <div className="relative flex-shrink-0">
+                        <img
+                          src={currentImageIndex[property.id] === 1 && property.imagem2 ? property.imagem2 : property.imagem}
+                          alt={property.nome}
+                          className="w-full h-40 sm:h-48 md:h-64 object-cover cursor-pointer"
+                          onClick={() => {
+                            // Always redirect to property link on image click
+                            window.open(property.link, '_blank');
+                          }}
+                          onError={(e) => {
+                            (e.target as HTMLImageElement).src = "https://images.unsplash.com/photo-1570129477492-45c003edd2be?w=600&h=400&fit=crop";
+                          }}
+                        />
+                        <Badge className="absolute top-2 right-2 sm:top-3 sm:right-3 bg-blue-600 text-xs sm:text-sm">
+                          {currentMatchIndex + 1}/{matchModeProperties.length}
+                        </Badge>
+                        <Badge className="absolute top-2 left-2 sm:top-3 sm:left-3 bg-purple-600 text-xs sm:text-sm">
+                          {property.site || 'QuintoAndar'}
+                        </Badge>
+                        {property.imagem2 && (
+                          <div className="absolute bottom-2 right-2 sm:bottom-3 sm:right-3 flex gap-1">
+                            <div
+                              className={`w-2 h-2 rounded-full cursor-pointer ${currentImageIndex[property.id] === 0 ? 'bg-white' : 'bg-white/50'}`}
+                              onClick={(e) => {
+                                e.stopPropagation();
+                                setCurrentImageIndex(prev => ({ ...prev, [property.id]: 0 }));
+                              }}
+                            />
+                            <div
+                              className={`w-2 h-2 rounded-full cursor-pointer ${currentImageIndex[property.id] === 1 ? 'bg-white' : 'bg-white/50'}`}
+                              onClick={(e) => {
+                                e.stopPropagation();
+                                setCurrentImageIndex(prev => ({ ...prev, [property.id]: 1 }));
+                              }}
+                            />
+                          </div>
+                        )}
+                      </div>
+
+                      <CardContent className="p-3 sm:p-4 md:p-6 flex-1 overflow-y-auto">
+                        <h3 className="font-bold text-lg sm:text-xl text-gray-900 mb-2 line-clamp-2">
+                          {property.nome}
+                        </h3>
+
+                        <div className="flex items-start gap-2 mb-3">
+                          <MapPin className="h-3 w-3 sm:h-4 sm:w-4 text-gray-500 mt-0.5 flex-shrink-0" />
+                          <p className="text-xs sm:text-sm text-gray-600 line-clamp-2">{property.localizacao}</p>
+                        </div>
+
+                        <div className="text-xl sm:text-2xl md:text-3xl font-bold text-green-600 mb-2">
+                          {property.valor}
+                        </div>
+
+                        {/* Condomínio */}
+                        {property.condominio && (
+                          <div className="text-sm text-gray-600 mb-3">
+                            <span className="font-medium">Condomínio:</span> {property.condominio}
+                          </div>
+                        )}
+
+                        {/* Endereço detalhado se disponível */}
+                        {(property.rua || property.bairro) && (
+                          <div className="flex items-start gap-2 mb-3">
+                            <MapPin className="h-3 w-3 sm:h-4 sm:w-4 text-gray-500 mt-0.5 flex-shrink-0" />
+                            <div className="text-xs sm:text-sm text-gray-600">
+                              {property.rua && <p>{property.rua}</p>}
+                              {property.bairro && <p>{property.bairro}</p>}
+                            </div>
+                          </div>
+                        )}
+
+                        <div className="flex flex-wrap gap-1.5 sm:gap-2 mb-3 sm:mb-4">
+                          <Badge variant="secondary" className="gap-1 text-xs">
+                            <Maximize2 className="h-3 w-3" />
+                            {property.m2}
+                          </Badge>
+                          <Badge variant="secondary" className="gap-1 text-xs">
+                            <Home className="h-3 w-3" />
+                            {property.quartos}
+                          </Badge>
+                          <Badge variant="secondary" className="gap-1 text-xs">
+                            <Car className="h-3 w-3" />
+                            {property.garagem} vagas
+                          </Badge>
+                          {property.banheiros && (
+                            <Badge variant="secondary" className="gap-1 text-xs">
+                              <Bath className="h-3 w-3" />
+                              {property.banheiros}
+                            </Badge>
+                          )}
+                          {property.distancia && userLocation && (
+                            <Badge variant="outline" className="gap-1 border-blue-200 text-blue-700 text-xs">
+                              <MapPin className="h-3 w-3" />
+                              {property.distancia.toFixed(1)} km
+                            </Badge>
+                          )}
+                        </div>
+
+                        {/* Tags */}
+                        {property.tags && property.tags.length > 0 && (
+                          <div className="flex flex-wrap gap-1 mb-3 sm:mb-4">
+                            {property.tags.map(tag => (
+                              <Badge key={tag} variant="default" className="text-xs bg-purple-100 text-purple-800">
+                                <Tag className="h-3 w-3 mr-1" />
+                                {tag}
+                              </Badge>
+                            ))}
+                          </div>
+                        )}
+
+                        {/* Vantagens */}
+                        {property.vantagens && (
+                          <div className="mb-3 sm:mb-4">
+                            <p className="text-sm font-medium text-gray-700 mb-1">Vantagens:</p>
+                            <p className="text-sm text-gray-600 line-clamp-3">{property.vantagens}</p>
+                          </div>
+                        )}
+
+                        {/* Palavras-chave */}
+                        {property.palavrasChaves && (
+                          <div className="mb-4 sm:mb-5">
+                            <p className="text-sm font-medium text-gray-700 mb-2">Palavras-chave:</p>
+                            <div className="flex flex-wrap gap-1">
+                              {property.palavrasChaves.split(',').slice(0, 4).map((palavra, index) => (
+                                <Badge key={index} variant="outline" className="text-xs">
+                                  {palavra.trim()}
+                                </Badge>
+                              ))}
+                            </div>
+                          </div>
+                        )}
+
+                        <div className="space-y-2 sm:space-y-3 mt-4 sm:mt-6">
+                          <Button
+                            onClick={() => setIsMatchModeTagModalOpen(true)}
+                            variant="outline"
+                            className="w-full gap-1 sm:gap-2 text-xs sm:text-sm py-2 sm:py-3"
+                            size="sm"
+                          >
+                            <Tag className="h-3 w-3 sm:h-4 sm:w-4" />
+                            <span className="hidden sm:inline">Adicionar Tag (T)</span>
+                            <span className="sm:hidden">Tag (T)</span>
+                          </Button>
+
+                          <div className="space-y-2">
+                            {/* Main action buttons - side by side on mobile */}
+                            <div className="grid grid-cols-2 gap-2">
+                              <Button
+                                size="sm"
+                                variant="destructive"
+                                onClick={() => handleMatchModeAction('dislike')}
+                                className="gap-1 sm:gap-2 text-xs sm:text-sm py-3 sm:py-4"
+                              >
+                                <ArrowLeft className="h-3 w-3 sm:h-4 sm:w-4 md:h-5 md:w-5" />
+                                <span className="hidden sm:inline">Rejeitar</span>
+                                <span className="sm:hidden">👎</span>
+                              </Button>
+                              <Button
+                                size="sm"
+                                onClick={() => handleMatchModeAction('like')}
+                                className="gap-1 sm:gap-2 bg-pink-600 hover:bg-pink-700 text-xs sm:text-sm py-3 sm:py-4"
+                              >
+                                <ArrowRight className="h-3 w-3 sm:h-4 sm:w-4 md:h-5 md:w-5" />
+                                <span className="hidden sm:inline">Curtir</span>
+                                <span className="sm:hidden">❤️</span>
+                              </Button>
+                            </div>
+
+                            {/* Ver detalhes button - full width */}
+                            <Button
+                              size="sm"
+                              onClick={() => {
+                                console.log('=== DEBUG BUTTON CLICK ===');
+                                console.log('Property name:', property.nome);
+                                console.log('Property link:', property.link);
+                                console.log('Window width:', window.innerWidth);
+
+                                if (!property.link || property.link === '#' || property.link.trim() === '') {
+                                  console.log('Link inválido ou vazio');
+                                  toast.error('Link não disponível para esta propriedade');
+                                  return;
+                                }
+
+                                try {
+                                  let url = property.link.trim();
+                                  console.log('URL original:', url);
+
+                                  // Ensure the link starts with http/https
+                                  if (!url.startsWith('http://') && !url.startsWith('https://')) {
+                                    url = 'https://' + url;
+                                  }
+
+                                  console.log('URL final:', url);
+
+                                  // Simple direct navigation for mobile
+                                  window.open(url, '_blank');
+                                  toast.success('Abrindo link do imóvel...');
+
+                                } catch (error) {
+                                  console.error('Erro ao abrir link:', error);
+                                  toast.error('Erro ao abrir o link: ' + error.message);
+                                }
+                              }}
+                              variant="outline"
+                              className="w-full gap-1 sm:gap-2 text-xs sm:text-sm py-3 sm:py-4"
+                            >
+                              <span className="hidden sm:inline">Ver Detalhes</span>
+                              <span className="sm:hidden">🔗 Ver</span>
+                            </Button>
+                          </div>
+                        </div>
+                      </CardContent>
+                    </Card>
+                  );
+                })()}
+              </div>
+            </div>
+          )}
+
+          {matchModeProperties.length === 0 && (
+            <div className="text-center py-8">
+              <Zap className="h-16 w-16 text-gray-400 mx-auto mb-4" />
+              <p className="text-gray-600">Todas as propriedades foram avaliadas!</p>
+            </div>
+          )}
+        </DialogContent>
+      </Dialog>
+
+      {/* Site Selection Modal */}
+      <Dialog open={isSelectSiteOpen} onOpenChange={setIsSelectSiteOpen}>
+        <DialogContent className="sm:max-w-md">
+          <DialogHeader>
+            <DialogTitle>Selecionar Site para Importação</DialogTitle>
+            <p className="text-sm text-gray-600">
+              Escolha o site de origem do arquivo XLSX para usar o mapeamento correto das colunas.
+            </p>
+          </DialogHeader>
+          <div className="space-y-4">
+            <Button
+              key="geral"
+              variant={selectedSite === 'geral' ? "default" : "outline"}
+              onClick={() => setSelectedSite('geral')}
+              className="w-full justify-start text-sm h-auto py-3 font-medium"
+            >
+              ⚡ Geral (Auto-detecta pela coluna "fonte")
+            </Button>
+            <div className="grid grid-cols-2 gap-2">
+              {[
+                { value: 'quintoandar', label: 'QuintoAndar' },
+                { value: 'imovelnaweb', label: 'Imóvel na Web' },
+                { value: 'olx', label: 'OLX' },
+                { value: 'zapimoveis', label: 'ZAP Imóveis' },
+                { value: 'vivareal', label: 'VivaReal' },
+                { value: 'netimoveis', label: 'Netimóveis' },
+                { value: 'loft', label: 'Loft' },
+                { value: 'chavesnamao', label: 'Chaves na Mão' },
+                { value: 'casamineira', label: 'Casa Mineira' }
+              ].map((site) => (
+                <Button
+                  key={site.value}
+                  variant={selectedSite === site.value ? "default" : "outline"}
+                  onClick={() => setSelectedSite(site.value)}
+                  className="justify-start text-sm h-auto py-2"
+                >
+                  {site.label}
+                </Button>
+              ))}
+            </div>
+            <div className="flex gap-2 justify-end">
+              <Button
+                variant="outline"
+                onClick={() => {
+                  setIsSelectSiteOpen(false);
+                  setSelectedSite('');
+                  setPendingFile(null);
+                }}
+              >
+                Cancelar
+              </Button>
+              <Button
+                onClick={processSelectedFile}
+                disabled={!selectedSite}
+              >
+                Importar Arquivo
+              </Button>
+            </div>
+          </div>
+        </DialogContent>
+      </Dialog>
+
+      {/* Tag Modal */}
+      <Dialog open={isTagModalOpen} onOpenChange={setIsTagModalOpen}>
+        <DialogContent className="sm:max-w-md">
+          <DialogHeader>
+            <DialogTitle>Adicionar Tag</DialogTitle>
+            <DialogDescription>
+              Adicione uma etiqueta personalizada para organizar seus im��veis
+            </DialogDescription>
+            {selectedPropertyForTag && (
+              <p className="text-sm text-gray-600">
+                Adicionando tag para: {selectedPropertyForTag.nome}
+              </p>
+            )}
+          </DialogHeader>
+          <div className="space-y-4">
+            <div className="space-y-2">
+              <Label htmlFor="tag">Nome da Tag</Label>
+              <Input
+                id="tag"
+                placeholder="Ex: Favorita, Próxima ao trabalho, Boa localização"
+                value={newTagInput}
+                onChange={(e) => setNewTagInput(e.target.value)}
+                onKeyDown={(e) => {
+                  if (e.key === 'Enter') {
+                    addNewTag();
+                  }
+                }}
+              />
+            </div>
+
+            {availableTags.length > 0 && (
+              <div className="space-y-2">
+                <Label>Tags Existentes</Label>
+                <div className="flex flex-wrap gap-1">
+                  {availableTags.map(tag => (
+                    <Badge
+                      key={tag}
+                      variant="outline"
+                      className="cursor-pointer hover:bg-blue-50"
+                      onClick={() => {
+                        if (selectedPropertyForTag) {
+                          addTagToProperty(selectedPropertyForTag.id, tag);
+                          setIsTagModalOpen(false);
+                          setSelectedPropertyForTag(null);
+                          toast.success(`Tag "${tag}" adicionada!`);
+                        }
+                      }}
+                    >
+                      {tag}
+                    </Badge>
+                  ))}
+                </div>
+              </div>
+            )}
+
+            <div className="flex gap-3">
+              <Button onClick={addNewTag} className="flex-1" disabled={!newTagInput.trim()}>
+                Adicionar Nova Tag
+              </Button>
+              <Button variant="outline" onClick={() => {
+                setIsTagModalOpen(false);
+                setSelectedPropertyForTag(null);
+                setNewTagInput("");
+              }}>
+                Cancelar
+              </Button>
+            </div>
+          </div>
+                </DialogContent>
+      </Dialog>
+
+      {/* Match Mode Tag Modal */}
+      <Dialog open={isMatchModeTagModalOpen} onOpenChange={setIsMatchModeTagModalOpen}>
+        <DialogContent className="w-[95vw] max-w-md max-h-[90vh] overflow-hidden">
+          <DialogHeader className="space-y-2">
+            <DialogTitle className="text-lg sm:text-xl">
+              <span className="hidden sm:inline">Adicionar Tag no Modo Match</span>
+              <span className="sm:hidden">Adicionar Tag</span>
+            </DialogTitle>
+            <DialogDescription className="text-xs sm:text-sm text-gray-600">
+              Adicione uma etiqueta para organizar melhor este imóvel
+            </DialogDescription>
+            {currentMatchIndex < matchModeProperties.length && (
+              <p className="text-xs sm:text-sm text-gray-600 line-clamp-2">
+                <span className="hidden sm:inline">Adicionando tag para:</span>
+                <span className="font-medium">{matchModeProperties[currentMatchIndex]?.nome}</span>
+              </p>
+            )}
+          </DialogHeader>
+          <div className="space-y-3 sm:space-y-4 overflow-y-auto">
+            <div className="space-y-2">
+              <Label htmlFor="matchTag" className="text-sm sm:text-base">Nome da Tag</Label>
+              <Input
+                id="matchTag"
+                placeholder="Ex: Favorita, Boa localização"
+                value={matchModeTagInput}
+                onChange={(e) => setMatchModeTagInput(e.target.value)}
+                onKeyDown={(e) => {
+                  if (e.key === 'Enter') {
+                    addNewTagInMatchMode();
+                  } else if (e.key === 'Escape') {
+                    setIsMatchModeTagModalOpen(false);
+                    setMatchModeTagInput("");
+                  }
+                }}
+                autoFocus
+                className="text-sm sm:text-base"
+              />
+            </div>
+
+            {availableTags.length > 0 && (
+              <div className="space-y-2">
+                <Label className="text-sm sm:text-base">Tags Existentes</Label>
+                <div className="flex flex-wrap gap-1 max-h-24 sm:max-h-32 overflow-y-auto p-1 border rounded">
+                  {availableTags.map(tag => {
+                    const currentProperty = matchModeProperties[currentMatchIndex];
+                    const hasTag = currentProperty?.tags?.includes(tag);
+                    return (
+                      <Badge
+                        key={tag}
+                        variant={hasTag ? "default" : "outline"}
+                        className={`cursor-pointer text-xs transition-colors ${
+                          hasTag
+                            ? "bg-purple-100 text-purple-800"
+                            : "hover:bg-blue-50"
+                        }`}
+                        onClick={() => {
+                          if (!hasTag) {
+                            addTagInMatchMode(tag);
+                            setIsMatchModeTagModalOpen(false);
+                            toast.success(`Tag "${tag}" adicionada!`);
+                          }
+                        }}
+                      >
+                        {hasTag && <Tag className="h-3 w-3 mr-1" />}
+                        {tag}
+                      </Badge>
+                    );
+                  })}
+                </div>
+              </div>
+            )}
+
+            <div className="flex flex-col sm:flex-row gap-2 sm:gap-3 pt-2">
+              <Button
+                onClick={addNewTagInMatchMode}
+                className="flex-1 text-sm sm:text-base"
+                disabled={!matchModeTagInput.trim()}
+                size="sm"
+              >
+                <span className="hidden sm:inline">Adicionar Nova Tag</span>
+                <span className="sm:hidden">Adicionar Tag</span>
+              </Button>
+              <Button
+                variant="outline"
+                onClick={() => {
+                  setIsMatchModeTagModalOpen(false);
+                  setMatchModeTagInput("");
+                }}
+                className="text-sm sm:text-base"
+                size="sm"
+              >
+                Cancelar
+              </Button>
+            </div>
+          </div>
+        </DialogContent>
+      </Dialog>
     </div>
   );
 }
