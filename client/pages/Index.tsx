@@ -1153,6 +1153,13 @@ export default function Index() {
           // Special handling for Casa Mineira
           const isExtraLinha = selectedSite === 'casamineira';
 
+          // Auto-detect site from 'fonte' column when 'geral' is selected
+          let detectedSite = selectedSite;
+          if (selectedSite === 'geral') {
+            const fonteValue = getColumnValue(row, mapping.site, 'site');
+            detectedSite = fonteValue ? fonteValue.toLowerCase() : 'geral';
+          }
+
           // Debug first few rows (removed for cleaner output)
 
           return {
@@ -1176,7 +1183,7 @@ export default function Index() {
             banheiros: getColumnValue(row, mapping.banheiros || [], 'banheiros'),
             vantagens: getColumnValue(row, mapping.vantagens || [], 'vantagens'),
             palavrasChaves: getColumnValue(row, mapping.palavrasChaves || [], 'palavrasChaves'),
-            site: getColumnValue(row, mapping.site, 'site') || selectedSite
+            site: detectedSite
           };
         });
 
