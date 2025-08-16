@@ -98,6 +98,12 @@ export default function Index() {
   const [touchStart, setTouchStart] = useState<TouchPosition | null>(null);
   const [showHeader, setShowHeader] = useState(true);
   const [lastScrollY, setLastScrollY] = useState(0);
+  const [scrapingStatus, setScrapingStatus] = useState<{
+    isRunning: boolean;
+    progress: string;
+    completed: boolean;
+    totalProperties?: number;
+  }>({ isRunning: false, progress: 'Pausado', completed: false });
   const [tempFilters, setTempFilters] = useState<Filters>({
     valorMin: "",
     valorMax: "",
