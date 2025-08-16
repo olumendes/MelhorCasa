@@ -2466,6 +2466,14 @@ export default function Index() {
             </p>
           </DialogHeader>
           <div className="space-y-4">
+            <Button
+              key="geral"
+              variant={selectedSite === 'geral' ? "default" : "outline"}
+              onClick={() => setSelectedSite('geral')}
+              className="w-full justify-start text-sm h-auto py-3 font-medium"
+            >
+              ⚡ Geral (Auto-detecta pela coluna "fonte")
+            </Button>
             <div className="grid grid-cols-2 gap-2">
               {[
                 { value: 'quintoandar', label: 'QuintoAndar' },
