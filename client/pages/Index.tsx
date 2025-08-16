@@ -850,6 +850,8 @@ export default function Index() {
         if (!isDuplicateProperty(property, prev)) {
           const updated = [...prev, property];
           localStorage.setItem('likedProperties', JSON.stringify(updated));
+          // Save to server
+          saveToServer('liked', property);
           return updated;
         }
         return prev;
